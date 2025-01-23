@@ -63,7 +63,7 @@ export default function login() {
           <DividerWithText />
           <View className="flex flex-col gap-10">
             <GoogleButtonSignIn />
-            <Link href="/" className=" text-center text-OldSilver font-bold ">
+            <Link href="/signup" className=" text-center text-OldSilver font-bold ">
               Don’t have an account?<Text className="text-black"> Sign Up</Text>
             </Link>
           </View>
