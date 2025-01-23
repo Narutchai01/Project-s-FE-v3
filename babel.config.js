@@ -1,5 +1,3 @@
-const plugin = require("tailwindcss");
-
 module.exports = function (api) {
   api.cache(true);
   return {
@@ -12,8 +10,7 @@ module.exports = function (api) {
         'module:react-native-dotenv',
         {
           moduleName: '@env',
-          envName: 'APP_ENV',
-          moduleName: '@env',
+          envName : 'APP_ENV',
           path: '.env',
         }
       ],
