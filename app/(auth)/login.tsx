@@ -20,7 +20,7 @@ export default function login() {
 
   const handleSubmit = async () => {
     await axiosInstance
-      .post("/api/user/login", data)
+      .post("/user/login", data)
       .then(async (res) => {
         await AsyncStorage.setItem("token", res.data.data.token);
       })

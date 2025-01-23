@@ -1,35 +1,65 @@
-import { Text, View, SafeAreaView, TextInput } from "react-native";
+import {
+  Text,
+  View,
+  SafeAreaView,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
 import React, { useState, useEffect } from "react";
 import { ButtonComponents } from "@/components/Buntton";
 import { RadioComponents } from "@/components/Radio";
-import { Link } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { ISignUp } from "@/interface/user";
 import { axiosInstance } from "@/lib/axios_instance";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import DateTimePicker, { Event } from "@react-native-community/datetimepicker";
 
 export default function SignUP() {
-    const [data, setData] = useState<ISignUp>({ 
-        full_name: "", birthday: "", email: "", password: "", sensitive_skin: false 
+  const [data, setData] = useState<ISignUp>({
+    full_name: "",
+    birthday: null,
+    email: "",
+    password: "",
+    sensitive_skin: false,
+  });
+
+  const handleChange = (name: string, value: string) => {
+    setData({
+      ...data,
+      [name]: value,
     });
+  };
 
-    const handleChange = (name: string, value: string) => {
-        setData({
-            ...data,
-            [name]: value,
-        });
-    };
+  const router = useRouter();
 
-    const handleSubmit = async () => {
-        await axiosInstance
-            .post("/api/user/signup", data)
-            .then(async (res) => {
-                await AsyncStorage.setItem("token", res.data.data.token);
-            })
-            .catch((err) => {
-                console.log(err);
-            });
-    };
+  const handleSubmit = async () => {
+    await axiosInstance
+      .post("/user/register", data)
+      .then(async (res) => {
+        if (res.status === 201) {
+          router.push("/login");
+          console.log(res.data);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  const [showDatePicker, setShowDatePicker] = useState(false);
+
+  const showDatePickerModal = () => {
+    setShowDatePicker(true);
+  };
+
+  const onDateChange = (event: any, selectedDate: Date | undefined) => {
+    setShowDatePicker(false);
+    if (selectedDate) {
+      setData({
+        ...data,
+        birthday: selectedDate,
+      });
+    }
+  };
 
   return (
     <SafeAreaView className="flex-1 items-center justify-center gap-y-4">
@@ -41,11 +71,26 @@ export default function SignUP() {
             className=" border-2  w-full rounded-full p-6 border-BrightGray"
             onChangeText={(full_name) => handleChange("full_name", full_name)}
           />
-          <TextInput
-            placeholder="Birthday"
-            className=" border-2  w-full rounded-full p-6 border-BrightGray"
-            onChangeText={(birthday) => handleChange("birthday", birthday)}
-          />
+
+          <TouchableOpacity
+            className="border-2  w-full rounded-full p-6 border-BrightGray"
+            onPress={showDatePickerModal}
+          >
+            <Text>
+              {data.birthday != null
+                ? data.birthday.toDateString()
+                : "Birthday"}
+            </Text>
+          </TouchableOpacity>
+          {showDatePicker && (
+            <DateTimePicker
+              value={data.birthday || new Date()}
+              mode="date"
+              display="default"
+              onChange={onDateChange}
+            />
+          )}
+
           <TextInput
             placeholder="Email"
             className=" border-2  w-full rounded-full p-6 border-BrightGray"
@@ -62,7 +107,14 @@ export default function SignUP() {
           />
           <View className="flex flex-col gap-y-4">
             <Text>Do you have sensitive facial skin?</Text>
-            <RadioComponents />
+            <RadioComponents
+              setValue={(value: boolean) =>
+                setData({
+                  ...data,
+                  sensitive_skin: value,
+                })
+              }
+            />
           </View>
           <ButtonComponents
             onPress={handleSubmit}
