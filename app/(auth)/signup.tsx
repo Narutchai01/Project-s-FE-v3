@@ -8,41 +8,18 @@ import {
 import React, { useState, useEffect } from "react";
 import { ButtonComponents } from "@/components/Buntton";
 import { RadioComponents } from "@/components/Radio";
-import { Link, useRouter } from "expo-router";
-import { ISignUp } from "@/interface/user";
-import { axiosInstance } from "@/lib/axios_instance";
+import { Link} from "expo-router";
 import DateTimePicker, { Event } from "@react-native-community/datetimepicker";
+import { useAuth } from "@/context/AuthContext";
 
 export default function SignUP() {
-  const [data, setData] = useState<ISignUp>({
-    full_name: "",
-    birthday: null,
-    email: "",
-    password: "",
-    sensitive_skin: false,
-  });
+  const { signupData, setSignupData, handleSignup } = useAuth();
 
   const handleChange = (name: string, value: string) => {
-    setData({
-      ...data,
+    setSignupData({
+      ...signupData,
       [name]: value,
     });
-  };
-
-  const router = useRouter();
-
-  const handleSubmit = async () => {
-    await axiosInstance
-      .post("/user/register", data)
-      .then(async (res) => {
-        if (res.status === 201) {
-          router.push("/login");
-          console.log(res.data);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
   };
 
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -54,8 +31,8 @@ export default function SignUP() {
   const onDateChange = (event: any, selectedDate: Date | undefined) => {
     setShowDatePicker(false);
     if (selectedDate) {
-      setData({
-        ...data,
+      setSignupData({
+        ...signupData,
         birthday: selectedDate,
       });
     }
@@ -77,14 +54,14 @@ export default function SignUP() {
             onPress={showDatePickerModal}
           >
             <Text>
-              {data.birthday != null
-                ? data.birthday.toDateString()
+              {signupData.birthday != null
+                ? signupData.birthday.toDateString()
                 : "Birthday"}
             </Text>
           </TouchableOpacity>
           {showDatePicker && (
             <DateTimePicker
-              value={data.birthday || new Date()}
+              value={signupData.birthday || new Date()}
               mode="date"
               display="default"
               onChange={onDateChange}
@@ -111,15 +88,15 @@ export default function SignUP() {
             <Text>Do you have sensitive facial skin?</Text>
             <RadioComponents
               setValue={(value: boolean) =>
-                setData({
-                  ...data,
+                setSignupData({
+                  ...signupData,
                   sensitive_skin: value,
                 })
               }
             />
           </View>
           <ButtonComponents
-            onPress={handleSubmit}
+            onPress={handleSignup}
             title="Register"
             className="flex flex-row items-center justify-center rounded-full border-4 border-BrightGray p-6 bg-Bittersweet"
             textSize="text-white text-xl font-bold"
@@ -130,5 +107,5 @@ export default function SignUP() {
         Already Have an account ?<Text className="text-black"> Login</Text>
       </Link>
     </SafeAreaView>
-  );
+);
 }
