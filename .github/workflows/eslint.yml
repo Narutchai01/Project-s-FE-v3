@@ -1,0 +1,30 @@
+name: ESLint Check
+
+on:
+  push:
+    branches:
+      - main
+      - developments
+  pull_request:
+    branches:
+      - main
+      - developments
+
+jobs:
+  eslint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: "latest" # Specify a version if needed
+
+      - name: Install dependencies with Bun
+        run: bun install
+
+      - name: Run ESLint
+        run: bun run lint
