@@ -98,11 +98,13 @@ export default function SignUP() {
           />
           <TextInput
             placeholder="Password"
+            secureTextEntry={true}
             className=" border-2  w-full rounded-full p-6 border-BrightGray"
             onChangeText={(password) => handleChange("password", password)}
           />
           <TextInput
             placeholder="Confirm Password"
+            secureTextEntry={true}
             className=" border-2  w-full rounded-full p-6 border-BrightGray"
           />
           <View className="flex flex-col gap-y-4">
