@@ -1,33 +1,16 @@
 import { View, Text, SafeAreaView, Image, TextInput } from "react-native";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { ButtonComponents, GoogleButtonSignIn } from "@/components/Buntton";
 import DividerWithText from "@/components/DividerWithText";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Link } from "expo-router";
-import { ILogin } from "@/interface/user";
-import { axiosInstance } from "@/lib/axios_instance";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAuth } from "@/context/AuthContext";
 
 export default function login() {
-  const [data, setData] = useState<ILogin>({ email: "", password: "" });
+  const { loginData, setLoginData, handleLogin } = useAuth();
 
-  const handleChange = (name: string, value: string) => {
-    setData({
-      ...data,
-      [name]: value,
-    });
-  };
-
-  const handleSubmit = async () => {
-    await axiosInstance
-      .post("/user/login", data)
-      .then(async (res) => {
-        await AsyncStorage.setItem("token", res.data.data.token);
-        console.log("login success");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  const handleChange = (key: string, value: string) => {
+    setLoginData({ ...loginData, [key]: value });
   };
 
   return (
@@ -54,7 +37,7 @@ export default function login() {
                 onChangeText={(password) => handleChange("password", password)}
               />
               <ButtonComponents
-                onPress={handleSubmit}
+                onPress={handleLogin}
                 title="Login"
                 className="flex flex-row items-center justify-center rounded-full border-4 border-BrightGray p-6 bg-Bittersweet"
                 textSize="text-white text-xl font-bold"
