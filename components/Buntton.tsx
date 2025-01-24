@@ -1,4 +1,4 @@
-import { Text, View, TouchableOpacity } from "react-native";
+import { Text, TouchableOpacity } from "react-native";
 import React, { FC } from "react";
 import { ButtonProps } from "@/interface/Button";
 import { Image } from "react-native";

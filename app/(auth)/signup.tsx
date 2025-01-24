@@ -5,11 +5,11 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import React, { useState, useEffect } from "react";
+import React, { useState} from "react";
 import { ButtonComponents } from "@/components/Buntton";
 import { RadioComponents } from "@/components/Radio";
 import { Link} from "expo-router";
-import DateTimePicker, { Event } from "@react-native-community/datetimepicker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { useAuth } from "@/context/AuthContext";
 
 export default function SignUP() {

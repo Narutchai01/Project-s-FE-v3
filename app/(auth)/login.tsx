@@ -6,7 +6,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Link } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
 
-export default function login() {
+export default function Login() {
   const { loginData, setLoginData, handleLogin } = useAuth();
 
   const handleChange = (key: string, value: string) => {
