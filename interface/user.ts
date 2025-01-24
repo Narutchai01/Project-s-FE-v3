@@ -4,7 +4,7 @@ export interface ILogin{
 }
 export interface ISignUp{
     full_name: string;
-    birthday: string;
+    birthday: Date | null;
     email: string;
     password: string;
     sensitive_skin: boolean;

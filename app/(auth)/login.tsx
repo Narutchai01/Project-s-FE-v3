@@ -20,9 +20,10 @@ export default function login() {
 
   const handleSubmit = async () => {
     await axiosInstance
-      .post("/api/user/login", data)
+      .post("/user/login", data)
       .then(async (res) => {
         await AsyncStorage.setItem("token", res.data.data.token);
+        console.log("login success");
       })
       .catch((err) => {
         console.log(err);
@@ -63,7 +64,10 @@ export default function login() {
           <DividerWithText />
           <View className="flex flex-col gap-10">
             <GoogleButtonSignIn />
-            <Link href="/signup" className=" text-center text-OldSilver font-bold ">
+            <Link
+              href="/signup"
+              className=" text-center text-OldSilver font-bold "
+            >
               Don’t have an account?<Text className="text-black"> Sign Up</Text>
             </Link>
           </View>

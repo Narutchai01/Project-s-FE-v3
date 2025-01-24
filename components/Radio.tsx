@@ -3,7 +3,11 @@ import React from "react";
 import { useState } from "react";
 import "../global.css";
 
-export function RadioComponents() {
+interface RadioProps {
+  setValue: (value: boolean) => void;
+}
+
+export function RadioComponents({ setValue }: RadioProps) {
   const [selected, setSelected] = useState<number | null>(null);
 
   const RadioValue = [
@@ -11,12 +15,17 @@ export function RadioComponents() {
     { id: 2, label: "Not Sensitive", value: false },
   ];
 
+  const OnPress = (value: boolean, id: number) => {
+    setSelected(id);
+    setValue(value);
+  };
+
   return (
     <View style={{ flexDirection: "row" }}>
       {RadioValue.map((item) => (
         <TouchableOpacity
           key={item.id}
-          onPress={() => setSelected(item.id)}
+          onPress={() => OnPress(item.value, item.id)}
           style={{
             gap: 10,
             flexDirection: "row",
@@ -39,7 +48,7 @@ export function RadioComponents() {
               <View
                 style={{
                   height: 14,
-                  width: 14 ,
+                  width: 14,
                   borderRadius: 6,
                   backgroundColor: "#000",
                 }}
