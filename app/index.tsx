@@ -1,4 +1,4 @@
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import "@/global.css";
 import { Link } from "expo-router";
 import { api_url } from "@/config/config";
