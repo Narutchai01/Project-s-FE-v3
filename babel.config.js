@@ -10,11 +10,16 @@ module.exports = function (api) {
         'module:react-native-dotenv',
         {
           moduleName: '@env',
-          envName : 'APP_ENV',
+          envName: 'APP_ENV',
           path: '.env',
         }
       ],
       'react-native-reanimated/plugin',
-    ]
+    ],
+    env: {
+      production: {
+        plugins: ['react-native-paper/babel'],
+      },
+    },
   };
 };

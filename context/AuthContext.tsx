@@ -61,6 +61,13 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       .post("/user/register", signupData)
       .then((res) => {
         const status = res.status;
+        setSignupData({
+          full_name: "",
+          birthday: null,
+          email: "",
+          password: "",
+          sensitive_skin: false,
+        } );
         if (status === 201) {
           router.push("/login");
         }

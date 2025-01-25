@@ -5,37 +5,23 @@ import {
   TextInput,
   TouchableOpacity,
 } from "react-native";
-import React, { useState} from "react";
+import React, { useState } from "react";
 import { ButtonComponents } from "@/components/Buntton";
 import { RadioComponents } from "@/components/Radio";
-import { Link} from "expo-router";
-import DateTimePicker from "@react-native-community/datetimepicker";
+import { Link } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
+import { DatePicker } from "@/components/DatePicker";
+import dayjs from "dayjs";
 
 export default function SignUP() {
   const { signupData, setSignupData, handleSignup } = useAuth();
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const handleChange = (name: string, value: string) => {
     setSignupData({
       ...signupData,
       [name]: value,
     });
-  };
-
-  const [showDatePicker, setShowDatePicker] = useState(false);
-
-  const showDatePickerModal = () => {
-    setShowDatePicker(true);
-  };
-
-  const onDateChange = (event: any, selectedDate: Date | undefined) => {
-    setShowDatePicker(false);
-    if (selectedDate) {
-      setSignupData({
-        ...signupData,
-        birthday: selectedDate,
-      });
-    }
   };
 
   return (
@@ -51,22 +37,21 @@ export default function SignUP() {
 
           <TouchableOpacity
             className="border-2  w-full rounded-full p-6 border-BrightGray"
-            onPress={showDatePickerModal}
+            onPress={() => setShowDatePicker(true)}
           >
             <Text>
               {signupData.birthday != null
-                ? signupData.birthday.toDateString()
+                ? dayjs(signupData.birthday).format("DD/MM/YYYY")
                 : "Birthday"}
             </Text>
           </TouchableOpacity>
-          {showDatePicker && (
-            <DateTimePicker
-              value={signupData.birthday || new Date()}
-              mode="date"
-              display="default"
-              onChange={onDateChange}
-            />
-          )}
+
+          <DatePicker
+            setSignupData={setSignupData}
+            signupData={signupData}
+            visible={showDatePicker}
+            onClose={() => setShowDatePicker(false)}
+          />
 
           <TextInput
             placeholder="Email"
@@ -107,5 +92,5 @@ export default function SignUP() {
         Already Have an account ?<Text className="text-black"> Login</Text>
       </Link>
     </SafeAreaView>
-);
+  );
 }
