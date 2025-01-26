@@ -3,6 +3,10 @@ import { ILogin, ISignUp } from "@/interface/user";
 import { axiosInstance } from "@/lib/axios_instance";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+  GoogleSignin,
+  statusCodes,
+} from "@react-native-google-signin/google-signin";
 
 type AuthContextType = {
   loginData: ILogin;
@@ -11,6 +15,7 @@ type AuthContextType = {
   signupData: ISignUp;
   setSignupData: (data: ISignUp) => void;
   handleSignup: () => void;
+  googleSignIn: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -67,7 +72,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
           email: "",
           password: "",
           sensitive_skin: false,
-        } );
+        });
         if (status === 201) {
           router.push("/login");
         }
@@ -77,6 +82,33 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       });
   };
 
+  GoogleSignin.configure({
+      scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+
+  });
+
+  const googleSignIn = async () => {
+  
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      console.log(userInfo);
+      // setUserInfo(userInfo);
+    } catch (error) {
+      if ((error as any).code === statusCodes.SIGN_IN_CANCELLED) {
+        // user cancelled the login flow
+        console.log("cancelled");
+      } else if ((error as any).code === statusCodes.IN_PROGRESS) {
+        console.log("in progress");
+      } else if ((error as any).code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+        console.log("play services not available or outdated");
+      } else {
+        console.log("Something went wrong", error);
+      }
+    }
+  };
+
+
   const AuthContextValue = {
     loginData,
     setLoginData,
@@ -84,6 +116,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     signupData,
     setSignupData,
     handleSignup,
+    googleSignIn,
   };
 
   return (

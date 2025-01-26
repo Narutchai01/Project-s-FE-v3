@@ -13,9 +13,9 @@ export const ButtonComponents: FC<ButtonProps> = (props) => {
 };
 
 
-export const GoogleButtonSignIn = () => {
+export const GoogleButtonSignIn = ({googleSignIn} : {googleSignIn : ()=>void}) => {
   return (
-    <TouchableOpacity className="flex flex-row items-center justify-center rounded-full border-4 border-BrightGray p-6">
+    <TouchableOpacity className="flex flex-row items-center justify-center rounded-full border-4 border-BrightGray p-6" onPress={googleSignIn}>
       <Image
         source={require("@/assets/images/google-logo.png")}
         width={350}
