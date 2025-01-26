@@ -7,7 +7,7 @@ import { Link } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
 
 export default function Login() {
-  const { loginData, setLoginData, handleLogin } = useAuth();
+  const { loginData, setLoginData, handleLogin ,googleSignIn} = useAuth();
 
   const handleChange = (key: string, value: string) => {
     setLoginData({ ...loginData, [key]: value });
@@ -46,7 +46,7 @@ export default function Login() {
           </View>
           <DividerWithText />
           <View className="flex flex-col gap-10">
-            <GoogleButtonSignIn />
+            <GoogleButtonSignIn googleSignIn={googleSignIn} />
             <Link
               href="/signup"
               className=" text-center text-OldSilver font-bold "
