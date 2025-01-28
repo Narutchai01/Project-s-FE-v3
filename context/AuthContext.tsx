@@ -44,21 +44,22 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   });
 
   const handleLogin = async () => {
-    await axiosInstance
-      .post("/user/login", loginData)
-      .then(async (res) => {
-        const status = res.status;
+    // await axiosInstance
+    //   .post("/user/login", loginData)
+    //   .then(async (res) => {
+    //     const status = res.status;
 
-        if (status !== 200) {
-          return;
-        }
-        const token: string = res.data.data.token;
-        await AsyncStorage.setItem("token", token);
-        console.log("login suc");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    //     if (status !== 200) {
+    //       return;
+    //     }
+    //     const token: string = res.data.data.token;
+    //     await AsyncStorage.setItem("token", token);
+    //     console.log("login suc");
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
+    router.push("/diary");
   };
 
   const handleSignup = async () => {
