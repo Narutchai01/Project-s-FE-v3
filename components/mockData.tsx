@@ -1,4 +1,4 @@
-interface DiaryEntry {
+interface DiaryData {
     id: number;
     image: string;
     date: string;
@@ -7,7 +7,7 @@ interface DiaryEntry {
     skinType: string;
   }
   
-  const mockData: DiaryEntry[] = [
+  const mockData: DiaryData[] = [
     {
       id: 1,
       image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf81PydDJjzDIgjSuK3A7ZaOWALBQlG3-_0g&s",
