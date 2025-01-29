@@ -5,3 +5,8 @@ export interface ButtonProps {
     onPress?: () => void;
     disabled?: boolean; 
 }
+
+export interface BackButtonProps {
+    title: string;
+    textSize: string;
+}

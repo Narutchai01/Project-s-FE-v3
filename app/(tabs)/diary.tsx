@@ -14,6 +14,7 @@ import mockData from "@/components/mockData";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ButtonComponents } from "@/components/Buntton";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 export default function DiaryScreen() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -52,10 +53,23 @@ export default function DiaryScreen() {
         : prevSelected
     );
   };
-
+  
   const handleCompareOrConfirm = () => {
     if (isCompareMode) {
-      console.log("Selected Diaries:", selectedDiaries);
+      const selectedData = mockData.filter((data) =>
+        selectedDiaries.includes(data.id.toString())
+      );
+  
+      if (selectedData.length === 0) {
+        console.error("No selected diaries found!");
+        return;
+      }
+  
+      router.push({
+        pathname: "/compare",
+        params: { selectedDiaries: JSON.stringify(selectedData) }, 
+      });
+  
       setIsCompareMode(false);
       setSelectedDiaries([]);
     } else {
@@ -98,12 +112,7 @@ export default function DiaryScreen() {
                 </TouchableOpacity>
               ) : (
                 <View className="flex-row items-center bg-Bittersweet rounded-full px-4 py-2 w-full">
-                  <Ionicons
-                    name="search"
-                    size={20}
-                    color="white"
-                    className="mr-2"
-                  />
+                  <Ionicons name="search" size={20} color="white" className="mr-2" />
                   <TextInput
                     className="flex-1 text-white text-lg"
                     placeholder="Search"
@@ -111,10 +120,7 @@ export default function DiaryScreen() {
                     value={searchQuery}
                     onChangeText={(text) => setSearchQuery(text)}
                   />
-                  <TouchableOpacity
-                    onPress={collapseSearchBar}
-                    className="ml-2"
-                  >
+                  <TouchableOpacity onPress={collapseSearchBar} className="ml-2">
                     <Ionicons name="close-circle" size={20} color="white" />
                   </TouchableOpacity>
                 </View>
