@@ -18,7 +18,8 @@ import { Ionicons } from "@expo/vector-icons";
 export default function DiaryScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-
+  const [isCompareMode, setIsCompareMode] = useState(false);
+  const [selectedDiaries, setSelectedDiaries] = useState<string[]>([]);
   const searchBarWidth = useRef(new Animated.Value(40)).current;
 
   const expandSearchBar = () => {
@@ -40,6 +41,28 @@ export default function DiaryScreen() {
     }).start(() => setIsSearchOpen(false));
   };
 
+  const toggleSelection = (id: string | number) => {
+    if (!isCompareMode) return;
+    const idStr = id.toString();
+    setSelectedDiaries((prevSelected) =>
+      prevSelected.includes(idStr)
+        ? prevSelected.filter((diaryId) => diaryId !== idStr)
+        : prevSelected.length < 3
+        ? [...prevSelected, idStr]
+        : prevSelected
+    );
+  };
+
+  const handleCompareOrConfirm = () => {
+    if (isCompareMode) {
+      console.log("Selected Diaries:", selectedDiaries);
+      setIsCompareMode(false);
+      setSelectedDiaries([]);
+    } else {
+      setIsCompareMode(true);
+    }
+  };
+
   const filteredData = mockData.filter(
     (data) =>
       data.date.includes(searchQuery) ||
@@ -51,7 +74,18 @@ export default function DiaryScreen() {
     <SafeAreaProvider>
       <SafeAreaView className="flex-1 bg-white p-4">
         <View className="flex-row justify-between items-center mb-4">
-          {!isSearchOpen && <Text className="text-Heading3">Diary</Text>}
+          {isCompareMode ? (
+            <TouchableOpacity
+              onPress={() => {
+                setIsCompareMode(false);
+                setSelectedDiaries([]);
+              }}
+            >
+              <Text className="text-Heading3 text-Bittersweet">Cancel</Text>
+            </TouchableOpacity>
+          ) : (
+            <Text className="text-Heading3">Diary</Text>
+          )}
 
           <View className="flex-row items-center gap-2">
             <Animated.View style={{ width: searchBarWidth }}>
@@ -64,7 +98,12 @@ export default function DiaryScreen() {
                 </TouchableOpacity>
               ) : (
                 <View className="flex-row items-center bg-Bittersweet rounded-full px-4 py-2 w-full">
-                  <Ionicons name="search" size={20} color="white" className="mr-2" />
+                  <Ionicons
+                    name="search"
+                    size={20}
+                    color="white"
+                    className="mr-2"
+                  />
                   <TextInput
                     className="flex-1 text-white text-lg"
                     placeholder="Search"
@@ -72,7 +111,10 @@ export default function DiaryScreen() {
                     value={searchQuery}
                     onChangeText={(text) => setSearchQuery(text)}
                   />
-                  <TouchableOpacity onPress={collapseSearchBar} className="ml-2">
+                  <TouchableOpacity
+                    onPress={collapseSearchBar}
+                    className="ml-2"
+                  >
                     <Ionicons name="close-circle" size={20} color="white" />
                   </TouchableOpacity>
                 </View>
@@ -80,13 +122,21 @@ export default function DiaryScreen() {
             </Animated.View>
 
             <ButtonComponents
-              title="Compare"
+              title={isCompareMode ? "Confirm" : "Compare"}
               className="rounded-full bg-Bittersweet px-4 py-2"
               textSize="text-white text-lg font-semibold"
-              onPress={() => console.log("Compare button pressed")}
+              onPress={handleCompareOrConfirm}
             />
           </View>
         </View>
+
+        {isCompareMode && (
+          <View className="flex items-center mb-4">
+            <Text className="text-Heading3 font-semibold text-center">
+              Select diary to compares ({selectedDiaries.length}/3)
+            </Text>
+          </View>
+        )}
 
         <ScrollView>
           {filteredData.map((data) => (
@@ -97,6 +147,9 @@ export default function DiaryScreen() {
               skinProblems={data.skinProblems}
               numberOfSpots={data.numberOfSpots}
               skinType={data.skinType}
+              isSelected={selectedDiaries.includes(data.id.toString())}
+              isCompareMode={isCompareMode}
+              onPress={() => toggleSelection(data.id)}
             />
           ))}
         </ScrollView>
