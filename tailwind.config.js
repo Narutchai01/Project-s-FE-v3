@@ -21,6 +21,7 @@ module.exports = {
       fontSize: {
         'heading': ['2.1875rem', { fontWeight: '600' }], /* 35px */
         'Heading3': ['1.375rem', { fontWeight: '600' }], /* 22px */
+        'Heading4': ['1.125rem', { fontWeight: '600' }], /* 18px */
         'label4': ['0.9375rem', { fontWeight: '500' }], /* 15px */
         'label2': ['0.8125rem', { fontWeight: '400' }], /* 13px */
         'label6': ['0.625rem', { fontWeight: '500' }], /* 10px */
