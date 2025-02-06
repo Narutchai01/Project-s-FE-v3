@@ -28,10 +28,10 @@ export default function SkincareRecommendComponent() {
       <ScrollView
         horizontal={!expanded}
         showsHorizontalScrollIndicator={false}
-        className={`mb-6 ${!expanded ? "pr-4" : ""}`}
+        className={`mb-8 ${!expanded ? "pr-4" : ""}`}
       >
         <View
-          className={`flex ${expanded ? "flex-wrap w-full" : "flex-nowrap"} flex-row gap-4`}
+          className={`flex ${expanded ? "flex-wrap w-full" : "flex-nowrap"} flex-row gap-6 mb-2`}
         >
           {Array(skincareItems)
             .fill(null)
