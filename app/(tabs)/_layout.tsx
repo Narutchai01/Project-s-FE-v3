@@ -5,6 +5,7 @@ export default function _layout() {
   return (
     <Tabs screenOptions={{ headerShown: false }}>
       <Tabs.Screen name="diary" />
+      <Tabs.Screen name="home" />
     </Tabs>
   );
 }
