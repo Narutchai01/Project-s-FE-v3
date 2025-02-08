@@ -102,7 +102,7 @@ export default function CompareScreen() {
   return (
     <ScrollView className="flex-1 bg-Snow p-4">
       <View className="flex-row items-center mb-4">
-        <BackButtonComponents title="Compare" textSize="text-lg font-bold ml-2" /> 
+        <BackButtonComponents title="Compare" textSize="text-Heading3 font-bold ml-2" /> 
       </View>
 
       <View className="flex-row justify-center mb-6">
