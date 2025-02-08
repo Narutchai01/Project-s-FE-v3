@@ -1,7 +1,7 @@
 const threadData = [
     {
-      image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf81PydDJjzDIgjSuK3A7ZaOWALBQlG3-_0g&s",
-      title: "Advanced Treatment",
+      image: "https://www.osdco.net/images/communities/content/knowledge/checklist/03-seven-week-old-puppy.jpg",
+      title: "Advanced Treatment Advanced Treatment",
       user: "ByeWind",
       userAvatar: "https://i.pravatar.cc/50?img=1", 
     },

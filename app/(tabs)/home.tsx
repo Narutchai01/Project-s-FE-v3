@@ -12,7 +12,7 @@ export default function SkincareScreen() {
   const year = today.getFullYear();
 
   return (
-    <ScrollView className="px-4 pt-8 bg-white">
+    <ScrollView className="px-4 pt-8 bg-Snow">
       <View className="flex-row items-center mb-6">
         <Image
           source={require("../../assets/images/ucare-logo.png")}
