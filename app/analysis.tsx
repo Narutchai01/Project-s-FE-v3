@@ -12,7 +12,7 @@ export default function AnalysisResultsScreen() {
     <ScrollView className="flex-1 bg-Snow p-4">
  
       <View className="flex-row items-center mb-4">
-        <BackButtonComponents title="Analysis Results" textSize="text-Heading3 font-bold text-gray-700" />
+        <BackButtonComponents title="Analysis Results" textSize="text-Heading3 font-bold text-gray-700 ml-2" />
         <TouchableOpacity className="ml-auto">
           <Share2 size={24} color="gray" />
         </TouchableOpacity>

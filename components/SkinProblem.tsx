@@ -20,7 +20,8 @@ export default function SkinProblemComponent() {
           <View key={index} className="w-[51px] h-[68px] flex items-center justify-start mr-2">
             <Image
               source={{ uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf81PydDJjzDIgjSuK3A7ZaOWALBQlG3-_0g&s" }}
-              className="w-10 h-10 rounded-full mb-2"
+              className={`w-10 h-10 rounded-full mb-2 ${problem === "Enlarged Pores" ? "border border-black" : ""}`}
+              style={problem === "Enlarged Pores" ? { borderWidth: 1.5 } : {}}
             />
             <Text className={`text-label6 text-center leading-tight ${problem === "Enlarged Pores" ? "font-bold text-black" : "text-gray-500"}`}>
               {problem}

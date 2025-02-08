@@ -50,15 +50,15 @@ export default function SkincareRecommendComponent() {
                   style={{ borderBottomRightRadius: 32.5 }}
                 />
                 <View
-                  className="absolute bottom-0 left-0 w-[117px] h-[30px] bg-white p-2 flex items-start justify-center"
+                  className="absolute bottom-0 left-0 w-full h-[30px] bg-white px-2 flex items-start justify-center"
                   style={{ borderTopLeftRadius: 13, borderTopRightRadius: 10 }}
                 >
                   <Text
-                    className="text-label12 font-medium"
+                    className="text-label12 font-medium w-full"
                     numberOfLines={1}
                     ellipsizeMode="tail"
                   >
-                    Granactive Retinoid 5% Granactive Retinoid 5%
+                    Granactive Retinoid 5% Serum for Anti-Aging
                   </Text>
                 </View>
               </View>
