@@ -1,13 +1,15 @@
 import {Dayjs} from "dayjs";
 
-export interface ILogin{
-    email: string;
-    password: string;
-}
-export interface ISignUp{
-    full_name: string;
+export type IUser = {
+    fullname: string;
     birthday: Dayjs | null;
     email: string;
     password: string;
-    sensitive_skin: boolean;
+    sensitive_skin: boolean | null;
+    image: string;
 }
+
+export type IPubicUser = Omit<IUser, "password">;
+export type ILogin = Omit<IUser, "fullname" | "birthday" | "sensitive_skin" | "image">;
+export type ISignUp = Omit<IUser, "image">;
+export type IGoogleLogin = Omit<IUser, "password" | "birthday">;

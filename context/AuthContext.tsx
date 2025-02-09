@@ -1,5 +1,16 @@
-import { createContext, FC, ReactNode, useContext, useState } from "react";
-import { ILogin, ISignUp } from "@/interface/user";
+import {
+  createContext,
+  FC,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import {
+  ILogin,
+  ISignUp,
+  IPubicUser,
+} from "@/interface/user";
 import { axiosInstance } from "@/lib/axios_instance";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -16,6 +27,7 @@ type AuthContextType = {
   setSignupData: (data: ISignUp) => void;
   handleSignup: () => void;
   googleSignIn: () => void;
+  User : IPubicUser;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -36,30 +48,37 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   });
 
   const [signupData, setSignupData] = useState<ISignUp>({
-    full_name: "",
+    fullname: "",
     birthday: null,
     email: "",
     password: "",
     sensitive_skin: false,
   });
 
-  const handleLogin = async () => {
-    // await axiosInstance
-    //   .post("/user/login", loginData)
-    //   .then(async (res) => {
-    //     const status = res.status;
+  const [User, setUser] = useState<IPubicUser>({
+    fullname: "",
+    birthday: null,
+    email: "",
+    sensitive_skin: null,
+    image: "",
+  });
 
-    //     if (status !== 200) {
-    //       return;
-    //     }
-    //     const token: string = res.data.data.token;
-    //     await AsyncStorage.setItem("token", token);
-    //     console.log("login suc");
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   });
-    router.push("/home");
+  const handleLogin = async () => {
+    await axiosInstance
+      .post("/user/login", loginData)
+      .then(async (res) => {
+        const status = res.status;
+
+        if (status !== 200) {
+          return;
+        }
+        const token: string = res.data.data.token;
+        await AsyncStorage.setItem("token", token);
+        console.log("login suc");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   const handleSignup = async () => {
@@ -68,7 +87,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       .then((res) => {
         const status = res.status;
         setSignupData({
-          full_name: "",
+          fullname: "",
           birthday: null,
           email: "",
           password: "",
@@ -83,25 +102,61 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       });
   };
 
-  GoogleSignin.configure({
-      scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+  const handleGetUser = async () => {
+    await AsyncStorage.getItem("token").then(async (token) => {
+      await axiosInstance
+        .get("/user/me", {
+          headers: {
+            Authorization: token,
+          },
+        })
+        .then((res) => {
+          setUser(res.data.data);
+        });
+    });
+  };
 
+  GoogleSignin.configure({
+    scopes: ["https://www.googleapis.com/auth/drive.readonly"],
   });
 
   const googleSignIn = async () => {
-  
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-      console.log(userInfo);
-      // setUserInfo(userInfo);
+      await axiosInstance
+        .post("/user/goolge-signin", {
+          email: userInfo.data?.user.email,
+          full_name: userInfo.data?.user.name,
+          image: userInfo.data?.user.photo,
+        })
+        .then((res) => {
+          const status = res.status;
+          if (status !== 200) {
+            return;
+          }
+
+          const token: string = res.data.data.token;
+          AsyncStorage.setItem("token", token);
+
+          if (User.sensitive_skin !== null) {
+            router.push("/home");
+          }
+          console.log("Skinsensitive is null");
+          
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     } catch (error) {
       if ((error as any).code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
         console.log("cancelled");
       } else if ((error as any).code === statusCodes.IN_PROGRESS) {
         console.log("in progress");
-      } else if ((error as any).code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+      } else if (
+        (error as any).code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE
+      ) {
         console.log("play services not available or outdated");
       } else {
         console.log("Something went wrong", error);
@@ -109,6 +164,9 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
+  useEffect(() => {
+    handleGetUser();
+  }, []);
 
   const AuthContextValue = {
     loginData,
@@ -118,6 +176,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     setSignupData,
     handleSignup,
     googleSignIn,
+    User,
   };
 
   return (
