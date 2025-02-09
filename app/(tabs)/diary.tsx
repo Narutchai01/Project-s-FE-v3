@@ -21,14 +21,35 @@ export default function DiaryScreen() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCompareMode, setIsCompareMode] = useState(false);
   const [selectedDiaries, setSelectedDiaries] = useState<string[]>([]);
+
   const searchBarWidth = useRef(new Animated.Value(40)).current;
+  const fadeOpacity = useRef(new Animated.Value(1)).current;
+
+  const fadeOutText = () => {
+    Animated.timing(fadeOpacity, {
+      toValue: 0,
+      duration: 400, 
+      easing: Easing.out(Easing.exp),
+      useNativeDriver: false,
+    }).start();
+  };
+
+  const fadeInText = () => {
+    Animated.timing(fadeOpacity, {
+      toValue: 1,
+      duration: 50,
+      easing: Easing.in(Easing.exp),
+      useNativeDriver: false,
+    }).start();
+  };
 
   const expandSearchBar = () => {
     setIsSearchOpen(true);
+    fadeOutText();
     Animated.timing(searchBarWidth, {
       toValue: 300,
-      duration: 300,
-      easing: Easing.out(Easing.ease),
+      duration: 500,
+      easing: Easing.out(Easing.exp),
       useNativeDriver: false,
     }).start();
   };
@@ -36,10 +57,15 @@ export default function DiaryScreen() {
   const collapseSearchBar = () => {
     Animated.timing(searchBarWidth, {
       toValue: 40,
-      duration: 300,
-      easing: Easing.out(Easing.ease),
+      duration: 500,
+      easing: Easing.out(Easing.exp),
       useNativeDriver: false,
-    }).start(() => setIsSearchOpen(false));
+    }).start(() => {
+      setTimeout(() => {
+        setIsSearchOpen(false);
+        fadeInText(); 
+      }, 0); 
+    });
   };
 
   const toggleSelection = (id: string | number) => {
@@ -86,23 +112,26 @@ export default function DiaryScreen() {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView className="flex-1 bg-white p-4">
-        <View className="flex-row justify-between items-center mb-4">
-          {isCompareMode ? (
-            <TouchableOpacity
-              onPress={() => {
-                setIsCompareMode(false);
-                setSelectedDiaries([]);
-              }}
-            >
-              <Text className="text-Heading3 text-Bittersweet">Cancel</Text>
-            </TouchableOpacity>
-          ) : (
-            <Text className="text-Heading3">Diary</Text>
-          )}
+      <SafeAreaView className="flex-1 bg-Snow p-8">
+        <View className="flex-row items-center justify-between mb-4">
+          
+          <Animated.View style={{ opacity: fadeOpacity }}>
+            {!isSearchOpen && isCompareMode ? (
+              <TouchableOpacity onPress={() => setIsCompareMode(false)}>
+                <Text className="text-Heading3 text-Quartz">Cancel</Text>
+              </TouchableOpacity>
+            ) : !isSearchOpen ? (
+              <Text className="text-Heading3 flex-1">Diary</Text>
+            ) : (
+              <View className="flex-1"></View> 
+            )}
+          </Animated.View>
 
           <View className="flex-row items-center gap-2">
-            <Animated.View style={{ width: searchBarWidth }}>
+            <Animated.View
+              style={{ width: searchBarWidth }}
+              className="h-10 rounded-full overflow-hidden bg-Bittersweet flex-row items-center"
+            >
               {!isSearchOpen ? (
                 <TouchableOpacity
                   className="bg-Bittersweet w-10 h-10 rounded-full flex items-center justify-center"
@@ -139,7 +168,7 @@ export default function DiaryScreen() {
         {isCompareMode && (
           <View className="flex items-center mb-4">
             <Text className="text-Heading3 font-semibold text-center">
-              Select diary to compares ({selectedDiaries.length}/3)
+              Select diary to compare ({selectedDiaries.length}/3)
             </Text>
           </View>
         )}
