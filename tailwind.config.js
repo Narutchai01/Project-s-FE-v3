@@ -22,6 +22,7 @@ module.exports = {
         'heading': ['2.1875rem', { fontWeight: '600' }], /* 35px */
         'Heading3': ['1.375rem', { fontWeight: '600' }], /* 22px */
         'label4': ['0.9375rem', { fontWeight: '500' }], /* 15px */
+        'label2': ['0.8125rem', { fontWeight: '400' }], /* 13px */
         'label6': ['0.625rem', { fontWeight: '500' }], /* 10px */
         'label12': ['0.5625rem', { fontWeight: '300' }], /* 9px */
       },
