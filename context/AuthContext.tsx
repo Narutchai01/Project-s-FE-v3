@@ -59,7 +59,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     //   .catch((err) => {
     //     console.log(err);
     //   });
-    router.push("/diary");
+    router.push("/analysis");
   };
 
   const handleSignup = async () => {
