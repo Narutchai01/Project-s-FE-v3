@@ -3,4 +3,5 @@ export interface ButtonProps {
     className: string;
     textSize?: string;
     onPress?: () => void;
+    disabled?: boolean; 
 }
