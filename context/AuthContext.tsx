@@ -59,7 +59,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     //   .catch((err) => {
     //     console.log(err);
     //   });
-    router.push("/home");
+    router.push("/faceScan");
   };
 
   const handleSignup = async () => {

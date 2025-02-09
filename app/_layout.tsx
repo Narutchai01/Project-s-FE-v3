@@ -13,6 +13,7 @@ export default function RootLayout() {
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="compare" />
           <Stack.Screen name="analysis" />
+          <Stack.Screen name="faceScan" />
         </Stack>
       </AuthProvider>
     </PaperProvider>
