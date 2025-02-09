@@ -104,7 +104,7 @@ export default function DiaryScreen() {
           <Animated.View style={{ opacity: fadeOpacity }}>
             {!isSearchOpen && isCompareMode ? (
               <TouchableOpacity onPress={() => setIsCompareMode(false)}>
-                <Text className="text-Heading3 text-gray-500">Cancel</Text>
+                <Text className="text-Heading3 text-Quartz">Cancel</Text>
               </TouchableOpacity>
             ) : !isSearchOpen ? (
               <Text className="text-Heading3 flex-1">Diary</Text>
