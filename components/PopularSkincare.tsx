@@ -1,12 +1,15 @@
-import React from "react";
-import { View, Text, Image, ScrollView, TouchableOpacity } from "react-native";
+import React, { FC } from "react";
+import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { ChevronRight } from "lucide-react-native";
+import { ISkincare } from "@/interface/skincare";
+import { CardSkincare } from "./Card";
 
-const skincareImage =
-  "https://www.osdco.net/images/communities/content/knowledge/checklist/03-seven-week-old-puppy.jpg";
+interface PopularSkincareProps {
+  skincares: ISkincare[] | null;
+}
 
-export default function PopularSkincare() {
-  const skincareList = Array(6).fill(skincareImage);
+export const PopularSkincare :FC<PopularSkincareProps> = (props) =>{
+  const { skincares } = props;
 
   return (
     <View className="mt-8 mb-4">
@@ -19,36 +22,15 @@ export default function PopularSkincare() {
       </View>
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {skincareList.map((image, index) => (
-          <View
-            key={index}
-            className="bg-white rounded-2xl shadow w-[115px] h-[130px] mx-2 mb-2 relative overflow-hidden"
-          >
-            <View
+        {skincares?.map((skincare, index) => {
+          return (
+            <CardSkincare
               key={index}
-              className="w-full h-[115px] rounded-t-2xl object-cover"
-            >
-              <Image
-                source={{ uri: image }}
-                className="w-full h-full rounded-t-2xl object-cover"
-                style={{ borderBottomRightRadius: 32.5 }}
-              />
-            </View>
-
-            <View
-              className="absolute bottom-0 left-0 w-full h-[30px] bg-white px-2 flex items-start justify-center"
-              style={{ borderTopLeftRadius: 13, borderTopRightRadius: 10 }}
-            >
-              <Text
-                className="text-label12 font-medium w-full"
-                numberOfLines={1}
-                ellipsizeMode="tail"
-              >
-                Granactive Retinoid 5% Serum for Anti-Aging
-              </Text>
-            </View>
-          </View>
-        ))}
+              image={skincare.image}
+              name={skincare.name}
+            />
+          );
+        })}
       </ScrollView>
     </View>
   );

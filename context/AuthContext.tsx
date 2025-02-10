@@ -6,11 +6,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import {
-  ILogin,
-  ISignUp,
-  IPubicUser,
-} from "@/interface/user";
+import { ILogin, ISignUp, IPubicUser } from "@/interface/user";
 import { axiosInstance } from "@/lib/axios_instance";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -27,7 +23,12 @@ type AuthContextType = {
   setSignupData: (data: ISignUp) => void;
   handleSignup: () => void;
   googleSignIn: () => void;
-  User : IPubicUser;
+  user: IPubicUser;
+  getToken: () => string | null;
+  isOpen: boolean,
+  setIsOpen: (isOpen: boolean) => void
+  setSensitiveSkin : (sensitiveSkin:boolean) => void
+  UpdateSenSitiveSkincare : () => void
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -42,6 +43,8 @@ export const useAuth = () => {
 
 export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const router = useRouter();
+  const [sensitiveSkin , setSensitiveSkin] = useState<boolean>(false)
+  const [isOpen,setIsOpen] = useState<boolean>(false)
   const [loginData, setLoginData] = useState<ILogin>({
     email: "",
     password: "",
@@ -55,13 +58,25 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     sensitive_skin: false,
   });
 
-  const [User, setUser] = useState<IPubicUser>({
+  const [user, setUser] = useState<IPubicUser>({
     fullname: "",
     birthday: null,
     email: "",
     sensitive_skin: null,
     image: "",
   });
+
+  const getToken = (): string | null => {
+    let token: string | null = null;
+    AsyncStorage.getItem("token")
+      .then((value) => {
+        token = value;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    return token;
+  };
 
   const handleLogin = async () => {
     await axiosInstance
@@ -103,18 +118,21 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   const handleGetUser = async () => {
-    await AsyncStorage.getItem("token").then(async (token) => {
-      await axiosInstance
-        .get("/user/me", {
-          headers: {
-            Authorization: token,
-          },
-        })
-        .then((res) => {
-          setUser(res.data.data);
-        });
-    });
+   try {
+    const token = await AsyncStorage.getItem("token")
+      const response = await axiosInstance.get("/user/me", {
+        headers: {
+          token: token,
+        },
+      });
+      setUser(response.data.data);
+      return response.data.data;
+   } catch (error) {
+      console.log("GetUser",error);
+   }
   };
+
+ 
 
   GoogleSignin.configure({
     scopes: ["https://www.googleapis.com/auth/drive.readonly"],
@@ -130,7 +148,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
           full_name: userInfo.data?.user.name,
           image: userInfo.data?.user.photo,
         })
-        .then((res) => {
+        .then(async(res) => {
           const status = res.status;
           if (status !== 200) {
             return;
@@ -139,11 +157,14 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
           const token: string = res.data.data.token;
           AsyncStorage.setItem("token", token);
 
-          if (User.sensitive_skin !== null) {
+          const newuser = await handleGetUser();
+
+          if (newuser?.sensitive_skin !== null) {
             router.push("/home");
+          } else {
+            console.log("Skinsensitive is null");
+            setIsOpen(true)
           }
-          console.log("Skinsensitive is null");
-          
         })
         .catch((err) => {
           console.log(err);
@@ -164,9 +185,27 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
-  useEffect(() => {
-    handleGetUser();
-  }, []);
+
+  const UpdateSenSitiveSkincare = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const response = await axiosInstance.put("/user", {
+        sensitive_skin: sensitiveSkin,
+      }, {
+        headers: {
+          token: token,
+        },
+      });
+      setIsOpen(false);
+      console.log(response.data.data);
+    } catch (error) {
+      console.log("UpdateSensitiveSkin",error);
+    }
+  }
+
+ useEffect(() => {
+    getToken();
+  },[]);
 
   const AuthContextValue = {
     loginData,
@@ -176,7 +215,12 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     setSignupData,
     handleSignup,
     googleSignIn,
-    User,
+    user,
+    getToken,
+    isOpen,
+    setIsOpen,
+    setSensitiveSkin,
+    UpdateSenSitiveSkincare
   };
 
   return (

@@ -5,9 +5,10 @@ import DividerWithText from "@/components/DividerWithText";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Link } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
+import { ModalSensitiveSkin } from "@/components/Modal";
 
 export default function Login() {
-  const { loginData, setLoginData, handleLogin ,googleSignIn} = useAuth();
+  const { loginData, setLoginData, handleLogin ,googleSignIn,isOpen,setSensitiveSkin ,UpdateSenSitiveSkincare} = useAuth();
 
   const handleChange = (key: string, value: string) => {
     setLoginData({ ...loginData, [key]: value });
@@ -55,6 +56,7 @@ export default function Login() {
             </Link>
           </View>
         </View>
+        <ModalSensitiveSkin isOpen={isOpen} setSensitiveSkin={setSensitiveSkin} onPres={UpdateSenSitiveSkincare}/>
       </SafeAreaView>
     </SafeAreaProvider>
   );

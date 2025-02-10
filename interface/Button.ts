@@ -1,6 +1,6 @@
 export interface ButtonProps {
     title: string;
-    className: string;
+    className?: string;
     textSize?: string;
     onPress?: () => void;
     disabled?: boolean; 

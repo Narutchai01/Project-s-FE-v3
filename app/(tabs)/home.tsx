@@ -1,15 +1,19 @@
 import React from "react";
-import { View, Text, Image, ScrollView} from "react-native";
+import { View, Text, Image, ScrollView } from "react-native";
 import SkinAnalysisCard from "@/components/SkinAnalysisCard";
 import PopularThreads from "@/components/PopularThreads";
-import PopularSkincare from "@/components/PopularSkincare";
+import { PopularSkincare } from "@/components/PopularSkincare";
+import { useHome } from "@/context/HomeContext";
+import dayjs from "dayjs";
 
 export default function SkincareScreen() {
-  const today = new Date();
-  const day = today.getDate();
-  const weekday = today.toLocaleDateString("en-US", { weekday: "long" });
-  const month = today.toLocaleDateString("en-US", { month: "short" });
-  const year = today.getFullYear();
+  const today = dayjs();
+  const day = today.date();
+  const weekday = today.format("dddd");
+  const month = today.format("MMM");
+  const year = today.year();
+
+  const { skincares } = useHome();
 
   return (
     <ScrollView className="px-4 pt-8 bg-Snow">
@@ -30,7 +34,7 @@ export default function SkincareScreen() {
 
       <SkinAnalysisCard />
       <PopularThreads />
-      <PopularSkincare />
+      <PopularSkincare skincares={skincares} />
     </ScrollView>
   );
 }
