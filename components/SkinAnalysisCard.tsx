@@ -1,24 +1,20 @@
-import React from "react";
+import { IResult } from "@/interface/result";
+import React, { FC } from "react";
 import { View, Text, Image } from "react-native";
+import dayjs from "dayjs";
+import { ISkin } from "@/interface/skin";
+import { Avatar } from "react-native-paper";
 
-export default function SkinAnalysisCard() {
-  const updatedDate = "21/11/2024";
+interface PropsSkinAnalysisCard {
+  resultLatest: IResult | null;
+  skins: ISkin[];
+}
 
-  const groupImagesIntoRows = (images: { uri: string }[]): { uri: string }[][] => {
-    return images.reduce<{ uri: string }[][]>((acc, image, index) => {
-      if (index % 3 === 0) acc.push([]); 
-      acc[acc.length - 1].push(image);
-      return acc;
-    }, []);
-  };
-
-  const skinTypeImages = Array(3).fill({ uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf81PydDJjzDIgjSuK3A7ZaOWALBQlG3-_0g&s" });
-  const acneImages = Array(6).fill({ uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf81PydDJjzDIgjSuK3A7ZaOWALBQlG3-_0g&s" });
-  const skinProblemImages = Array(4).fill({ uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf81PydDJjzDIgjSuK3A7ZaOWALBQlG3-_0g&s" });
-
-  const skinTypeRows = groupImagesIntoRows(skinTypeImages);
-  const acneRows = groupImagesIntoRows(acneImages);
-  const skinProblemRows = groupImagesIntoRows(skinProblemImages);
+export const SkinAnalysisCard: FC<PropsSkinAnalysisCard> = (props) => {
+  const { resultLatest, skins } = props;
+  const updatedDate = resultLatest
+    ? dayjs(resultLatest.create_at).format("MMMM D, YYYY")
+    : "";
 
   return (
     <View className="flex justify-center items-center mt-2">
@@ -26,42 +22,42 @@ export default function SkinAnalysisCard() {
         <View className="flex-row items-center justify-center ">
           <View className="w-[148px] h-[200.95px]">
             <Image
-              source={{ uri: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRf81PydDJjzDIgjSuK3A7ZaOWALBQlG3-_0g&s" }}
+              source={{ uri: resultLatest?.image }}
               className="w-[148px] h-[200.95px] rounded-2xl object-cover"
             />
           </View>
 
           <View className="flex flex-col justify-evenly ml-8 ">
             <Text className="text-label2 font-bold mb-1 mt-1">Skin Type:</Text>
-            <View >
-              {skinTypeRows.map((row, rowIndex) => (
-                <View key={rowIndex} className="flex-row gap-2 mb-2">
-                  {row.map((image, index) => (
-                    <Image key={index} source={image} className="w-8 h-8 rounded-full" />
-                  ))}
-                </View>
+            <View>
+              {skins.map((item, index) => (
+                <Avatar.Image
+                  size={24}
+                  key={index}
+                  source={{ uri: item.image }}
+                />
               ))}
             </View>
 
             <Text className="text-label2 font-bold mb-1">Acne Type:</Text>
-            <View >
-              {acneRows.map((row, rowIndex) => (
-                <View key={rowIndex} className="flex-row gap-2 mb-2">
-                  {row.map((image, index) => (
-                    <Image key={index} source={image} className="w-8 h-8 rounded-full" />
-                  ))}
-                </View>
+            <View>
+              {skins.map((item, index) => (
+                <Avatar.Image
+                  size={24}
+                  key={index}
+                  source={{ uri: item.image }}
+                />
               ))}
             </View>
 
             <Text className="text-label2 font-bold mb-1 ">Skin Problems:</Text>
             <View>
-              {skinProblemRows.map((row, rowIndex) => (
-                <View key={rowIndex} className="flex-row gap-2 mb-2">
-                  {row.map((image, index) => (
-                    <Image key={index} source={image} className="w-8 h-8 rounded-full" />
-                  ))}
-                </View>
+              {skins.map((item, index) => (
+                <Avatar.Image
+                  size={24}
+                  key={index}
+                  source={{ uri: item.image }}
+                />
               ))}
             </View>
           </View>
@@ -73,4 +69,4 @@ export default function SkinAnalysisCard() {
       </View>
     </View>
   );
-}
+};

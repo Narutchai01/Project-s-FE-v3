@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text, Image, ScrollView } from "react-native";
-import SkinAnalysisCard from "@/components/SkinAnalysisCard";
+import {SkinAnalysisCard }from "@/components/SkinAnalysisCard";
 import PopularThreads from "@/components/PopularThreads";
 import { PopularSkincare } from "@/components/PopularSkincare";
 import { useHome } from "@/context/HomeContext";
@@ -13,7 +13,7 @@ export default function SkincareScreen() {
   const month = today.format("MMM");
   const year = today.year();
 
-  const { skincares } = useHome();
+  const { skincares ,resultLatest ,skins} = useHome();
 
   return (
     <ScrollView className="px-4 pt-8 bg-Snow">
@@ -32,7 +32,7 @@ export default function SkincareScreen() {
         </View>
       </View>
 
-      <SkinAnalysisCard />
+      <SkinAnalysisCard resultLatest={resultLatest} skins={Array.isArray(skins) ? skins : []} />
       <PopularThreads />
       <PopularSkincare skincares={skincares} />
     </ScrollView>

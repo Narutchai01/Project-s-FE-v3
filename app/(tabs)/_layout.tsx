@@ -6,9 +6,8 @@ export default function _layout() {
   return (
     <HomeProvider>
       <Tabs screenOptions={{ headerShown: false }}>
+        <Tabs.Screen name="home"/>
         <Tabs.Screen name="diary" />
-        <Tabs.Screen name="home" options={{
-        }} />
       </Tabs>
     </HomeProvider>
   );
