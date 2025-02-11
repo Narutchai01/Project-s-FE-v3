@@ -11,12 +11,16 @@ import { axiosInstance } from "@/lib/axios_instance";
 import { ISkincare } from "@/interface/skincare";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { ISkin } from "@/interface/skin";
+import { IAcne } from "@/interface/acne";
+import { IFacial } from "@/interface/facial";
 
 type HomeContextType = {
   results: IResult[] | null;
   skincares: ISkincare[] | null;
   resultLatest: IResult | null;
   skins : ISkin[] | null
+  acnes : IAcne[] | null
+  facials : IFacial[] | null
 };
 
 const HomeContext = createContext<HomeContextType | null>(null);
@@ -34,6 +38,8 @@ export const HomeProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [skincares, setSkincares] = useState<ISkincare[] | null>(null);
   const [resultLatest, setResultLatest] = useState<IResult | null>(null);
   const [skins, setSkins] = useState<ISkin[] | null>(null);
+  const [acnes , setAcnes] = useState<IAcne[] | null>(null);
+  const [facials , setFacials] = useState<IFacial[] | null>(null);
 
   useEffect(() => {
     if (results && results.length > 0) {
@@ -78,17 +84,43 @@ export const HomeProvider: FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
+
+  const getAcne = async () => {
+    try {
+      await axiosInstance.get("/acne").then((response) => {
+        setAcnes(response.data.data);
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+
+  const getFacial = async () => {
+    try {
+      await axiosInstance.get("/facial").then((response) => {
+        setFacials(response.data.data);
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   useEffect(() => {
     getResults();
     getSkincares();
     getSkin();
-  }, []);
+    getAcne();
+    getFacial();
+  }, [results]);
 
   const contextValue = {
     results,
     skincares,
     resultLatest,
-    skins
+    skins,
+    acnes,
+    facials
   };
 
   return (

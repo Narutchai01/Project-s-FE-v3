@@ -13,7 +13,7 @@ export default function SkincareScreen() {
   const month = today.format("MMM");
   const year = today.year();
 
-  const { skincares ,resultLatest ,skins} = useHome();
+  const { skincares ,resultLatest ,skins ,acnes,facials} = useHome();
 
   return (
     <ScrollView className="px-4 pt-8 bg-Snow">
@@ -32,7 +32,7 @@ export default function SkincareScreen() {
         </View>
       </View>
 
-      <SkinAnalysisCard resultLatest={resultLatest} skins={Array.isArray(skins) ? skins : []} />
+      <SkinAnalysisCard resultLatest={resultLatest} skins={Array.isArray(skins) ? skins : []} acnes={Array.isArray(acnes) ? acnes : []} facials={Array.isArray(facials) ? facials : []} />
       <PopularThreads />
       <PopularSkincare skincares={skincares} />
     </ScrollView>

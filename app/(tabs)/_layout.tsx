@@ -8,6 +8,7 @@ export default function _layout() {
       <Tabs screenOptions={{ headerShown: false }}>
         <Tabs.Screen name="home"/>
         <Tabs.Screen name="diary" />
+        <Tabs.Screen name="camera" />
       </Tabs>
     </HomeProvider>
   );

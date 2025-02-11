@@ -4,14 +4,18 @@ import { View, Text, Image } from "react-native";
 import dayjs from "dayjs";
 import { ISkin } from "@/interface/skin";
 import { Avatar } from "react-native-paper";
+import { IAcne } from "@/interface/acne";
+import { IFacial } from "@/interface/facial";
 
 interface PropsSkinAnalysisCard {
   resultLatest: IResult | null;
   skins: ISkin[];
+  acnes: IAcne[];
+  facials: IFacial[];
 }
 
 export const SkinAnalysisCard: FC<PropsSkinAnalysisCard> = (props) => {
-  const { resultLatest, skins } = props;
+  const { resultLatest, skins, acnes, facials } = props;
   const updatedDate = resultLatest
     ? dayjs(resultLatest.create_at).format("MMMM D, YYYY")
     : "";
@@ -29,36 +33,46 @@ export const SkinAnalysisCard: FC<PropsSkinAnalysisCard> = (props) => {
 
           <View className="flex flex-col justify-evenly ml-8 ">
             <Text className="text-label2 font-bold mb-1 mt-1">Skin Type:</Text>
-            <View>
-              {skins.map((item, index) => (
-                <Avatar.Image
-                  size={24}
-                  key={index}
-                  source={{ uri: item.image }}
-                />
-              ))}
+            <View className="flex flex-row gap-2">
+              {skins
+                .filter((item) => item.id === resultLatest?.skin_id)
+                .map((item, index) => (
+                  <Avatar.Image
+                    size={24}
+                    key={index}
+                    source={{ uri: item.image }}
+                  />
+                ))}
             </View>
 
             <Text className="text-label2 font-bold mb-1">Acne Type:</Text>
-            <View>
-              {skins.map((item, index) => (
-                <Avatar.Image
-                  size={24}
-                  key={index}
-                  source={{ uri: item.image }}
-                />
-              ))}
+            <View className="flex flex-row gap-2">
+              {acnes
+                .filter((item) =>
+                  resultLatest?.acne_type.some((acne) => acne.id === item.id)
+                )
+                .map((item, index) => (
+                  <Avatar.Image
+                    size={24}
+                    key={index}
+                    source={{ uri: item.image }}
+                  />
+                ))}
             </View>
 
             <Text className="text-label2 font-bold mb-1 ">Skin Problems:</Text>
-            <View>
-              {skins.map((item, index) => (
-                <Avatar.Image
-                  size={24}
-                  key={index}
-                  source={{ uri: item.image }}
-                />
-              ))}
+            <View className="flex flex-row gap-2">
+              {facials
+                .filter((item) =>
+                  resultLatest?.facial_type.some((facial) => facial.id === item.id)
+                )
+                .map((item, index) => (
+                  <Avatar.Image
+                    size={24}
+                    key={index}
+                    source={{ uri: item.image }}
+                  />
+                ))}
             </View>
           </View>
         </View>
