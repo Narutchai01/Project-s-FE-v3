@@ -1,11 +1,12 @@
 import { IResult } from "@/interface/result";
 import React, { FC } from "react";
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, TouchableOpacity } from "react-native";
 import dayjs from "dayjs";
 import { ISkin } from "@/interface/skin";
 import { Avatar } from "react-native-paper";
 import { IAcne } from "@/interface/acne";
 import { IFacial } from "@/interface/facial";
+import { useRouter } from "expo-router";
 
 interface PropsSkinAnalysisCard {
   resultLatest: IResult | null;
@@ -15,13 +16,14 @@ interface PropsSkinAnalysisCard {
 }
 
 export const SkinAnalysisCard: FC<PropsSkinAnalysisCard> = (props) => {
+  const router = useRouter();
   const { resultLatest, skins, acnes, facials } = props;
   const updatedDate = resultLatest
     ? dayjs(resultLatest.create_at).format("MMMM D, YYYY")
     : "";
 
   return (
-    <View className="flex justify-center items-center mt-2">
+    <TouchableOpacity className="flex justify-center items-center mt-2" onPress={() => router.push(`/diary/${resultLatest?.id}`)}>
       <View className="bg-white rounded-3xl shadow-md flex items-center justify-center w-[350px] h-[246px]">
         <View className="flex-row items-center justify-center ">
           <View className="w-[148px] h-[200.95px]">
@@ -81,6 +83,6 @@ export const SkinAnalysisCard: FC<PropsSkinAnalysisCard> = (props) => {
       <View className="flex-row justify-end mt-4 mr-16 w-full">
         <Text className="text-gray-500 text-label7">update {updatedDate}</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };

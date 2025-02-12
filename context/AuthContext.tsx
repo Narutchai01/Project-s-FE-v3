@@ -197,6 +197,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
         },
       });
       setIsOpen(false);
+      router.push("/home");
       console.log(response.data.data);
     } catch (error) {
       console.log("UpdateSensitiveSkin",error);

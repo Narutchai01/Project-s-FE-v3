@@ -9,7 +9,7 @@ export const CardSkincare: FC<CardSkincareProps> = (props) => {
 
 
   return (
-    <View className="bg-white rounded-2xl shadow w-[115px] h-[130px] mx-2 mb-2 relative overflow-hidden">
+    <View className="bg-white rounded-2xl shadow w-[100px] h-[100px] mx-2 mb-2 relative overflow-hidden">
       <View className="w-full h-[115px] rounded-t-2xl object-cover">
         <Image
           source={{ uri: image }}

@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { Camera, CameraView } from "expo-camera";
 import { useRouter } from "expo-router";
-import { BackButtonComponents } from "@/components/Buntton";
 
 export default function FaceScan() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -57,23 +56,22 @@ export default function FaceScan() {
 
   return (
     <View className="flex-1 bg-black">
-      <View className="absolute top-10 left-5 z-10">
-        <BackButtonComponents title="Camera" textSize="text-lg" />
-      </View>
-
       <CameraView
         ref={cameraRef}
         style={{ flex: 1 }}
         facing="front"
         onCameraReady={() => setIsCameraReady(true)}
       >
-        <View className="absolute top-32 w-4/5 h-1/2 border-2 border-white rounded-full border-dashed" />
+        <View className="absolute top-32 w-4/5 h-1/2 border-2 border-white rounded-full border-dashed self-center" />
 
-        <TouchableOpacity className="absolute bottom-14" onPress={takePicture}>
+        <TouchableOpacity
+          className="absolute bottom-14 left-1/2 transform -translate-x-1/2"
+          onPress={takePicture}
+        >
           <View className="w-20 h-20 bg-white rounded-full border-4 border-gray-400" />
         </TouchableOpacity>
 
-        <View className="absolute bottom-32 w-4/5">
+        <View className="absolute bottom-32 w-4/5 left-1/2 transform -translate-x-1/2">
           <Text className="text-white text-label4 font-bold text-center">
             Advice for Face Scanning
           </Text>

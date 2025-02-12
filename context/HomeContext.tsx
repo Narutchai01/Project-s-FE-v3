@@ -112,7 +112,7 @@ export const HomeProvider: FC<{ children: ReactNode }> = ({ children }) => {
     getSkin();
     getAcne();
     getFacial();
-  }, [results]);
+  }, []);
 
   const contextValue = {
     results,
