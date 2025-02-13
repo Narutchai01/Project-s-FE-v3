@@ -7,4 +7,7 @@ export interface CardSkincareProps {
 
 export interface DiaryCardProps {
     data : IResult;
+  compareMode?: boolean;
+  selectItem?: () => void;
+  selectArray?: number[];
 }

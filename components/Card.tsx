@@ -1,8 +1,9 @@
-import { FC } from "react";
+import { FC ,useState} from "react";
 import { View, Text, Image, Pressable } from "react-native";
 import { CardSkincareProps, DiaryCardProps } from "@/interface/Card";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
+
 
 export const CardSkincare: FC<CardSkincareProps> = (props) => {
   const { image, name } = props;
@@ -35,8 +36,9 @@ export const CardSkincare: FC<CardSkincareProps> = (props) => {
 };
 
 export const CardDiary: FC<DiaryCardProps> = (props) => {
-  const { data } = props;
+  const { data, compareMode, selectItem, selectArray = [] } = props;
   const router = useRouter();
+  const check = selectArray.includes(data.id);
 
   const date = dayjs(data.create_at).format("DD MMM YYYY");
   const countAcne = data.acne_type
@@ -49,8 +51,8 @@ export const CardDiary: FC<DiaryCardProps> = (props) => {
   const skinType = data.skin.name;
   const result_id = data.id.toString();
   return (
-    <Pressable onPress={() => router.push(`/diary/${result_id}` as any)}>
-      <View className="flex-row items-center bg-white rounded-lg shadow p-4 mb-4">
+    <Pressable onPress={() => compareMode && selectItem ? selectItem() : router.push(`/diary/${result_id}` as any)}>
+      <View className={`flex-row items-center rounded-lg shadow p-4 mb-4 ${check && compareMode ? "bg-[#CAC9C9]" : "bg-white"}`}>
         <Image
           source={{ uri: data.image }}
           className="w-[88px] h-[118px] rounded-lg ml-4 mr-6"
