@@ -57,9 +57,9 @@ export const CardDiary: FC<DiaryCardProps> = (props) => {
         />
         <View className="flex-1">
           <Text className={`text-label4 font-semibold `}>Date: {date}</Text>
-          <Text className={`text-label6`}>Skin Problems: {skinProblems}</Text>
-          <Text className={`text-label6 `}>Acnes: {countAcne}</Text>
           <Text className={`text-label6`}>Skin Type: {skinType}</Text>
+          <Text className={`text-label6 `}>Acnes: {countAcne}</Text>
+          <Text className={`text-label6`}>Skin Problems: {skinProblems}</Text>
         </View>
       </View>
     </Pressable>

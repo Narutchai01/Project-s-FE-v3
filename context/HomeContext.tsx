@@ -51,7 +51,7 @@ export const HomeProvider: FC<{ children: ReactNode }> = ({ children }) => {
     try {
       const token = await AsyncStorage.getItem("token");
       if (!token) {
-        throw new Error("Token is not available");
+        return;
       }
       const response = await axiosInstance.get("/results/", {
         headers: {
@@ -112,7 +112,7 @@ export const HomeProvider: FC<{ children: ReactNode }> = ({ children }) => {
     getSkin();
     getAcne();
     getFacial();
-  }, []);
+  }, [results]);
 
   const contextValue = {
     results,

@@ -11,7 +11,7 @@ export default function _layout() {
   return (
     <HomeProvider>
       <Tabs screenOptions={{ headerShown: false
-        ,tabBarActiveTintColor: "red",
+        ,tabBarActiveTintColor: "#FF6F61",
        }}>
         <Tabs.Screen 
           name="home" 

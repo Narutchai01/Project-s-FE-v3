@@ -2,7 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { Camera, CameraView } from "expo-camera";
 import { useRouter } from "expo-router";
-
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { axiosInstance } from "@/lib/axios_instance";
 export default function FaceScan() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isCameraReady, setIsCameraReady] = useState(false);
@@ -32,7 +33,28 @@ export default function FaceScan() {
 
       console.log("Captured Photo:", photo.uri);
 
-      router.push(`/analysis?photo=${encodeURIComponent(photo.uri)}`);
+      const formData = new FormData();
+      const photoFile = {
+        uri: photo.uri,
+        name: "photo.jpg",
+        type: "image/jpeg",
+      } as unknown as Blob;
+
+      formData.append("file", photoFile);
+
+      try {
+        const token = await AsyncStorage.getItem("token");
+        const response = await axiosInstance.post("/results", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            token: token,
+          },
+        });
+        console.log("Upload response:", response.data);
+        router.push(`/diary/${response.data.data.id}`);
+      } catch (error) {
+        console.error("Failed to upload photo:", error);
+      }
     }
   };
 
