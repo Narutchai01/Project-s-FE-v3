@@ -1,4 +1,5 @@
 import { Text, View } from "react-native";
+import { Image } from "react-native";
 import { Avatar } from "react-native-paper";
 import { IAvatarTitle, IMapAvatar } from "@/interface/avatar";
 import { FC } from "react";
@@ -8,9 +9,9 @@ export const AvatarText: FC<IAvatarTitle> = (props) => {
   return (
     <View className="flex justify-center items-center">
       {image ? (
-        <Avatar.Image size={56} source={{ uri: image }} />
+      <Image source={{ uri: image }} style={{ width: 48, height: 48, borderRadius: 24 }} />
       ) : (
-        <Avatar.Text size={48} label={title.charAt(0)} />
+      <Avatar.Text size={48} label={title.charAt(0)} />
       )}
       <Text>{title}</Text>
     </View>

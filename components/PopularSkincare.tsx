@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
+import { View, Text, ScrollView, TouchableOpacity ,FlatList } from "react-native";
 import { ChevronRight } from "lucide-react-native";
 import { ISkincare } from "@/interface/skincare";
 import { CardSkincare } from "./Card";
@@ -21,17 +21,18 @@ export const PopularSkincare :FC<PopularSkincareProps> = (props) =>{
         </TouchableOpacity>
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {skincares?.map((skincare, index) => {
-          return (
-            <CardSkincare
-              key={index}
-              image={skincare.image}
-              name={skincare.name}
-            />
-          );
-        })}
-      </ScrollView>
+      <FlatList
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        data={skincares}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => (
+          <CardSkincare
+        image={item.image}
+        name={item.name}
+          />
+        )}
+      />
     </View>
   );
 }

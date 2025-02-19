@@ -3,6 +3,7 @@ import {
   Text,
   View,
   ScrollView,
+  FlatList,
   SafeAreaView,
 } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -187,13 +188,19 @@ export default function DiaryScreen() {
           </View>
         )}
 
-        <ScrollView>
-          {results?.map((result) => {
-            return (
-              <CardDiary key={result.id} data={result} compareMode={isCompare} selectItem={()=>handleCompareOrConfirm(result.id)} selectArray={compare} />
-            );
-          })}
-        </ScrollView>
+        <FlatList
+          data={results}
+          keyExtractor={(item) => item.id.toString()}
+          renderItem={({ item }) => (
+            <CardDiary
+              key={item.id}
+              data={item}
+              compareMode={isCompare}
+              selectItem={() => handleCompareOrConfirm(item.id)}
+              selectArray={compare}
+            />
+          )}
+        />
       </SafeAreaView>
     </SafeAreaProvider>
   );
