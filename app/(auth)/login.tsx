@@ -1,13 +1,36 @@
 import { View, Text, SafeAreaView, Image, TextInput } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { ButtonComponents, GoogleButtonSignIn } from "@/components/Buntton";
 import DividerWithText from "@/components/DividerWithText";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { Link } from "expo-router";
+import { Link, useRouter} from "expo-router";
 import { useAuth } from "@/context/AuthContext";
+import { ModalSensitiveSkin } from "@/components/Modal";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Login() {
-  const { loginData, setLoginData, handleLogin ,googleSignIn} = useAuth();
+  const router = useRouter();
+  const {
+    loginData,
+    setLoginData,
+    handleLogin,
+    googleSignIn,
+    isOpen,
+    setSensitiveSkin,
+    UpdateSenSitiveSkincare,
+    user,
+  } = useAuth();
+
+useEffect(() => {
+    const checkLogin = async () => {
+      const token = await AsyncStorage.getItem("token");
+      if (token && user.sensitive_skin !== null) {
+        router.push("/home");
+      }
+    };
+    checkLogin();
+});
+
 
   const handleChange = (key: string, value: string) => {
     setLoginData({ ...loginData, [key]: value });
@@ -55,6 +78,11 @@ export default function Login() {
             </Link>
           </View>
         </View>
+        <ModalSensitiveSkin
+          isOpen={isOpen}
+          setSensitiveSkin={setSensitiveSkin}
+          onPres={UpdateSenSitiveSkincare}
+        />
       </SafeAreaView>
     </SafeAreaProvider>
   );
