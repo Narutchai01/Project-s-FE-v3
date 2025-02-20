@@ -6,6 +6,7 @@ import {
   House,
   BookAIcon,
   CameraIcon,
+  MessageCircleMore,
 } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { ButtonComponents } from "@/components/Buntton";
@@ -28,6 +29,14 @@ export default function _layout() {
           options={{
         tabBarIcon: ({ color, size }) => (
           <House size={size} color={color} />
+        ),
+          }}
+        />
+        <Tabs.Screen
+          name="threads"
+          options={{
+        tabBarIcon: ({ color, size }) => (
+          <MessageCircleMore size={size} color={color} />
         ),
           }}
         />

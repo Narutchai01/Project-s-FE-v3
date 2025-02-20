@@ -2,7 +2,7 @@ import React from "react";
 import { View, Text, TouchableOpacity, FlatList } from "react-native";
 import { ChevronRight } from "lucide-react-native";
 import threadData from "./../components/threadData";
-import { ThreadCard } from "@/components/Card";
+import { PopularThreadCard } from "@/components/Card";
 
 export default function PopularThreads() {
   return (
@@ -21,7 +21,7 @@ export default function PopularThreads() {
         data={threadData}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
-          <ThreadCard
+          <PopularThreadCard
             image={item.image}
             title={item.title}
             user={item.user}
