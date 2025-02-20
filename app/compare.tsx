@@ -1,148 +1,98 @@
-import React, { useEffect } from "react";
-import { View, ScrollView } from "react-native";
-import { useLocalSearchParams } from "expo-router";
-import { BackButtonComponents } from "@/components/Buntton";
-import CompareDiary from "@/components/CompareDiary";
-import LineChartComponent from "@/components/LineChart";
+import React, { useEffect, useState } from "react";
+import { View, ScrollView, Text } from "react-native";
 import { useCompare } from "@/context/CompareContext";
-import { IResult } from "@/interface/result";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
-import { Image } from "react-native";
+import CompareDiary from "@/components/CompareDiary";
+import LineChartComponent from "@/components/LineChart";
+import LoadingIndicator from "@/components/Loading";
+import { IResult, Type } from "@/interface/result";
 
 export default function CompareScreen() {
   const { compare } = useCompare();
+  const [compareData, setCompareData] = useState<IResult[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const [compareData, setCompareData] = React.useState<IResult[] | null>(null);
+  const acneTypeLabels: Record<number, string> = {
+    1: "Blackheads",
+    2: "Whiteheads",
+    3: "Inflamed Acne",
+    4: "Pimples with Pus",
+    5: "Nodules",
+    6: "Red Pimples",
+  };
 
-  const fetchData = async () => {
-    const token = await AsyncStorage.getItem("token");
-    if (!token) return;
-    await axiosInstance
-      .post(
-        "/results/compare",
-        {
-          IDs: compare,
-        },
-        {
-          headers: {
-            token: token,
-          },
-        }
-      )
-      .then((res) => {
-        setCompareData(res.data.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  const skinProblemLabels: Record<number, string> = {
+    1: "Red marks",
+    2: "Black marks",
+    3: "Enlarged Pores",
+    4: "Wrinkles",
+    5: "Scars",
+    6: "Dull Facial Skin",
+    7: "Freckles and Dark Spots",
   };
 
   useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      const token = await AsyncStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        const response = await axiosInstance.post<{ data: IResult[] }>(
+          "/results/compare",
+          { IDs: compare },
+          { headers: { token } }
+        );
+        setCompareData(response.data.data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchData();
-  }, []);
+  }, [compare]);
 
-  console.log(compareData);
+  if (loading) {
+    return <LoadingIndicator />;
+  }
 
-  // const acneData = {
-  //   labels: parsedDiaries.map((diary: any) => diary.date),
-  //   datasets: [
-  //     {
-  //       data: parsedDiaries.map((diary: any) => diary.numberOfSpots || 0),
-  //       color: (opacity = 1) => `rgba(138, 43, 226, ${opacity})`,
-  //       strokeWidth: 2,
-  //     },
-  //     {
-  //       data: parsedDiaries.map((diary: any) => diary.numberOfSpots / 2 || 0),
-  //       color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`,
-  //       strokeWidth: 2,
-  //     },
-  //     {
-  //       data: parsedDiaries.map((diary: any) => diary.numberOfSpots / 3 || 0),
-  //       color: (opacity = 1) => `rgba(255, 0, 0, ${opacity})`,
-  //       strokeWidth: 2,
-  //     },
-  //     {
-  //       data: parsedDiaries.map((diary: any) => diary.numberOfSpots / 4 || 0),
-  //       color: (opacity = 1) => `rgba(30, 144, 255, ${opacity})`,
-  //       strokeWidth: 2,
-  //     },
-  //     {
-  //       data: parsedDiaries.map((diary: any) => diary.numberOfSpots / 5 || 0),
-  //       color: (opacity = 1) => `rgba(72, 61, 139, ${opacity})`,
-  //       strokeWidth: 2,
-  //     },
-  //     {
-  //       data: parsedDiaries.map((diary: any) => diary.numberOfSpots / 6 || 0),
-  //       color: (opacity = 1) => `rgba(75, 0, 130, ${opacity})`,
-  //       strokeWidth: 2,
-  //     },
-  //   ],
-  //   legend: [
-  //     "สิวอุดตันหัวขาว",
-  //     "สิวหัวช้าง",
-  //     "สิวอักเสบ",
-  //     "สิวอุดตันหัวดำ",
-  //     "สิวผื่นนูน",
-  //     "สิวตุ่มแดง",
-  //   ],
-  // };
+  if (!compareData.length) {
+    return (
+      <View className="flex-1 items-center justify-center">
+        <Text className="text-label2">No data available</Text>
+      </View>
+    );
+  }
 
-  // const skinProblemsData = {
-  //   labels: parsedDiaries.map((diary: any) => diary.date),
-  //   datasets: [
-  //     {
-  //       data: parsedDiaries.map((diary: any) => diary.numberOfSpots - 1 || 0),
-  //       color: (opacity = 1) => `rgba(138, 43, 226, ${opacity})`,
-  //       strokeWidth: 2,
-  //     },
-  //     {
-  //       data: parsedDiaries.map((diary: any) => diary.numberOfSpots / 2 || 0),
-  //       color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`,
-  //       strokeWidth: 2,
-  //     },
-  //     {
-  //       data: parsedDiaries.map((diary: any) => diary.numberOfSpots / 3 || 0),
-  //       color: (opacity = 1) => `rgba(255, 0, 0, ${opacity})`,
-  //       strokeWidth: 2,
-  //     },
-  //     {
-  //       data: parsedDiaries.map((diary: any) => diary.numberOfSpots / 4 || 0),
-  //       color: (opacity = 1) => `rgba(30, 144, 255, ${opacity})`,
-  //       strokeWidth: 2,
-  //     },
-  //     {
-  //       data: parsedDiaries.map((diary: any) => diary.numberOfSpots / 5 || 0),
-  //       color: (opacity = 1) => `rgba(72, 61, 139, ${opacity})`,
-  //       strokeWidth: 2,
-  //     },
-  //     {
-  //       data: parsedDiaries.map((diary: any) => diary.numberOfSpots / 6 || 0),
-  //       color: (opacity = 1) => `rgba(75, 0, 130, ${opacity})`,
-  //       strokeWidth: 2,
-  //     },
-  //   ],
-  //   legend: [
-  //     "รอยดำรอยแดง",
-  //     "ฝ้า กระ จุดด่างดำ",
-  //     "รูขุมขนกว้าง",
-  //     "หลุม แผลเป็น",
-  //     "ริ้วรอย",
-  //     "หน้าหมองคล้ำ",
-  //   ],
-  // };
+  const dates: string[] = compareData.map((item) =>
+    new Date(item.create_at).toLocaleDateString()
+  );
+
+  const createGenres = (labels: Record<number, string>, key: keyof IResult) =>
+    Object.keys(labels).map((id) => ({
+      label: labels[Number(id)],
+      data: compareData.map((item) => {
+        const found = (item[key] as Type[]).find((entry) => entry.id === Number(id));
+        return found ? found.count : 0;
+      }),
+    }));
+
+  const acneGenres = createGenres(acneTypeLabels, "acne_type");
+  const skinProblemGenres = createGenres(skinProblemLabels, "facial_type");
 
   return (
     <ScrollView className="flex-1 bg-Snow p-4">
-
       <View className="flex-row justify-center mb-6">
         {compareData?.map((item) => (
-          <CompareDiary image={item.image} date={item.create_at} />
+          <CompareDiary key={item.create_at.toString()} image={item.image} date={item.create_at} />
         ))}
       </View>
 
-      {/* {compareData && <LineChartComponent title="Summary of Acne Types" data={compareData} />} */}
-      {/* <LineChartComponent title="Summary of Skin Problems" data={skinProblemsData} /> */}
+      <LineChartComponent title="Summary of Acne Types" labels={dates} genres={acneGenres} />
+      <LineChartComponent title="Summary of Skin Problems" labels={dates} genres={skinProblemGenres} />
     </ScrollView>
   );
 }
