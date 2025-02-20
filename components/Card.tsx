@@ -1,17 +1,16 @@
-import { FC ,useState} from "react";
-import { View, Text, Image, Pressable } from "react-native";
-import { CardSkincareProps, DiaryCardProps } from "@/interface/Card";
+import { FC, useState } from "react";
+import { View, Text, Image, Pressable, TouchableOpacity } from "react-native";
+import { CardSkincareProps, DiaryCardProps, ThreadCardProps } from "@/interface/Card";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
-
+import { Heart } from "lucide-react-native";
 
 export const CardSkincare: FC<CardSkincareProps> = (props) => {
   const { image, name } = props;
 
-
   return (
-    <View className="bg-white rounded-2xl shadow w-[100px] h-[100px] mx-2 mb-2 relative overflow-hidden">
-      <View className="w-full h-[115px] rounded-t-2xl object-cover">
+    <View className="bg-white rounded-2xl shadow w-[115px] h-[130px] mx-2 mb-2 relative overflow-hidden">
+      <View className="w-[115px] h-[115px] relative overflow-hidden">
         <Image
           source={{ uri: image }}
           className="w-full h-full rounded-t-2xl object-cover"
@@ -20,16 +19,18 @@ export const CardSkincare: FC<CardSkincareProps> = (props) => {
       </View>
 
       <View
-        className="absolute bottom-0 left-0 w-full h-[30px] bg-white px-2 flex items-start justify-center"
-        style={{ borderTopLeftRadius: 13, borderTopRightRadius: 10 }}
+        className="absolute bottom-0 left-0 w-[120px] h-[30px] bg-white"
+        style={{ borderTopLeftRadius: 13, borderTopRightRadius: 5 }}
       >
-        <Text
-          className="text-label12 font-medium w-full"
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {name}
-        </Text>
+        <View className="p-2">
+          <Text
+            className="text-label12 font-medium w-full"
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {name}
+          </Text>
+        </View>
       </View>
     </View>
   );
@@ -51,8 +52,18 @@ export const CardDiary: FC<DiaryCardProps> = (props) => {
   const skinType = data.skin.name;
   const result_id = data.id.toString();
   return (
-    <Pressable onPress={() => compareMode && selectItem ? selectItem() : router.push(`/diary/${result_id}` as any)}>
-      <View className={`flex-row items-center rounded-lg shadow p-4 mb-4 ${check && compareMode ? "bg-[#CAC9C9]" : "bg-white"}`}>
+    <Pressable
+      onPress={() =>
+        compareMode && selectItem
+          ? selectItem()
+          : router.push(`/diary/${result_id}` as any)
+      }
+    >
+      <View
+        className={`flex-row items-center rounded-lg shadow p-4 mb-4 ${
+          check && compareMode ? "bg-[#CAC9C9]" : "bg-white"
+        }`}
+      >
         <Image
           source={{ uri: data.image }}
           className="w-[88px] h-[118px] rounded-lg ml-4 mr-6"
@@ -65,5 +76,48 @@ export const CardDiary: FC<DiaryCardProps> = (props) => {
         </View>
       </View>
     </Pressable>
+  );
+};
+
+export const ThreadCard: FC<ThreadCardProps> = (props) => {
+  const { image, title, user, userAvatar } = props;
+  return (
+    <View className="bg-white rounded-2xl shadow w-[120px] h-[155px] mx-2 mb-2 relative overflow-hidden">
+      <View className="w-[120px] h-[120px] relative overflow-hidden">
+        <Image
+          source={{ uri: image }}
+          className="w-full h-full rounded-t-2xl object-cover"
+          style={{ borderBottomRightRadius: 32.5 }}
+        />
+      </View>
+
+      <View
+        className="absolute bottom-0 left-0 w-[120px] bg-white"
+        style={{ borderTopLeftRadius: 13, borderTopRightRadius: 5 }}
+      >
+        <View className="p-2">
+          <Text
+            className="text-label12 font-medium mb-1"
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {title}
+          </Text>
+          <View className="flex-row items-center justify-between">
+            <View className="flex-row items-center">
+              <Image
+                source={{ uri: userAvatar }}
+                className="w-5 h-5 rounded-full mr-2"
+              />
+              <Text className="text-label13 text-gray-600">{user}</Text>
+            </View>
+
+            <TouchableOpacity className="w-7 h-7 bg-White rounded-full flex items-center justify-center">
+              <Heart size={12} color="gray" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </View>
   );
 };

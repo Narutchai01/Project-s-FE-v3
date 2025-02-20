@@ -1,3 +1,4 @@
+import { ThreadCard } from '@/components/Card';
 import { IResult } from "./result";
 
 export interface CardSkincareProps {
@@ -10,4 +11,10 @@ export interface DiaryCardProps {
   compareMode?: boolean;
   selectItem?: () => void;
   selectArray?: number[];
+}
+export interface ThreadCardProps {
+  image: string;
+  title: string;
+  user: string;
+  userAvatar: string;
 }
