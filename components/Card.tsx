@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC } from "react";
 import { View, Text, Image, Pressable, TouchableOpacity } from "react-native";
 import { CardSkincareProps, DiaryCardProps, ThreadCardProps } from "@/interface/Card";
 import dayjs from "dayjs";
