@@ -3,7 +3,7 @@ import { ISkincare } from "./skincare";
 export interface IThreadDetail {
   id: number;
   skincare: ISkincare;
-  caption: string;
+  title: string;
 }
 
 export interface IUser {
@@ -13,6 +13,7 @@ export interface IUser {
     birthday: string | null;
     sensitive_skin: boolean | null;
     image: string;
+    userAvatar: string;
   }
   
   export interface IThread {

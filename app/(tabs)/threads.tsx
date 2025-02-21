@@ -54,10 +54,10 @@ export default function ThreadsScreen() {
           columnWrapperStyle={{ justifyContent: "space-between" }}
           renderItem={({ item }) => (
             <ThreadCard
-              image={item.thread_detail[0]?.skincare?.image || ""}
-              title={item.thread_detail[0]?.skincare?.name || "No Title"}
+              image={item.thread_detail[0]?.skincare?.image}
+              title={item.thread_detail[0]?.skincare?.name}
               user={item.user.full_name}
-              userAvatar={item.user.image || ""}
+              userAvatar={item.user.userAvatar}
             />
           )}
         />
