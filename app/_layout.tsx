@@ -33,6 +33,13 @@ export default function RootLayout() {
                   headerShown: true,
                 }}
               />
+              <Stack.Screen
+                name="postThread"
+                options={{
+                  headerTitle: "Thread",
+                  headerShown: true,
+                }}
+              />
             </Stack>
           </CompareProvider>
         </HomeProvider>

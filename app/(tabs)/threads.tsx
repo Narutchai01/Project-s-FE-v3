@@ -10,8 +10,10 @@ import { ThreadCard } from "@/components/Card";
 import { axiosInstance } from "@/lib/axios_instance";
 import { IThread } from "@/interface/threads";
 import LoadingIndicator from "@/components/Loading";
+import { useRouter } from "expo-router";
 
 export default function ThreadsScreen() {
+  const router = useRouter();
   const [threads, setThreads] = useState<IThread[]>([]); 
   const [loading, setLoading] = useState(true);
 
@@ -39,7 +41,7 @@ export default function ThreadsScreen() {
     <View className="flex-1 bg-Snow p-4">
       <View className="flex-row items-center justify-between mt-6 mb-8">
         <Text className="text-Heading3 font-semibold">Threads</Text>
-        <TouchableOpacity className="bg-Bittersweet w-10 h-10 rounded-lg flex items-center justify-center">
+        <TouchableOpacity className="bg-Bittersweet w-10 h-10 rounded-lg flex items-center justify-center" onPress={() => router.push("/postThread")}>
           <Plus size={25} color="white" />
         </TouchableOpacity>
       </View>

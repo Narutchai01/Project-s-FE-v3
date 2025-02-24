@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { View, Text, Image, Pressable, TouchableOpacity } from "react-native";
-import { CardSkincareProps, DiaryCardProps, ThreadCardProps } from "@/interface/Card";
+import { CardSkincareProps, DiaryCardProps, SelectSkincareCardProps, ThreadCardProps } from "@/interface/Card";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 import { Heart } from "lucide-react-native";
@@ -162,5 +162,23 @@ export const ThreadCard: FC<ThreadCardProps> = (props) => {
         </View>
       </View>
     </View>
+  );
+};
+
+export const SelectSkincareCard: FC<SelectSkincareCardProps> = (props) => {
+  const { name, image } = props;
+
+  return (
+    <View
+        className="flex-row items-center rounded-lg shadow p-4 mb-4 bg-white"
+      >
+        <Image
+          source={{ uri: image }}
+          className="w-[88px] h-[118px] rounded-lg ml-4 mr-6"
+        />
+        <View className="flex-1">
+          <Text className={`text-label4 font-semibold `}>{name}</Text>
+        </View>
+      </View>
   );
 };
