@@ -41,7 +41,7 @@ export default function ThreadsScreen() {
     <View className="flex-1 bg-Snow p-4">
       <View className="flex-row items-center justify-between mt-6 mb-8">
         <Text className="text-Heading3 font-semibold">Threads</Text>
-        <TouchableOpacity className="bg-Bittersweet w-10 h-10 rounded-lg flex items-center justify-center" onPress={() => router.push("/postThread")}>
+        <TouchableOpacity className="bg-Bittersweet w-10 h-10 rounded-lg flex items-center justify-center" onPress={() => router.push("/CreateReview")}>
           <Plus size={25} color="white" />
         </TouchableOpacity>
       </View>
