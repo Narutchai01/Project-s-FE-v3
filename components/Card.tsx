@@ -1,6 +1,6 @@
 import { FC } from "react";
 import { View, Text, Image, Pressable, TouchableOpacity } from "react-native";
-import { CardSkincareProps, DiaryCardProps, SelectSkincareCardProps, ThreadCardProps } from "@/interface/Card";
+import { CardSkincareProps, DiaryCardProps, CardReviewProps, ThreadCardProps } from "@/interface/Card";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 import { Heart } from "lucide-react-native";
@@ -165,20 +165,31 @@ export const ThreadCard: FC<ThreadCardProps> = (props) => {
   );
 };
 
-export const SelectSkincareCard: FC<SelectSkincareCardProps> = (props) => {
-  const { name, image } = props;
+export const ReviewCard: FC<CardReviewProps> = (props) => {
+  const { data, selectMode, selectItem, selectArray = [] } = props;
+  const check = selectArray.includes(data.id);
+
+  const handlePress = () => {
+    if (selectMode && selectItem) {
+      selectItem(data.id);
+    }
+  };
 
   return (
-    <View
-        className="flex-row items-center rounded-lg shadow p-4 mb-4 bg-white"
+    <Pressable onPress={handlePress}>
+      <View
+        className={`flex-row items-center rounded-lg shadow p-4 mb-4 ${
+          check && selectMode ? "bg-[#CAC9C9]" : "bg-white"
+        }`}
       >
         <Image
-          source={{ uri: image }}
+          source={{ uri: data.image }}
           className="w-[88px] h-[118px] rounded-lg ml-4 mr-6"
         />
         <View className="flex-1">
-          <Text className={`text-label4 font-semibold `}>{name}</Text>
+          <Text className={`text-label4 font-semibold `}>{data.name}</Text>
         </View>
       </View>
+    </Pressable>
   );
 };

@@ -1,4 +1,5 @@
 import { IResult } from "./result";
+import { ISkincare } from "./skincare";
 
 export interface CardSkincareProps {
   image: string;
@@ -18,7 +19,9 @@ export interface ThreadCardProps {
   userAvatar: string;
 }
 
-export interface SelectSkincareCardProps {
-  image: string;
-  name: string;
+export interface CardReviewProps {
+  data: ISkincare;
+  selectMode?: boolean;
+  selectItem?: (id: number) => void;
+  selectArray?: number[];
 }
