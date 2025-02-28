@@ -1,9 +1,11 @@
 import { FC } from "react";
 import { View, Text, Image, Pressable, TouchableOpacity } from "react-native";
-import { CardSkincareProps, DiaryCardProps, CardReviewProps, ThreadCardProps } from "@/interface/Card";
+import { CardSkincareProps, DiaryCardProps, CardReviewProps, ThreadCardProps, AddPhotoProps } from "@/interface/Card";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 import { Heart } from "lucide-react-native";
+import { LucideImage } from "lucide-react-native";
+import { MediaType, launchImageLibrary } from "react-native-image-picker";
 
 export const CardSkincare: FC<CardSkincareProps> = (props) => {
   const { image, name } = props;
@@ -193,3 +195,54 @@ export const ReviewCard: FC<CardReviewProps> = (props) => {
     </Pressable>
   );
 };
+
+export const AddPhoto: FC<AddPhotoProps> = (props) => {
+  const { image, setImage } = props;
+
+  const openImagePicker = async () => {
+    try {
+      const options = {
+        mediaType: "photo" as MediaType,
+        maxHeight: 400,
+        maxWidth: 400,
+      };
+
+      launchImageLibrary(options, (response) => {
+        if (response.didCancel) {
+          console.log("User cancelled image picker");
+        } else if (response.errorCode) {
+          console.log("Image picker error: ", response.errorMessage);
+        } else {
+          setImage(response?.assets?.[0]?.uri || null);
+        }
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  return (
+    <View className="mb-6">
+      <TouchableOpacity
+        onPress={openImagePicker}
+        className={`border-2 p-4 ${
+          !image ? "border-Bittersweet" : "border-Bittersweet"
+        } rounded-lg flex items-center justify-center ${
+          image ? "bg-gray-100" : "bg-[rgba(255,111,97,0.1)]"
+        } w-[190px] h-[260px]`} 
+      >
+        {image ? (
+          <Image
+            source={{ uri: image }}
+            className="w-[190px] h-[260px] rounded-lg object-cover"
+          />
+        ) : (
+          <View className="flex items-center">
+            <LucideImage size={24} className="text-red-500" />
+            <Text className="text-black text-label1">Add a photo</Text>
+          </View>
+        )}
+      </TouchableOpacity>
+    </View>
+  );
+}

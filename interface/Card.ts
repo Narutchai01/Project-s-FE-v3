@@ -25,3 +25,7 @@ export interface CardReviewProps {
   selectItem?: (id: number) => void;
   selectArray?: number[];
 }
+export interface AddPhotoProps {
+  image: string | null;
+  setImage: (image: string | null) => void;
+}

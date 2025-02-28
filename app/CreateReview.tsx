@@ -13,7 +13,7 @@ export default function CreateSkincareScreen() {
   const [skincareItems, setSkincareItems] = useState<ISkincare[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
-  const { isReview, setIsReview } = useReview();
+  const { isReview, setIsReview, setReview } = useReview();
   const router = useRouter();
 
   const fetchSkincareItems = async () => {
@@ -51,8 +51,9 @@ export default function CreateSkincareScreen() {
   };
 
   const handleConfirm = () => {
+    setReview(selectedItems);
     setIsReview(!isReview);
-    router.push("/CreateReviewPost"); 
+    router.push("/CreateReviewPost");
   };
 
   return (
