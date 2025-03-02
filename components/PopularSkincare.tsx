@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { View, Text, ScrollView, TouchableOpacity ,FlatList } from "react-native";
+import { View, Text,TouchableOpacity ,FlatList } from "react-native";
 import { ChevronRight } from "lucide-react-native";
 import { ISkincare } from "@/interface/skincare";
 import { CardSkincare } from "./Card";

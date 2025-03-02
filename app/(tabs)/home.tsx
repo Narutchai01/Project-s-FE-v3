@@ -1,10 +1,10 @@
 import React from "react";
 import { View, Text, Image, ScrollView } from "react-native";
-import {SkinAnalysisCard }from "@/components/SkinAnalysisCard";
+import { SkinAnalysisCard } from "@/components/SkinAnalysisCard";
 import PopularThreads from "@/components/PopularThreads";
 import { PopularSkincare } from "@/components/PopularSkincare";
-import { useHome } from "@/context/HomeContext";
 import dayjs from "dayjs";
+import { useCompare } from "@/context/CompareContext";
 
 export default function SkincareScreen() {
   const today = dayjs();
@@ -13,7 +13,7 @@ export default function SkincareScreen() {
   const month = today.format("MMM");
   const year = today.year();
 
-  const { skincares ,resultLatest ,skins ,acnes,facials} = useHome();
+  const { skincares } = useCompare();
 
   return (
     <ScrollView className="px-4 pt-8 bg-Snow">
@@ -32,7 +32,7 @@ export default function SkincareScreen() {
         </View>
       </View>
 
-      <SkinAnalysisCard resultLatest={resultLatest} skins={Array.isArray(skins) ? skins : []} acnes={Array.isArray(acnes) ? acnes : []} facials={Array.isArray(facials) ? facials : []} />
+      {/* <SkinAnalysisCard resultLatest={resultLatest} skins={Array.isArray(skins) ? skins : []} acnes={Array.isArray(acnes) ? acnes : []} facials={Array.isArray(facials) ? facials : []} /> */}
       <PopularThreads />
       <PopularSkincare skincares={skincares} />
     </ScrollView>
