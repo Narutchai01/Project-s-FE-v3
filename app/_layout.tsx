@@ -42,6 +42,7 @@ export default function RootLayout() {
                   headerShown: true,
                 }}
               />
+              <Stack.Screen name="thread/[id]" />
             </Stack>
           </ReviewProvider>
         </CompareProvider>

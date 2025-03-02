@@ -12,7 +12,6 @@ import { IResult } from "@/interface/result";
 import { axiosInstance } from "@/lib/axios_instance";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { CardSkincare } from "@/components/Card";
-import { AvatarText } from "@/components/Avatar";
 import { ChevronUp, ChevronDown } from "lucide-react-native";
 import { useAcneStore } from "@/store/acneStore";
 import { useFacialStore } from "@/store/facialStore";

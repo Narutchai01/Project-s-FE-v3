@@ -13,20 +13,23 @@ import useLoading from "@/hook/useLoading";
 import LoadingIndicator from "@/components/Loading";
 import axios from "axios";
 
-const renderCard = (item: IThread) => {
+const renderCard = (item: IThread, handlerRouter: (id: number) => void) => {
   return (
-    <ThreadCard
-      image={item.images?.[0]?.image}
-      title={item.title}
-      user={item.user?.full_name}
-      userAvatar={item.user?.image}
-    />
+    <TouchableOpacity onPress={() => handlerRouter(item.id)}>
+      <ThreadCard
+        image={item.images?.[0]?.image}
+        title={item.title}
+        user={item.user?.full_name}
+        userAvatar={item.user?.image}
+      />
+    </TouchableOpacity>
   );
 };
 
 export default function CommonScreen() {
   const [threads, setThreads] = useState<IThread[] | null>(null);
   const { startLoading, stopLoading, isLoading } = useLoading();
+  const router = useRouter();
 
   const fecthThread = async () => {
     startLoading();
@@ -50,6 +53,10 @@ export default function CommonScreen() {
           }
         }
       });
+  };
+
+  const handleRouter = (id: number) => {
+    router.push(`/thread/${id}`);
   };
 
   useEffect(() => {
@@ -89,7 +96,7 @@ export default function CommonScreen() {
               data={threads}
               keyExtractor={(item) => item.id.toString()}
               numColumns={2}
-              renderItem={({ item }) => renderCard(item)}
+              renderItem={({ item }) => renderCard(item, handleRouter)}
             />
           )}
         </View>

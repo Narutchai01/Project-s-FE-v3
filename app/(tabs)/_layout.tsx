@@ -37,14 +37,6 @@ export default function _layout() {
         }}
       />
       <Tabs.Screen
-        name="threads"
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <MessageCircleMore size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="diary"
         options={{
           headerTitle: isCompare ? "" : "Diary",
