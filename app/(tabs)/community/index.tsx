@@ -71,7 +71,7 @@ export default function CommonScreen() {
           <Text className="text-Heading3 font-semibold">Threads</Text>
           <TouchableOpacity
             className="bg-Bittersweet w-10 h-10 rounded-lg flex items-center justify-center"
-            onPress={() => router.push("/CreateReview")}
+             onPress={() => router.push("/CreateReviewPost")}
           >
             <Plus size={25} color="white" />
           </TouchableOpacity>

@@ -6,15 +6,15 @@ import { axiosInstance } from "@/lib/axios_instance";
 import { ISkincare } from "@/interface/skincare";
 import Loading from "@/components/Loading";
 import { ButtonComponents } from "@/components/Buntton";
-import { useRouter } from 'expo-router';
-import { useReview } from "@/context/ReviewContext";
+import { useRouter } from "expo-router";
+import { useReview } from "@/context/ReviewContext"; 
 
 export default function CreateSkincareScreen() {
   const [skincareItems, setSkincareItems] = useState<ISkincare[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
-  const { isReview, setIsReview, setReview } = useReview();
   const router = useRouter();
+  const { setReview, setIsReview, setSkincare } = useReview();
 
   const fetchSkincareItems = async () => {
     setLoading(true);
@@ -31,29 +31,45 @@ export default function CreateSkincareScreen() {
   };
 
   useEffect(() => {
-    fetchSkincareItems();
+    fetchSkincareItems(); 
   }, []);
 
+  useEffect(() => {
+    const selectedSkincareData = skincareItems.filter((item) =>
+      selectedItems.includes(item.id)
+    );
+    setSkincare(selectedSkincareData); 
+  }, [selectedItems, skincareItems, setSkincare]); 
+
   const handleSelectItem = (id: number) => {
-    if (selectedItems.includes(id)) {
-      setSelectedItems(selectedItems.filter((item) => item !== id));
-    } else {
-      if (selectedItems.length < 10) {
-        setSelectedItems([...selectedItems, id]);
+    setSelectedItems((prevSelectedItems) => {
+      const isAlreadySelected = prevSelectedItems.includes(id);
+      if (isAlreadySelected) {
+        return prevSelectedItems.filter((item) => item !== id);
       } else {
-        console.error("You can only select up to 10 items.");
+        if (prevSelectedItems.length < 10) {
+          return [...prevSelectedItems, id];
+        } else {
+          console.error("You can only select up to 10 items.");
+          return prevSelectedItems;
+        }
       }
-    }
+    });
   };
 
   const handleCancel = () => {
+    router.push("/CreateReviewPost");
     setSelectedItems([]); 
   };
 
   const handleConfirm = () => {
-    setReview(selectedItems);
-    setIsReview(!isReview);
-    router.push("/CreateReviewPost");
+    const selectedSkincareData = skincareItems.filter((item) =>
+      selectedItems.includes(item.id)
+    );
+
+    setReview(selectedSkincareData); 
+    setIsReview(true);
+    router.push("/CreateReviewPost"); 
   };
 
   return (
@@ -86,7 +102,7 @@ export default function CreateSkincareScreen() {
         </View>
 
         {loading ? (
-          <Loading />
+          <Loading /> 
         ) : (
           <FlatList
             data={skincareItems}
@@ -95,9 +111,9 @@ export default function CreateSkincareScreen() {
               <ReviewCard
                 key={item.id}
                 data={item}
-                selectMode={true}
+                selectMode={true} 
                 selectItem={handleSelectItem}
-                selectArray={selectedItems}
+                selectArray={selectedItems} 
               />
             )}
           />

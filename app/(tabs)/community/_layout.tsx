@@ -5,7 +5,7 @@ export default function CommonLayout() {
   return (
     <Stack
       screenOptions={{
-        headerShown: false,
+        headerShown: true,
       }}
     >
       <Stack.Screen name="index" />
