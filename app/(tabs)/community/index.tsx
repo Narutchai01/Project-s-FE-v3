@@ -1,5 +1,5 @@
 import { View, FlatList, Text, TouchableOpacity } from "react-native";
-import { Plus } from "lucide-react-native";
+import { CopyPlus, Plus } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import React, { useEffect } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -12,6 +12,7 @@ import { ThreadCard } from "@/components/Card";
 import useLoading from "@/hook/useLoading";
 import LoadingIndicator from "@/components/Loading";
 import axios from "axios";
+import { MessageCircleQuestion } from "lucide-react-native";
 
 const renderCard = (item: IThread, handlerRouter: (id: number) => void) => {
   return (
@@ -30,6 +31,7 @@ export default function CommonScreen() {
   const [threads, setThreads] = useState<IThread[] | null>(null);
   const { startLoading, stopLoading, isLoading } = useLoading();
   const router = useRouter();
+  const [isMode, setIsMode] = useState(true);
 
   const fecthThread = async () => {
     startLoading();
@@ -66,14 +68,26 @@ export default function CommonScreen() {
   const CustomHeader = () => {
     const router = useRouter();
     return (
-      <View className="flex-1 bg-Snow p-4">
-        <View className="flex-row items-center justify-between mt-6 mb-8">
-          <Text className="text-Heading3 font-semibold">Threads</Text>
-          <TouchableOpacity
-            className="bg-Bittersweet w-10 h-10 rounded-lg flex items-center justify-center"
-             onPress={() => router.push("/CreateReviewPost")}
-          >
-            <Plus size={25} color="white" />
+      <View className="bg-Snow p-4">
+        <View className="flex flex-row items-center justify-between">
+          <Text className="text-Heading3 text-Quartz">
+            {isMode ? "review" : "Threads"}
+          </Text>
+          <TouchableOpacity className="bg-Bittersweet w-10 h-10 rounded-lg flex items-center justify-center">
+            <Plus
+              size={24}
+              color="white"
+              onPress={() => router.push("/CreateReviewPost")}
+            />
+          </TouchableOpacity>
+        </View>
+        <View className="flex flex-row items-center justify-between mt-4">
+          <TouchableOpacity>
+            <MessageCircleQuestion size={30} />
+          </TouchableOpacity>
+
+          <TouchableOpacity>
+            <CopyPlus size={30}/>
           </TouchableOpacity>
         </View>
       </View>
@@ -84,13 +98,24 @@ export default function CommonScreen() {
     <SafeAreaProvider>
       <Stack.Screen
         options={{
-          // headerShown: true,
+          headerShown: true,
           header: () => <CustomHeader />,
         }}
       />
       <SafeAreaView>
         <View>
-          {isLoading && !threads ? (
+          {isMode ? (
+            isLoading && !threads ? (
+              <LoadingIndicator />
+            ) : (
+              <FlatList
+                data={threads}
+                keyExtractor={(item) => item.id.toString()}
+                numColumns={2}
+                renderItem={({ item }) => renderCard(item, handleRouter)}
+              />
+            )
+          ) : isLoading && !threads ? (
             <LoadingIndicator />
           ) : (
             <FlatList

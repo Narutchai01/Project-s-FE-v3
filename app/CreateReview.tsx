@@ -1,45 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Text, View, FlatList, SafeAreaView } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ReviewCard } from "@/components/Card";
-import { axiosInstance } from "@/lib/axios_instance";
-import { ISkincare } from "@/interface/skincare";
 import Loading from "@/components/Loading";
 import { ButtonComponents } from "@/components/Buntton";
 import { useRouter } from "expo-router";
 import { useReview } from "@/context/ReviewContext"; 
+import { useCompare } from "@/context/CompareContext";
+import useLoading from "@/hook/useLoading";
 
 export default function CreateSkincareScreen() {
-  const [skincareItems, setSkincareItems] = useState<ISkincare[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedItems, setSelectedItems] = useState<number[]>([]);
   const router = useRouter();
-  const { setReview, setIsReview, setSkincare } = useReview();
+  const { setReview, setIsReview } = useReview();
+  const {skincares} = useCompare();
+  const {isLoading} = useLoading();
 
-  const fetchSkincareItems = async () => {
-    setLoading(true);
-    try {
-      const response = await axiosInstance.get("/skincare");
-      if (response.data.status) {
-        setSkincareItems(response.data.data);
-      }
-    } catch (error) {
-      console.error("Error fetching skincare items:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchSkincareItems(); 
-  }, []);
-
-  useEffect(() => {
-    const selectedSkincareData = skincareItems.filter((item) =>
-      selectedItems.includes(item.id)
-    );
-    setSkincare(selectedSkincareData); 
-  }, [selectedItems, skincareItems, setSkincare]); 
 
   const handleSelectItem = (id: number) => {
     setSelectedItems((prevSelectedItems) => {
@@ -63,7 +39,7 @@ export default function CreateSkincareScreen() {
   };
 
   const handleConfirm = () => {
-    const selectedSkincareData = skincareItems.filter((item) =>
+    const selectedSkincareData = skincares.filter((item) =>
       selectedItems.includes(item.id)
     );
 
@@ -101,11 +77,11 @@ export default function CreateSkincareScreen() {
           </Text>
         </View>
 
-        {loading ? (
+        {isLoading ? (
           <Loading /> 
         ) : (
           <FlatList
-            data={skincareItems}
+            data={skincares}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
               <ReviewCard
