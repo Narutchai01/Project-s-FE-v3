@@ -84,6 +84,7 @@ export default function CommonScreen() {
     <SafeAreaProvider>
       <Stack.Screen
         options={{
+          // headerShown: true,
           header: () => <CustomHeader />,
         }}
       />

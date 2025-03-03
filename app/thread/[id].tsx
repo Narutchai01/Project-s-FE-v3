@@ -1,23 +1,30 @@
-import { View, Text, FlatList, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  Dimensions,
+  TouchableOpacity,
+} from "react-native";
 import React from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { useLocalSearchParams } from "expo-router";
-import { useState, useEffect } from "react";
+import { Stack, useLocalSearchParams } from "expo-router";
+import { useState, useEffect,useCallback } from "react";
 import { IThread } from "@/interface/threads";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
 import useLoading from "@/hook/useLoading";
 import { Image } from "expo-image";
-import { Heart, MessageCircle, Bookmark, Dot } from "lucide-react-native";
-import { ButtonComponents } from "@/components/Buntton";
-
 import LoadingIndicator from "@/components/Loading";
+import { ActivityBar, UserBar } from "@/components/Bar";
+import { SquareArrowLeft } from "lucide-react-native";
+
 export default function ThreadDetails() {
   const { id } = useLocalSearchParams();
   const { startLoading, stopLoading, isLoading } = useLoading();
   const [thread, setThread] = useState<IThread | null>(null);
-  const { width } = Dimensions.get("screen");
-  const [curImage, setCurrImage] = useState<number>(0);
+  const { width, height } = Dimensions.get("window");
+  const [currImage, setCurrImage] = useState(0);
+  const [commentCount, setCommentCount] = useState(0);
 
   const fecThread = async () => {
     startLoading();
@@ -44,97 +51,82 @@ export default function ThreadDetails() {
 
   useEffect(() => {
     fecThread();
-  }, []);
+  }, [thread]);
+
+
+  
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView>
-        {isLoading ? (
+    <SafeAreaProvider style={{ backgroundColor: "#fff" }}>
+      <Stack.Screen
+        options={{
+          headerShown: true,
+          header: () => (
+            <View className="h-16 bg-White">
+              <View className=" h-full flex-row items-center justify-between px-3">
+                <TouchableOpacity className="flex flex-row gap-x-3 items-center">
+                  <SquareArrowLeft size={28} color="#4A4A4A" />
+                  <Text className="text-2xl font-semibold text-Quartz" >Thread</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ),
+        }}
+      />
+      <SafeAreaView className="flex-1">
+        {isLoading && thread === null ? (
           <LoadingIndicator />
         ) : (
           <View>
-            <View className="flex flex-row justify-between items-center">
-              <View className="flex flex-row items-center gap-x-5">
-                <View
-                  style={{
-                    width: 50,
-                    height: 50,
-                  }}
-                >
-                  <Image
-                    source={{ uri: thread?.user.image }}
-                    style={{
-                      width: "100%",
-                      height: "100%",
-                      borderRadius: 50,
-                    }}
-                  />
-                </View>
-                <Text>{thread?.user.full_name}</Text>
-              </View>
-              <ButtonComponents
-                title="Folloow"
-                className=" bg-Bittersweet px-5 py-2 rounded-full"
-                textSize="text-white"
+            <UserBar
+              userImage={thread?.user?.image}
+              username={thread?.user?.full_name}
+            />
+            <View style={{ padding: 10 }}>
+              <FlatList
+                data={thread?.images}
+                renderItem={({ item, index }) => {
+                  return (
+                    <Image
+                      source={{ uri: item.image }}
+                      style={{
+                        width: width - 20,
+                        height: height * 0.5,
+                        borderRadius: 10,
+                      }}
+                      key={index}
+                    />
+                  );
+                }}
+                keyExtractor={(item) => item.id.toString()}
+                pagingEnabled
+                bounces={false}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                onScroll={(e) => {
+                  const { contentOffset } = e.nativeEvent;
+                  const index = Math.round(contentOffset.x / (width - 20));
+                  setCurrImage(index);
+                }}
               />
             </View>
-            <FlatList
-              data={thread?.images}
-              renderItem={({ item, index }) => (
-                <View
-                  style={{
-                    width: width,
-                    height: 520,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Image
-                    source={{ uri: item?.image }}
-                    style={{ width: "100%", height: "100%", borderRadius: 30 }}
-                    onLoad={() => setCurrImage(index)}
-                  />
-                </View>
-              )}
-              keyExtractor={(_, index) => index.toString()}
-              pagingEnabled
-              bounces={false}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              onMomentumScrollEnd={(event) => {
-                const index = Math.round(
-                  event.nativeEvent.contentOffset.x / width
-                );
-                setCurrImage(index);
-              }}
+            <ActivityBar
+              favorite={thread?.favorite}
+              favoriteCount={thread?.favorite_count}
+              commnetCount={commentCount}
+              dataPaginate={thread?.images}
+              currImage={currImage}
+              bookmark={thread?.bookmark}
             />
-
-            <View
-              style={{ flexDirection: "row", justifyContent: "space-between" }}
-            >
-              <View style={{ flexDirection: "row" }}>
-                <View style={{ flexDirection: "row" }}>
-                  <Heart color={thread?.favorite ? "red" : "gray"} />
-                  <Text className="text-3xl">{thread?.favorite_count}</Text>
-                </View>
-                <MessageCircle />
-              </View>
-
-              <View style={{ flexDirection: "row" }}>
-                {thread?.images.map((_, index) => (
-                  <Dot
-                    key={index}
-                    size={48}
-                    color={index !== curImage ? "gray" : "red"}
-                  />
-                ))}
-              </View>
-              <Bookmark />
-            </View>
-
-            <View>
-              <Text className="text-3xl font-bold">{thread?.title}</Text>
-              <Text>{thread?.caption}</Text>
+            <View className="container mx-auto px-3">
+              <Text style={{
+                fontSize: width * 0.05,
+                fontWeight: "bold",
+              }}>{thread?.title}</Text>
+              <Text style={{
+                fontSize: width * 0.0375,
+                fontWeight: "medium",
+              }}>{thread?.caption}</Text>
             </View>
           </View>
         )}
