@@ -14,20 +14,24 @@ import { MessageCircleQuestion } from "lucide-react-native";
 import { IReview } from "@/interface/review";
 import { IThread } from "@/interface/threads";
 
-const getImageSource = (item: IThread | IReview): string => {
-  if ("images" in item) {
-    return item.images?.[0]?.image || ""; 
-  }
-  return item.image || ""; 
-};
-
-const renderCard = (item: IThread | IReview, handlerRouter: (id: number) => void) => {
-  const image = getImageSource(item); 
-
+const renderCard = (item: IThread , handlerRouter: (id: number) => void) => {
   return (
     <TouchableOpacity onPress={() => handlerRouter(item.id)}>
       <ThreadCard
-        image={image}
+        image={item.images?.[0]?.image}
+        title={item.title}
+        user={item.user?.full_name}
+        userAvatar={item.user?.image}
+      />
+    </TouchableOpacity>
+  );
+};
+
+const renderCardReview = (item: IReview , handlerRouter: (id: number) => void) => {
+  return (
+    <TouchableOpacity onPress={() => handlerRouter(item.id)}>
+      <ThreadCard
+        image={item.image}
         title={item.title}
         user={item.user?.full_name}
         userAvatar={item.user?.image}
@@ -78,11 +82,7 @@ export default function CommonScreen() {
       })
       .then((res) => {
         if (res.data.status) {
-          const reviewsWithImages = res.data.data.map((review: IReview) => ({
-            ...review,
-            image: review.image || "", 
-          }));
-          setReviews(reviewsWithImages);
+          setReviews(res.data.data);
           stopLoading();
         }
       })
@@ -98,11 +98,7 @@ export default function CommonScreen() {
 
   const handleRouter = (id: number) => {
     console.log(`Navigating to: ${isMode ? '/thread/' : '/reviewSkincare/'}${id}`);
-    if (isMode) {
-      router.push(`/thread/${id}`);
-    } else {
-      router.push(`/reviewSkincare/${id}`);
-    }
+    router.push(isMode ? `/thread/${id}` : `/review/${id}`);
   };
 
   useEffect(() => {
@@ -167,7 +163,7 @@ export default function CommonScreen() {
               data={reviews}
               keyExtractor={(item) => item.id.toString()}
               numColumns={2}
-              renderItem={({ item }) => renderCard(item, handleRouter)}
+              renderItem={({ item }) => renderCardReview(item, handleRouter)}
             />
           )}
         </View>
