@@ -8,7 +8,7 @@ export interface IReview {
     bookmark:       boolean;
     owner:          boolean;
     content:        string;
-    image:          Image[];
+    image:          string;
     user:           User;
     create_at:      Date;
     skincares:      ISkincare[]

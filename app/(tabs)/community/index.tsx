@@ -1,11 +1,9 @@
 import { View, FlatList, Text, TouchableOpacity } from "react-native";
 import { CopyPlus, Plus } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Stack } from "expo-router";
-import { useState } from "react";
-import { IThread } from "@/interface/threads";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
 import { ThreadCard } from "@/components/Card";
@@ -13,12 +11,23 @@ import useLoading from "@/hook/useLoading";
 import LoadingIndicator from "@/components/Loading";
 import axios from "axios";
 import { MessageCircleQuestion } from "lucide-react-native";
+import { IReview } from "@/interface/review";
+import { IThread } from "@/interface/threads";
 
-const renderCard = (item: IThread, handlerRouter: (id: number) => void) => {
+const getImageSource = (item: IThread | IReview): string => {
+  if ("images" in item) {
+    return item.images?.[0]?.image || ""; 
+  }
+  return item.image || ""; 
+};
+
+const renderCard = (item: IThread | IReview, handlerRouter: (id: number) => void) => {
+  const image = getImageSource(item); 
+
   return (
     <TouchableOpacity onPress={() => handlerRouter(item.id)}>
       <ThreadCard
-        image={item.images?.[0]?.image}
+        image={image}
         title={item.title}
         user={item.user?.full_name}
         userAvatar={item.user?.image}
@@ -29,11 +38,12 @@ const renderCard = (item: IThread, handlerRouter: (id: number) => void) => {
 
 export default function CommonScreen() {
   const [threads, setThreads] = useState<IThread[] | null>(null);
+  const [reviews, setReviews] = useState<IReview[] | null>(null);
   const { startLoading, stopLoading, isLoading } = useLoading();
   const router = useRouter();
-  const [isMode, setIsMode] = useState(true);
+  const [isMode, setIsMode] = useState(false);
 
-  const fecthThread = async () => {
+  const fetchThread = async () => {
     startLoading();
     const token = await AsyncStorage.getItem("token");
     await axiosInstance
@@ -57,12 +67,47 @@ export default function CommonScreen() {
       });
   };
 
+  const fecthReview = async () => {
+    startLoading();
+    const token = await AsyncStorage.getItem("token");
+    await axiosInstance
+      .get("/reviews", {
+        headers: {
+          token: token,
+        },
+      })
+      .then((res) => {
+        if (res.data.status) {
+          const reviewsWithImages = res.data.data.map((review: IReview) => ({
+            ...review,
+            image: review.image || "", 
+          }));
+          setReviews(reviewsWithImages);
+          stopLoading();
+        }
+      })
+      .catch((err) => {
+        if (axios.isAxiosError(err)) {
+          if (err.response?.status === 401) {
+            console.log("Unauthorized");
+          }
+        }
+      });
+  };
+  
+
   const handleRouter = (id: number) => {
-    router.push(`/thread/${id}`);
+    console.log(`Navigating to: ${isMode ? '/thread/' : '/reviewSkincare/'}${id}`);
+    if (isMode) {
+      router.push(`/thread/${id}`);
+    } else {
+      router.push(`/reviewSkincare/${id}`);
+    }
   };
 
   useEffect(() => {
-    fecthThread();
+    fetchThread();
+    fecthReview();
   }, []);
 
   const CustomHeader = () => {
@@ -71,7 +116,7 @@ export default function CommonScreen() {
       <View className="bg-Snow p-4">
         <View className="flex flex-row items-center justify-between">
           <Text className="text-Heading3 text-Quartz">
-            {isMode ? "review" : "Threads"}
+            {isMode ? "Threads" : "Review"}
           </Text>
           <TouchableOpacity className="bg-Bittersweet w-10 h-10 rounded-lg flex items-center justify-center">
             <Plus
@@ -82,12 +127,12 @@ export default function CommonScreen() {
           </TouchableOpacity>
         </View>
         <View className="flex flex-row items-center justify-between mt-4">
-          <TouchableOpacity>
-            <MessageCircleQuestion size={30} />
+          <TouchableOpacity onPress={() => setIsMode(false)}>
+            <CopyPlus size={30} />
           </TouchableOpacity>
 
-          <TouchableOpacity>
-            <CopyPlus size={30}/>
+          <TouchableOpacity onPress={() => setIsMode(true)}>
+            <MessageCircleQuestion size={30} />
           </TouchableOpacity>
         </View>
       </View>
@@ -115,11 +160,11 @@ export default function CommonScreen() {
                 renderItem={({ item }) => renderCard(item, handleRouter)}
               />
             )
-          ) : isLoading && !threads ? (
+          ) : isLoading && !reviews ? (
             <LoadingIndicator />
           ) : (
             <FlatList
-              data={threads}
+              data={reviews}
               keyExtractor={(item) => item.id.toString()}
               numColumns={2}
               renderItem={({ item }) => renderCard(item, handleRouter)}
