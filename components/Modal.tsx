@@ -34,7 +34,7 @@ interface PropsModalSensitiveSkin {
 
 interface ModalSkincareProps {
   isOpen: boolean;
-  onClose: () => void; 
+  onClose: () => void;
   // setSkincare((prev, item) => [...prev, item]);
 }
 
@@ -222,28 +222,27 @@ export const ModalCreateThread: FC<any> = (props) => {
   );
 };
 
-export default function ModalSkincare({ isOpen, onClose, setSkincare, skincare }: any) {
-  // const [selectedItems, setSelectedItems] = useState<number[]>([]);
-  // const { setReview, setIsReview } = useReview();
-  const {skincares} = useCompare();
-  const {isLoading} = useLoading();
+export function ModalSkincare({ isOpen, onClose, setSkincare, skincare }: any) {
+  const { skincares } = useCompare();
+  const { isLoading } = useLoading();
 
   const handleSelectItem = (item: ISkincare) => {
-    setSkincare((prev: ISkincare[]) => {
-      if (prev.length === 10) {
-        return prev;
-      }
-      return [...prev, item];
-    });
+    if (skincare.includes(item) || skincare.length >= 10) {
+      setSkincare((prev: ISkincare[]) =>
+        prev.filter((prevItem: ISkincare) => prevItem.id !== item.id)
+      );
+    } else {
+      setSkincare((prev: ISkincare[]) => [...prev, item]);
+    }
   };
 
   const handleConfirm = () => {
     onClose();
   };
-  
+
   const handleCancel = () => {
     setSkincare([]);
-    onClose(); 
+    onClose();
   };
 
   return (
@@ -276,18 +275,16 @@ export default function ModalSkincare({ isOpen, onClose, setSkincare, skincare }
         </View>
 
         {isLoading ? (
-          <Loading /> 
+          <Loading />
         ) : (
           <FlatList
             data={skincares}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
               <ReviewCard
-                key={item.id}
                 data={item}
-                selectMode={true} 
-                selectItem={( ) => handleSelectItem(item)}
-                selectArray={skincare} 
+                selectArray={skincare}
+                setItem={() => handleSelectItem(item)}
               />
             )}
           />

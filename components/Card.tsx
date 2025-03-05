@@ -168,20 +168,14 @@ export const ThreadCard: FC<ThreadCardProps> = (props) => {
 };
 
 export const ReviewCard: FC<CardReviewProps> = (props) => {
-  const { data, selectMode, selectItem, selectArray = [] } = props;
-  const check = selectArray.includes(data.id);
-
-  const handlePress = () => {
-    if (selectMode && selectItem) {
-      selectItem(data.id);
-    }
-  };
+  const { data, selectArray = [] ,setItem} = props;
+  const check = selectArray.includes(data);
 
   return (
-    <Pressable onPress={handlePress}>
+    <Pressable onPress={() => setItem(data)}>
       <View
         className={`flex-row items-center rounded-lg shadow p-4 mb-4 ${
-          check && selectMode ? "bg-[#CAC9C9]" : "bg-white"
+          check  ? "bg-[#CAC9C9]" : "bg-white"
         }`}
       >
         <Image

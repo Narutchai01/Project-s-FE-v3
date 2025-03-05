@@ -14,7 +14,7 @@ import { useRouter } from "expo-router";
 import { ISkincare } from "@/interface/skincare";
 import { axiosInstance } from "@/lib/axios_instance";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import ModalSkincare from "@/components/Modal";
+import {ModalSkincare} from "@/components/Modal";
 import useLoading from "@/hook/useLoading";
 import { ImageIcon } from "lucide-react-native";
 import * as DocumentPicker from "expo-document-picker";
@@ -89,6 +89,9 @@ export default function CreateReviewPost() {
       stopLoading();
     }
   };
+
+  console.log(skincare);
+  
 
   return (
     <SafeAreaView className="p-4">
@@ -203,8 +206,8 @@ export default function CreateReviewPost() {
       <ModalSkincare
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        setSkincare={setSkincare}
         skincare={skincare}
+        setSkincare={setSkincare}
       />
     </SafeAreaView>
   );

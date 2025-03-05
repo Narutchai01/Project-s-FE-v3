@@ -21,9 +21,8 @@ export interface ThreadCardProps {
 
 export interface CardReviewProps {
   data: ISkincare;
-  selectMode?: boolean;
-  selectItem?: (id: number) => void;
-  selectArray?: number[];
+  setItem : (item: ISkincare) => void;
+  selectArray?: ISkincare[];
 }
 export interface AddPhotoProps {
   image: string | null;
