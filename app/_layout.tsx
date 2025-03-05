@@ -3,17 +3,20 @@ import { AuthProvider } from "@/context/AuthContext";
 import { AppRegistry } from "react-native";
 import { PaperProvider } from "react-native-paper";
 import { expo } from "@/app.json";
-import { HomeProvider } from "@/context/HomeContext";
 import { CompareProvider } from "@/context/CompareContext";
+import { ReviewProvider } from "@/context/ReviewContext";
 
 export default function RootLayout() {
   return (
     <PaperProvider>
       <AuthProvider>
-        <HomeProvider>
-          <CompareProvider>
+        <CompareProvider>
+          <ReviewProvider>
             <Stack
-              screenOptions={{ headerShadowVisible: false, headerShown: false }}
+              screenOptions={{
+                headerShadowVisible: false,
+                headerShown: false,
+              }}
             >
               <Stack.Screen name="(auth)" />
               <Stack.Screen name="(tabs)" />
@@ -22,7 +25,6 @@ export default function RootLayout() {
                 options={{
                   headerTitle: "Compare",
                   headerShown: true,
-                  
                 }}
               />
               <Stack.Screen
@@ -33,9 +35,18 @@ export default function RootLayout() {
                   headerShown: true,
                 }}
               />
+              <Stack.Screen
+                name="create-review"
+                options={{
+                  headerTitle: "Review",
+                  headerShown: true,
+                }}
+              />
+              <Stack.Screen name="thread/[id]" />
+              <Stack.Screen name="review/[id]" />
             </Stack>
-          </CompareProvider>
-        </HomeProvider>
+          </ReviewProvider>
+        </CompareProvider>
       </AuthProvider>
     </PaperProvider>
   );

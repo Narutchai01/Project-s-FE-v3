@@ -32,7 +32,7 @@ export default function CompareScreen() {
     7: "Freckles and Dark Spots",
   };
 
-  useEffect(() => {
+
     const fetchData = async () => {
       setLoading(true);
       const token = await AsyncStorage.getItem("token");
@@ -52,6 +52,7 @@ export default function CompareScreen() {
       }
     };
 
+  useEffect(() => {
     fetchData();
   }, [compare]);
 

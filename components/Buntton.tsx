@@ -43,7 +43,7 @@ export const BackButtonComponents: FC<BackButtonProps> = (props) => {
   return (
     <TouchableOpacity
       onPress={() => router.back()}
-      className="mb-4 flex-row items-center"
+      className="mb-4 flex-row items-center gap-x-4"
     >
       <SquareArrowLeft size={28} color="#4A4A4A" />
       <Text className={textSize}>{title}</Text>
