@@ -60,7 +60,7 @@ export default function CreateReviewPost() {
       const formData = new FormData();
       formData.append("title", review.title);
       formData.append("content", review.content);
-      formData.append("review", JSON.stringify(review));
+      // formData.append("review", JSON.stringify(review));
       if (image) {
         image.forEach((img: string) => {
           const file = {
@@ -203,6 +203,8 @@ export default function CreateReviewPost() {
       <ModalSkincare
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        setSkincare={setSkincare}
+        skincare={skincare}
       />
     </SafeAreaView>
   );

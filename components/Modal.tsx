@@ -24,6 +24,7 @@ import { ReviewCard } from "./Card";
 import Loading from "@/components/Loading";
 import { useCompare } from "@/context/CompareContext";
 import { useReview } from "@/context/ReviewContext";
+import { ISkincare } from "@/interface/skincare";
 
 interface PropsModalSensitiveSkin {
   isOpen: boolean;
@@ -34,6 +35,7 @@ interface PropsModalSensitiveSkin {
 interface ModalSkincareProps {
   isOpen: boolean;
   onClose: () => void; 
+  // setSkincare((prev, item) => [...prev, item]);
 }
 
 export const ModalSensitiveSkin: FC<PropsModalSensitiveSkin> = (props) => {
@@ -220,39 +222,27 @@ export const ModalCreateThread: FC<any> = (props) => {
   );
 };
 
-export default function ModalSkincare({ isOpen, onClose }: ModalSkincareProps) {
-  const [selectedItems, setSelectedItems] = useState<number[]>([]);
-  const { setReview, setIsReview } = useReview();
+export default function ModalSkincare({ isOpen, onClose, setSkincare, skincare }: any) {
+  // const [selectedItems, setSelectedItems] = useState<number[]>([]);
+  // const { setReview, setIsReview } = useReview();
   const {skincares} = useCompare();
   const {isLoading} = useLoading();
 
-  const handleSelectItem = (id: number) => {
-    setSelectedItems((prevSelectedItems) => {
-      const isAlreadySelected = prevSelectedItems.includes(id);
-      if (isAlreadySelected) {
-        return prevSelectedItems.filter((item) => item !== id);
-      } else {
-        if (prevSelectedItems.length < 10) {
-          return [...prevSelectedItems, id];
-        } else {
-          console.error("You can only select up to 10 items.");
-          return prevSelectedItems;
-        }
+  const handleSelectItem = (item: ISkincare) => {
+    setSkincare((prev: ISkincare[]) => {
+      if (prev.length === 10) {
+        return prev;
       }
+      return [...prev, item];
     });
   };
 
   const handleConfirm = () => {
-    const selectedSkincareData = skincares.filter((item) =>
-      selectedItems.includes(item.id)
-    );
-    setReview(selectedSkincareData);
-    setIsReview(true);
     onClose();
   };
   
   const handleCancel = () => {
-    setSelectedItems([]);
+    setSkincare([]);
     onClose(); 
   };
 
@@ -281,7 +271,7 @@ export default function ModalSkincare({ isOpen, onClose }: ModalSkincareProps) {
 
         <View className="flex items-center mb-4">
           <Text className="text-Heading3 font-semibold text-center">
-            Select skincares to review ({selectedItems.length}/10)
+            Select skincares to review ({skincare?.length}/10)
           </Text>
         </View>
 
@@ -296,8 +286,8 @@ export default function ModalSkincare({ isOpen, onClose }: ModalSkincareProps) {
                 key={item.id}
                 data={item}
                 selectMode={true} 
-                selectItem={handleSelectItem}
-                selectArray={selectedItems} 
+                selectItem={( ) => handleSelectItem(item)}
+                selectArray={skincare} 
               />
             )}
           />
