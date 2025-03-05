@@ -60,16 +60,14 @@ export default function CreateReviewPost() {
       const formData = new FormData();
       formData.append("title", review.title);
       formData.append("content", review.content);
-      // formData.append("review", JSON.stringify(review));
+      formData.append("skincare_id", JSON.stringify(skincare.map((item) => item.id)));
       if (image) {
-        image.forEach((img: string) => {
-          const file = {
-            uri: img,
-            name: "image.jpg",
-            type: "image/jpeg",
-          };
-          formData.append("files", file as unknown as Blob);
-        });
+        const file = {
+          uri: image[0],
+          name: "image.jpg",
+          type: "image/jpeg",
+        };
+        formData.append("file", file as unknown as Blob);
       }
       await axiosInstance
         .post("/reviews", formData, {
