@@ -17,6 +17,7 @@ interface IActivityBar {
   bookmark: boolean | undefined;
   hadleFavorite: () => void;
   handleBookmark: () => void;
+  isOpenComment: () => void;
 }
 
 export const ActivityBar: FC<IActivityBar> = (props) => {
@@ -29,6 +30,7 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
     bookmark,
     hadleFavorite,
     handleBookmark,
+    isOpenComment,
   } = props;
 
   return (
@@ -61,7 +63,9 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
               gap: 8,
             }}
           >
-            <MessageCircle size={24} />
+            <TouchableOpacity onPress={isOpenComment}>
+              <MessageCircle size={24} />
+            </TouchableOpacity>
             <Text style={{ fontSize: 20 }}>{commnetCount}</Text>
           </View>
         </View>
