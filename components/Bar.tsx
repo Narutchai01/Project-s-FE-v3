@@ -1,13 +1,12 @@
 import { Heart, MessageCircle, Bookmark } from "lucide-react-native";
-import { Text, View } from "react-native";
+import { Text, Touchable, TouchableOpacity, View } from "react-native";
 import { ImagePagination } from "./paginate";
 import { FC } from "react";
 import { Image } from "expo-image";
 import { ButtonComponents } from "./Buntton";
-import {Dimensions} from "react-native";
+import { Dimensions } from "react-native";
 
 const { width, height } = Dimensions.get("window");
-
 
 interface IActivityBar {
   favorite: boolean | undefined;
@@ -16,6 +15,8 @@ interface IActivityBar {
   dataPaginate: any;
   currImage: number;
   bookmark: boolean | undefined;
+  hadleFavorite: () => void;
+  handleBookmark: () => void;
 }
 
 export const ActivityBar: FC<IActivityBar> = (props) => {
@@ -26,6 +27,8 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
     dataPaginate,
     currImage,
     bookmark,
+    hadleFavorite,
+    handleBookmark,
   } = props;
 
   return (
@@ -46,7 +49,9 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
               gap: 8,
             }}
           >
-            <Heart size={24} color={favorite ? "red" : "gray"} />
+            <TouchableOpacity onPress={hadleFavorite}>
+              <Heart size={24} color={favorite ? "red" : "gray"} />
+            </TouchableOpacity>
             <Text style={{ fontSize: 20 }}>{favoriteCount}</Text>
           </View>
           <View
@@ -65,14 +70,16 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
         <ImagePagination data={dataPaginate} currImage={currImage} />
       </View>
       <View className="px-10">
-        <Bookmark size={24} color={bookmark ? "red" : "gray"} />
+        <TouchableOpacity onPress={handleBookmark}>
+          <Bookmark size={24} color={bookmark ? "red" : "gray"} />
+        </TouchableOpacity>
       </View>
     </View>
   );
 };
 
 export const UserBar: FC<any> = (props) => {
-  const { userImage, username} = props;
+  const { userImage, username } = props;
 
   return (
     <View className="flex flex-row justify-between items-center px-3 py-2">
