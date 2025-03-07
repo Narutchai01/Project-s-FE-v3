@@ -1,6 +1,13 @@
 import { FC } from "react";
 import { View, Text, Image, Pressable, TouchableOpacity } from "react-native";
-import { CardSkincareProps, DiaryCardProps, CardReviewProps, ThreadCardProps, AddPhotoProps } from "@/interface/Card";
+import {
+  CardSkincareProps,
+  DiaryCardProps,
+  CardReviewProps,
+  ThreadCardProps,
+  AddPhotoProps,
+  ICommentCardProps,
+} from "@/interface/Card";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
 import { Heart } from "lucide-react-native";
@@ -14,7 +21,7 @@ export const CardSkincare: FC<CardSkincareProps> = (props) => {
     <View className="bg-white rounded-2xl shadow w-[115px] h-[130px] mx-2 mb-2 relative overflow-hidden">
       <View className="w-[115px] h-[115px] relative overflow-hidden">
         <Image
-          source={{ uri: image }}
+          source={{ uri: image || undefined }}
           className="w-full h-full rounded-t-2xl object-cover"
           style={{ borderBottomRightRadius: 32.5 }}
         />
@@ -168,14 +175,14 @@ export const ThreadCard: FC<ThreadCardProps> = (props) => {
 };
 
 export const ReviewCard: FC<CardReviewProps> = (props) => {
-  const { data, selectArray = [] ,setItem} = props;
+  const { data, selectArray = [], setItem } = props;
   const check = selectArray.includes(data);
 
   return (
     <Pressable onPress={() => setItem(data)}>
       <View
         className={`flex-row items-center rounded-lg shadow p-4 mb-4 ${
-          check  ? "bg-[#CAC9C9]" : "bg-white"
+          check ? "bg-[#CAC9C9]" : "bg-white"
         }`}
       >
         <Image
@@ -223,7 +230,7 @@ export const AddPhoto: FC<AddPhotoProps> = (props) => {
           !image ? "border-Bittersweet" : "border-Bittersweet"
         } rounded-lg flex items-center justify-center ${
           image ? "bg-gray-100" : "bg-[rgba(255,111,97,0.1)]"
-        } w-[190px] h-[260px]`} 
+        } w-[190px] h-[260px]`}
       >
         {image ? (
           <Image
@@ -239,4 +246,29 @@ export const AddPhoto: FC<AddPhotoProps> = (props) => {
       </TouchableOpacity>
     </View>
   );
-}
+};
+
+export const CommentCard: FC<ICommentCardProps> = (props) => {
+  const { image, username, content, count_favorite = 1, favorite, handleFavoriteComment } = props;
+
+  return (
+    <View className="flex flex-row justify-between">
+      <View className="flex flex-row gap-x-4">
+        <Image
+          source={{ uri: image || undefined }}
+          style={{ width: 50, height: 50, borderRadius: 50 }}
+        />
+        <View className="flex justify-center gap-y-4">
+          <Text className="text-xl">{username}</Text>
+          <Text className=" text-lg">{content}</Text>
+        </View>
+      </View>
+      <View className="flex justify-center items-center">
+        <TouchableOpacity onPress={handleFavoriteComment}>
+              <Heart size={24} color={favorite ? "red" : "gray"} />
+        </TouchableOpacity>
+        <Text>{count_favorite > 0 ? count_favorite : ""}</Text>
+      </View>
+    </View>
+  );
+};

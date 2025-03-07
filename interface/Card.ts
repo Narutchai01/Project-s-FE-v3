@@ -7,7 +7,7 @@ export interface CardSkincareProps {
 }
 
 export interface DiaryCardProps {
-  data : IResult;
+  data: IResult;
   compareMode?: boolean;
   selectItem?: () => void;
   selectArray?: number[];
@@ -21,10 +21,20 @@ export interface ThreadCardProps {
 
 export interface CardReviewProps {
   data: ISkincare;
-  setItem : (item: ISkincare) => void;
+  setItem: (item: ISkincare) => void;
   selectArray?: ISkincare[];
 }
 export interface AddPhotoProps {
   image: string | null;
   setImage: (image: string | null) => void;
+}
+
+export interface ICommentCardProps {
+  id: number;
+  image: string | null;
+  username: string | null;
+  content: string | null;
+  count_favorite: number;
+  favorite: boolean;
+  handleFavoriteComment: () => void;
 }
