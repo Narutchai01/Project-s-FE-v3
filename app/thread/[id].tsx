@@ -8,7 +8,7 @@ import {
 import React from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { useState, useEffect,useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { IThread } from "@/interface/threads";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
@@ -37,7 +37,6 @@ export default function ThreadDetails() {
       });
 
       const data = res.data;
-      console.log("Review data received:", data);
       if (data.status) {
         setThread(data.data);
         stopLoading();
@@ -52,10 +51,39 @@ export default function ThreadDetails() {
 
   useEffect(() => {
     fecThread();
-  }, [thread]);
+  }, []);
 
+  const handleFavorite = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const res = await axiosInstance.post(`/favorite/thread/${id}`, null, {
+        headers: {
+          token: token,
+        },
+      });
 
-  
+      console.log(res);
+      fecThread();
+    } catch (error: any) {
+      console.log(error.response.data);
+    }
+  };
+
+  const handleBookmark = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const res = await axiosInstance.post(`/bookmark/thread/${id}`, null, {
+        headers: {
+          token: token,
+        },
+      });
+
+      console.log(res);
+      fecThread();
+    } catch (error: any) {
+      console.log(error.response.data);
+    }
+  };
 
   return (
     <SafeAreaProvider style={{ backgroundColor: "#fff" }}>
@@ -67,7 +95,9 @@ export default function ThreadDetails() {
               <View className=" h-full flex-row items-center justify-between px-3">
                 <TouchableOpacity className="flex flex-row gap-x-3 items-center">
                   <SquareArrowLeft size={28} color="#4A4A4A" />
-                  <Text className="text-2xl font-semibold text-Quartz" >Thread</Text>
+                  <Text className="text-2xl font-semibold text-Quartz">
+                    Thread
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -112,6 +142,8 @@ export default function ThreadDetails() {
               />
             </View>
             <ActivityBar
+              hadleFavorite={handleFavorite}
+              handleBookmark={handleBookmark}
               favorite={thread?.favorite}
               favoriteCount={thread?.favorite_count}
               commnetCount={commentCount}
@@ -120,14 +152,22 @@ export default function ThreadDetails() {
               bookmark={thread?.bookmark}
             />
             <View className="container mx-auto px-3">
-              <Text style={{
-                fontSize: width * 0.05,
-                fontWeight: "bold",
-              }}>{thread?.title}</Text>
-              <Text style={{
-                fontSize: width * 0.0375,
-                fontWeight: "medium",
-              }}>{thread?.caption}</Text>
+              <Text
+                style={{
+                  fontSize: width * 0.05,
+                  fontWeight: "bold",
+                }}
+              >
+                {thread?.title}
+              </Text>
+              <Text
+                style={{
+                  fontSize: width * 0.0375,
+                  fontWeight: "medium",
+                }}
+              >
+                {thread?.caption}
+              </Text>
             </View>
           </View>
         )}
