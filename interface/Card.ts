@@ -28,3 +28,8 @@ export interface AddPhotoProps {
   image: string | null;
   setImage: (image: string | null) => void;
 }
+
+export interface CardPopularSkincare {
+  image: string;
+  name: string;
+}
