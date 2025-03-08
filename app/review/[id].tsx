@@ -81,7 +81,7 @@ export default function ReviewDetails() {
             />
             <View style={{ padding: 10 }}>
               <FlatList
-                data={review?.skincares} // Change to display skincare images
+                data={review?.skincares} 
                 renderItem={({ item, index }) => {
                   return (
                     <ExpoImage
@@ -111,7 +111,7 @@ export default function ReviewDetails() {
               favorite={review?.favorite}
               favoriteCount={review?.favorite_count}
               commnetCount={commentCount}
-              dataPaginate={review?.skincares} // Updated to skincares for pagination
+              dataPaginate={review?.skincares} 
               currImage={currImage}
               bookmark={review?.bookmark}
             />

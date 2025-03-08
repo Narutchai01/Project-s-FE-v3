@@ -246,6 +246,35 @@ export const AddPhoto: FC<AddPhotoProps> = (props) => {
       </TouchableOpacity>
     </View>
   );
+}
+
+export const CardPopularSkincare: FC<CardSkincareProps> = (props) => {
+  const { image, name } = props;
+
+  return (
+    <View className="bg-white rounded-2xl shadow w-[165px] h-[200px] mx-3 mb-4 relative overflow-hidden">
+      <View className="w-full h-[165px] relative overflow-hidden">
+        <Image
+          source={{ uri: image }}
+          className="w-full h-full rounded-t-2xl object-cover"
+          style={{ borderBottomRightRadius: 32.5 }}
+        />
+      </View>
+
+      <View
+        className="absolute bottom-0 left-0 w-full h-[45px] bg-white flex-row items-center px-2"
+        style={{ borderTopLeftRadius: 13, borderTopRightRadius: 5 }}
+      >
+        <Text
+          className="text-label2 font-medium w-full"
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          {name}
+        </Text>
+      </View>
+    </View>
+  );
 };
 
 export const CommentCard: FC<ICommentCardProps> = (props) => {

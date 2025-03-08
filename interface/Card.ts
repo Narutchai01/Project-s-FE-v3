@@ -29,6 +29,10 @@ export interface AddPhotoProps {
   setImage: (image: string | null) => void;
 }
 
+export interface CardPopularSkincare {
+  image: string;
+  name: string;
+}
 export interface ICommentCardProps {
   id: number;
   image: string | null;

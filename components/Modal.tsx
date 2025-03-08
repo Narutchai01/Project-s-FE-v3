@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import {
   Modal,
   Text,
@@ -8,6 +8,8 @@ import {
   TextInput,
   ScrollView,
   SafeAreaView,
+  ActivityIndicator,
+  Dimensions,
 } from "react-native";
 import { RadioComponents } from "./Radio";
 import { ButtonComponents } from "./Buntton";
@@ -23,8 +25,9 @@ import useLoading from "@/hook/useLoading";
 import { ReviewCard } from "./Card";
 import Loading from "@/components/Loading";
 import { useCompare } from "@/context/CompareContext";
-import { useReview } from "@/context/ReviewContext";
 import { ISkincare } from "@/interface/skincare";
+import { CardPopularSkincare } from "./Card";
+import { useSkincareStore } from "@/store/skincare"; 
 import { ICommentThread } from "@/interface/comment";
 import { CommentCard } from "./Card";
 import { CircleArrowUp } from "lucide-react-native";
@@ -35,11 +38,6 @@ interface PropsModalSensitiveSkin {
   onPres: () => void;
 }
 
-interface ModalSkincareProps {
-  isOpen: boolean;
-  onClose: () => void;
-  // setSkincare((prev, item) => [...prev, item]);
-}
 
 export const ModalSensitiveSkin: FC<PropsModalSensitiveSkin> = (props) => {
   const { isOpen, setSensitiveSkin, onPres } = props;
@@ -297,6 +295,62 @@ export function ModalSkincare({ isOpen, onClose, setSkincare, skincare }: any) {
   );
 }
 
+interface ModalSkincareDetailProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+export const ModalSkincareDetail: FC<ModalSkincareDetailProps> = (props) => {
+  const { isOpen, onClose } = props;
+  const { skincare } = useSkincareStore();
+  const { isLoading } = useLoading();
+  const { width, height } = Dimensions.get("window");
+
+  return (
+    <Modal visible={isOpen} animationType="slide" onRequestClose={onClose}>
+      <SafeAreaView>
+        <View className="h-16 bg-Snow mb-4">
+          <View className="h-full flex-row items-center justify-between px-3">
+            <TouchableOpacity className="flex flex-row gap-x-3 items-center" onPress={onClose}>
+              <SquareArrowLeft size={28} color="#4A4A4A" />
+              <Text className="text-Heading3 font-semibold text-Quartz">
+                {skincare?.name || "Skincare Detail"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {isLoading ? (
+          <View className="flex-1 justify-center items-center">
+            <ActivityIndicator size="large" color="#4A4A4A" />
+          </View>
+        ) : skincare ? (
+          <ScrollView>
+            <Image 
+              source={{ uri: skincare.image }} 
+              style={{ 
+                width: width - 20, 
+                height: height * 0.5, 
+                borderRadius: 10, 
+                alignSelf: "center" 
+              }} 
+            />
+            
+            <Text className="text-label4 font-semibold mt-4 text-start px-4">
+              {skincare.name}
+            </Text>
+            <Text className="text-slabel4 mt-2 text-start px-4">
+              {skincare.description}
+            </Text>
+          </ScrollView>
+        ) : (
+          <View className="flex-1 justify-center items-center">
+            <Text className="text-lg text-gray-600">Skincare not found</Text>
+          </View>
+        )}
+      </SafeAreaView>
+    </Modal>
+  );
+};
 interface IModalComment {
   isCommentOpen: boolean;
   comments: ICommentThread[];

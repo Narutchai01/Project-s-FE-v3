@@ -7,10 +7,14 @@ type SkincareStore = {
   skincares: ISkincare[];
   fetchSkincares: () => Promise<void>;
   loadSkincares: () => Promise<void>;
+  skincare: ISkincare | null;
+  setSkincare: (item:ISkincare) => void;
 };
 
 export const useSkincareStore = create<SkincareStore>((set) => ({
+  skincare: null,
   skincares: [],
+  
   fetchSkincares: async () => {
     try {
       const response = await axiosInstance.get("/skincare/");
@@ -38,4 +42,7 @@ export const useSkincareStore = create<SkincareStore>((set) => ({
   clearSkincares: () => {
     set({ skincares: [] });
   },
+  setSkincare: async(item:ISkincare) => {
+    set({ skincare: item });
+  }
 }));
