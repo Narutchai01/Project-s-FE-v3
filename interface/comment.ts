@@ -7,6 +7,17 @@ export interface ICommentThread {
     text:           string;
 }
 
+
+
+export interface ICommentReview {
+    id:             number;
+    review_id:      number;
+    user:           User;
+    favorite:       boolean;
+    favorite_count: number;
+    content:        string;
+}
+
 export interface User {
     id:             number;
     full_name:      string;

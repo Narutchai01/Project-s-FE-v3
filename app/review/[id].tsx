@@ -11,10 +11,12 @@ import { Stack, useLocalSearchParams } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
 import useLoading from "@/hook/useLoading";
-import { Image as ExpoImage } from "expo-image";
+import { Image } from "expo-image";
 import LoadingIndicator from "@/components/Loading";
 import { ActivityBar, UserBar } from "@/components/Bar";
 import { SquareArrowLeft } from "lucide-react-native";
+import { ICommentReview } from "@/interface/comment";
+import { ModalCommentReview } from "@/components/Modal";
 import { IReview } from "@/interface/review";
 
 export default function ReviewDetails() {
@@ -23,27 +25,24 @@ export default function ReviewDetails() {
   const [review, setReview] = useState<IReview | null>(null);
   const { width, height } = Dimensions.get("window");
   const [currImage, setCurrImage] = useState(0);
+  const [comment, setComment] = useState<ICommentReview[]>([]);
   const [commentCount, setCommentCount] = useState(0);
+  const [isCommentOpen, setIsCommentOpen] = useState(false);
+  const [commentContent, setCommentContent] = useState("");
 
   const fetchReview = async () => {
     startLoading();
     try {
       const token = await AsyncStorage.getItem("token");
       const res = await axiosInstance.get(`/reviews/${id}`, {
-        headers: {
-          token,
-        },
+        headers: { token },
       });
-  
-      const data = res.data;
-      console.log("Review data received:", data);
-      if (data.status) {
-        setReview(data.data);
-        stopLoading();
+
+      if (res.data.status) {
+        setReview(res.data.data);
       }
     } catch (error) {
-      console.log(error);
-      stopLoading();
+      console.error(error);
     } finally {
       stopLoading();
     }
@@ -52,6 +51,86 @@ export default function ReviewDetails() {
   useEffect(() => {
     fetchReview();
   }, []);
+
+  const fetchComments = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const res = await axiosInstance.get(`/comment/reviews/skincare/${id}`, {
+        headers: { token },
+      });
+
+      if (res.data.status) {
+        setComment(res.data.data);
+        setCommentCount(res.data.data.length);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchComments();
+  }, []);
+
+  const handleFavorite = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      await axiosInstance.post(`/favorite/review/skincare/${id}`, null, {
+        headers: { token },
+      });
+      fetchReview();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleFavoriteComment = async (comment_id: number) => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      await axiosInstance.post(`/favorite/comment/review/skincare/${comment_id}`, null, {
+        headers: { token },
+      });
+      fetchComments();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleComment = async () => {
+    if (!commentContent.trim()) return;
+    try {
+      const token = await AsyncStorage.getItem("token");
+      await axiosInstance.post(
+        "/comment/review",
+        { review_id: review?.id, text: commentContent },
+        { headers: { token } }
+      );
+      setCommentContent("");
+      fetchComments();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleBookmark = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      await axiosInstance.post(`/bookmark/review/${id}`, null, {
+        headers: { token },
+      });
+      fetchReview();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const isOpenComment = () => {
+    setIsCommentOpen(true);
+  };
+
+  const closeComment = () => {
+    setIsCommentOpen(false);
+  };
 
   return (
     <SafeAreaProvider style={{ backgroundColor: "#fff" }}>
@@ -63,7 +142,9 @@ export default function ReviewDetails() {
               <View className=" h-full flex-row items-center justify-between px-3">
                 <TouchableOpacity className="flex flex-row gap-x-3 items-center">
                   <SquareArrowLeft size={28} color="#4A4A4A" />
-                  <Text className="text-2xl font-semibold text-Quartz" >Reviews</Text>
+                  <Text className="text-2xl font-semibold text-Quartz">
+                    Reviews
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -81,10 +162,10 @@ export default function ReviewDetails() {
             />
             <View style={{ padding: 10 }}>
               <FlatList
-                data={review?.skincares} 
+                data={review?.skincares}
                 renderItem={({ item, index }) => {
                   return (
-                    <ExpoImage
+                    <Image
                       source={{ uri: item.image }}
                       style={{
                         width: width - 20,
@@ -108,26 +189,46 @@ export default function ReviewDetails() {
               />
             </View>
             <ActivityBar
+              isOpenComment={isOpenComment}
+              hadleFavorite={handleFavorite}
+              handleBookmark={handleBookmark}
               favorite={review?.favorite}
               favoriteCount={review?.favorite_count}
               commnetCount={commentCount}
-              dataPaginate={review?.skincares} 
+              dataPaginate={review?.skincares}
               currImage={currImage}
               bookmark={review?.bookmark}
             />
             <View className="container mx-auto px-3">
-              <Text style={{
-                fontSize: width * 0.05,
-                fontWeight: "bold",
-              }}>{review?.title}</Text>
-              <Text style={{
-                fontSize: width * 0.0375,
-                fontWeight: "medium",
-              }}>{review?.content}</Text>
+              <Text
+                style={{
+                  fontSize: width * 0.05,
+                  fontWeight: "bold",
+                }}
+              >
+                {review?.title}
+              </Text>
+              <Text
+                style={{
+                  fontSize: width * 0.0375,
+                  fontWeight: "medium",
+                }}
+              >
+                {review?.content}
+              </Text>
             </View>
           </View>
         )}
       </SafeAreaView>
+      
+      <ModalCommentReview
+        isCommentClose={closeComment}
+        comments={comment}
+        isCommentOpen={isCommentOpen}
+        handleFavoriteComment={handleFavoriteComment}
+        handleComment={handleComment}
+        setComment={setCommentContent}
+      />
     </SafeAreaProvider>
   );
 }
