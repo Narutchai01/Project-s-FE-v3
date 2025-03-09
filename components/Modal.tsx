@@ -375,7 +375,7 @@ export const ModalComment: FC<IModalComment> = (props) => {
       <View className="bg-white h-full rounded-t-3xl container mx-auto px-4 py-10">
         <View className="flex gap-y-4">
           <TouchableOpacity onPress={isCommentCloase}>
-            <View className="bg-black h-1 container mx-auto w-4/12"></View>
+            <View className="bg-black h-1 container mx-auto w-2/12"></View>
           </TouchableOpacity>
           <Text className="text-center text-3xl font-bold mb-8">Comments</Text>
         </View>
@@ -420,20 +420,22 @@ interface IModalCommentReview {
   setComment: (content: string) => void;
 }
 
-export const ModalCommentReview: React.FC<IModalCommentReview> = ({
-  isCommentOpen,
-  isCommentClose,
-  comments,
-  handleFavoriteComment,
-  handleComment,
-  setComment,
-}) => {
+export const ModalCommentReview: FC<IModalCommentReview> = (props) => {
+  const {
+    isCommentOpen,
+    comments,
+    handleFavoriteComment,
+    isCommentClose,
+    handleComment,
+    setComment,
+  } = props;
+
   return (
-    <Modal visible={isCommentOpen} animationType="slide" transparent={true} onRequestClose={isCommentClose}>
+    <Modal visible={isCommentOpen} animationType="slide" transparent={true}>
       <View className="bg-white h-full rounded-t-3xl container mx-auto px-4 py-10">
-        <View className="flex gap-y-4">
+      <View className="flex gap-y-4">
           <TouchableOpacity onPress={isCommentClose}>
-            <View className="bg-black h-1 container mx-auto w-4/12"></View>
+            <View className="bg-black h-1 container mx-auto w-2/12"></View>
           </TouchableOpacity>
           <Text className="text-center text-3xl font-bold mb-8">Comments</Text>
         </View>
@@ -456,8 +458,8 @@ export const ModalCommentReview: React.FC<IModalCommentReview> = ({
         <View className="flex flex-row justify-center container mx-auto px-5 gap-x-2 items-center py-2">
           <TextInput
             className="border-Quartz border-2 w-full rounded-full py-4"
-            placeholder="Share your thoughts..."
-            onChangeText={setComment}
+            placeholder="Share your thoughts"
+            onChangeText={(content) => setComment(content)}
           />
           <TouchableOpacity onPress={handleComment}>
             <CircleArrowUp size={36} />

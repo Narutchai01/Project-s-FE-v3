@@ -13,6 +13,7 @@ import axios from "axios";
 import { MessageCircleQuestion } from "lucide-react-native";
 import { IReview } from "@/interface/review";
 import { IThread } from "@/interface/threads";
+import { ModalCreateThread } from "@/components/Modal";
 
 const renderCard = (item: IThread , handlerRouter: (id: number) => void) => {
   return (
@@ -46,6 +47,7 @@ export default function CommonScreen() {
   const { startLoading, stopLoading, isLoading } = useLoading();
   const router = useRouter();
   const [isMode, setIsMode] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchThread = async () => {
     startLoading();
@@ -109,7 +111,7 @@ export default function CommonScreen() {
   const CustomHeader = () => {
     const router = useRouter();
     return (
-      <View className="bg-Snow p-4">
+      <View className="bg-Snow p-4 border-b-2 border-gray-300 mb-4 relative">
         <View className="flex flex-row items-center justify-between">
           <Text className="text-Heading3 text-Quartz">
             {isMode ? "Threads" : "Review"}
@@ -118,17 +120,27 @@ export default function CommonScreen() {
             <Plus
               size={24}
               color="white"
-              onPress={() => router.push("/CreateReviewPost")}
+              onPress={() => isMode ? setIsModalOpen(true) : router.push("/CreateReviewPost")}
             />
           </TouchableOpacity>
         </View>
-        <View className="flex flex-row items-center justify-between mt-4">
+        <View className="flex flex-row items-center justify-around mt-4">
           <TouchableOpacity onPress={() => setIsMode(false)}>
-            <CopyPlus size={30} />
+            <View className="flex items-center relative">
+              <CopyPlus size={34} />
+              {!isMode && (
+                <View className="absolute bottom-[-15px] w-full border-b-2 border-black" />
+              )}
+            </View>
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => setIsMode(true)}>
-            <MessageCircleQuestion size={30} />
+            <View className="flex items-center relative">
+              <MessageCircleQuestion size={34} />
+              {isMode && (
+                <View className="absolute bottom-[-15px] w-full border-b-2 border-black" />
+              )}
+            </View>
           </TouchableOpacity>
         </View>
       </View>
@@ -168,6 +180,7 @@ export default function CommonScreen() {
           )}
         </View>
       </SafeAreaView>
+      <ModalCreateThread isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </SafeAreaProvider>
   );
 }
