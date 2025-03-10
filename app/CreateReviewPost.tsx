@@ -14,17 +14,17 @@ import { useRouter } from "expo-router";
 import { ISkincare } from "@/interface/skincare";
 import { axiosInstance } from "@/lib/axios_instance";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import {ModalSkincare} from "@/components/Modal";
+import { ModalSkincare } from "@/components/Modal";
 import useLoading from "@/hook/useLoading";
 import { ImageIcon } from "lucide-react-native";
-import * as DocumentPicker from "expo-document-picker";
+import * as ImagePicker from "expo-image-picker";
 
 export default function CreateReviewPost() {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { isLoading, startLoading, stopLoading } = useLoading();
   const [skincare, setSkincare] = useState<ISkincare[]>([]);
-  const [image, setImage] = useState<string[] | null>(null);
+  const [image, setImage] = useState<string | null>(null);
   const [review, setReview] = useState({
     title: "",
     content: "",
@@ -38,15 +38,18 @@ export default function CreateReviewPost() {
     setIsModalOpen(true);
   };
 
-  const handleChooseImage = async () => {
-    const result = await DocumentPicker.getDocumentAsync({
-      type: "image/*",
-      copyToCacheDirectory: true,
-      multiple: false,
-    });
+  const pickImageAsync = async () => {
+    const result: ImagePicker.ImagePickerResult =
+      await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 1,
+      });
 
-    if (result.canceled === false) {
-      setImage([result.assets[0].uri]);
+    if (!result.canceled && result.assets && result.assets[0].uri) {
+      setImage(result.assets[0].uri);
+    } else {
+      alert("You did not select any image.");
     }
   };
 
@@ -60,10 +63,13 @@ export default function CreateReviewPost() {
       const formData = new FormData();
       formData.append("title", review.title);
       formData.append("content", review.content);
-      formData.append("skincare_id", JSON.stringify(skincare.map((item) => item.id)));
+      formData.append(
+        "skincare_id",
+        JSON.stringify(skincare.map((item) => item.id))
+      );
       if (image) {
         const file = {
-          uri: image[0],
+          uri: image,
           name: "image.jpg",
           type: "image/jpeg",
         };
@@ -89,7 +95,6 @@ export default function CreateReviewPost() {
   };
 
   console.log(skincare);
-  
 
   return (
     <SafeAreaView className="p-4">
@@ -99,48 +104,37 @@ export default function CreateReviewPost() {
         <Text className="text-Heading4">Thumbnail</Text>
       </View>
 
-      <View className="mb-4 flex flex-row items-center justify-center ">
-        <FlatList
-          data={image}
-          keyExtractor={(_, index: number) => index.toString()}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          ListHeaderComponent={() => {
-            return (
-              <TouchableOpacity
-                onPress={handleChooseImage}
-                style={{
-                  height: 350,
-                  width: 250,
-                  borderRadius: 10,
-                  borderColor: "black",
-                  borderWidth: 1,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  marginRight: 10,
-                }}
-              >
-                <View>
-                  <ImageIcon size={100} color="#4A4A4A" />
-                  <Text>Tap a photo</Text>
-                </View>
-              </TouchableOpacity>
-            );
+      <View className="mb-4 flex items-center justify-center">
+        <TouchableOpacity
+          onPress={pickImageAsync}
+          style={{
+            height: 350,
+            width: 250,
+            borderRadius: 10,
+            borderColor: "black",
+            borderWidth: 1,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            marginRight: 10,
           }}
-          renderItem={({ item }: { item: string }) => (
+        >
+          {image ? (
             <Image
-              source={{ uri: item }}
+              source={{ uri: image }}
               style={{
                 width: 250,
                 height: 350,
                 borderRadius: 10,
-                marginTop: 10,
-                marginRight: 10,
               }}
             />
+          ) : (
+            <View>
+              <ImageIcon size={100} color="#4A4A4A" />
+              <Text>Tap a photo</Text>
+            </View>
           )}
-        />
+        </TouchableOpacity>
       </View>
 
       <View className="mb-4">
@@ -162,7 +156,15 @@ export default function CreateReviewPost() {
                   source={{ uri: item.image }}
                   style={{ width: 100, height: 120, borderRadius: 10 }}
                 />
-                <Text>{item.name}</Text>
+                <View className="flex items-center justify-center mt-2">
+                  <Text
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                    style={{ width: 100, textAlign: "center" }}
+                  >
+                    {item.name}
+                  </Text>
+                </View>
               </View>
             ))
           ) : (

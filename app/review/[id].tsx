@@ -16,7 +16,7 @@ import LoadingIndicator from "@/components/Loading";
 import { ActivityBar, UserBar } from "@/components/Bar";
 import { SquareArrowLeft } from "lucide-react-native";
 import { ICommentReview } from "@/interface/comment";
-import { ModalCommentReview } from "@/components/Modal";
+import { ModalComment } from "@/components/Modal";
 import { IReview } from "@/interface/review";
 
 export default function ReviewDetails() {
@@ -38,8 +38,10 @@ export default function ReviewDetails() {
         headers: { token },
       });
 
-      if (res.data.status) {
-        setReview(res.data.data);
+      const data = res.data;
+      if (data.status) {
+        setReview(data.data);
+        stopLoading();
       }
     } catch (error) {
       console.error(error);
@@ -56,71 +58,102 @@ export default function ReviewDetails() {
     try {
       const token = await AsyncStorage.getItem("token");
       const res = await axiosInstance.get(`/comment/reviews/skincare/${id}`, {
-        headers: { token },
+        headers: {
+          token: token,
+        },
       });
 
-      if (res.data.status) {
-        setComment(res.data.data);
-        setCommentCount(res.data.data.length);
+      const data = res.data;
+      if (data.status) {
+        setComment(data.data);
+        setCommentCount(data.data.length);
       }
-    } catch (error) {
-      console.error(error);
+      fetchComments();
+    } catch (error: any) {
+      console.log(error);
     }
   };
-
-  useEffect(() => {
-    fetchComments();
-  }, []);
 
   const handleFavorite = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      await axiosInstance.post(`/favorite/review/skincare/${id}`, null, {
-        headers: { token },
-      });
+      const res = await axiosInstance.post(
+        `/favorite/review/skincare/${id}`,
+        null,
+        {
+          headers: {
+            token: token,
+          },
+        }
+      );
+
+      console.log(res);
       fetchReview();
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      console.log(error.response.data);
     }
   };
 
   const handleFavoriteComment = async (comment_id: number) => {
     try {
       const token = await AsyncStorage.getItem("token");
-      await axiosInstance.post(`/favorite/comment/review/skincare/${comment_id}`, null, {
-        headers: { token },
-      });
-      fetchComments();
-    } catch (error) {
-      console.error(error);
+      const res = await axiosInstance.post(
+        `/favorite/comment/review/skincare/${comment_id}`,
+        null,
+        {
+          headers: {
+            token: token,
+          },
+        }
+      );
+      if (res.data) {
+        fetchComments();
+      }
+    } catch (error: any) {
+      console.log(error.response.data);
     }
   };
 
   const handleComment = async () => {
-    if (!commentContent.trim()) return;
     try {
       const token = await AsyncStorage.getItem("token");
-      await axiosInstance.post(
-        "/comment/review",
-        { review_id: review?.id, text: commentContent },
-        { headers: { token } }
+      const res = await axiosInstance.post(
+        "/comment/reviews/skincare",
+        {
+          review_skincare_id: review?.id,
+          content: commentContent,
+        },
+        { headers: { token: token } }
       );
-      setCommentContent("");
+
+      const data = res.data;
+      if (!data.status) {
+        return;
+      }
       fetchComments();
+      setCommentContent("");
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   };
+
+  useEffect(() => {
+    fetchComments();
+  }, [comment]);
 
   const handleBookmark = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      await axiosInstance.post(`/bookmark/review/${id}`, null, {
-        headers: { token },
+      const res = await axiosInstance.post(`/bookmark/review/${id}`, null, {
+        headers: {
+          token: token,
+        },
       });
+
+      console.log(res);
       fetchReview();
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      console.log(error.response.data);
     }
   };
 
@@ -220,8 +253,8 @@ export default function ReviewDetails() {
           </View>
         )}
       </SafeAreaView>
-      
-      <ModalCommentReview
+
+      <ModalComment
         isCommentClose={closeComment}
         comments={comment}
         isCommentOpen={isCommentOpen}

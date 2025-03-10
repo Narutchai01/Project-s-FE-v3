@@ -353,74 +353,14 @@ export const ModalSkincareDetail: FC<ModalSkincareDetailProps> = (props) => {
 };
 interface IModalComment {
   isCommentOpen: boolean;
-  comments: ICommentThread[];
-  handleFavoriteComment: (comment_id: number) => void;
-  isCommentCloase: () => void;
-  handleComment: () => void;
-  setComment: (content: string) => void;
-}
-
-export const ModalComment: FC<IModalComment> = (props) => {
-  const {
-    isCommentOpen,
-    comments,
-    handleFavoriteComment,
-    isCommentCloase,
-    handleComment,
-    setComment,
-  } = props;
-
-  return (
-    <Modal visible={isCommentOpen} animationType="slide" transparent={true}>
-      <View className="bg-white h-full rounded-t-3xl container mx-auto px-4 py-10">
-        <View className="flex gap-y-4">
-          <TouchableOpacity onPress={isCommentCloase}>
-            <View className="bg-black h-1 container mx-auto w-4/12"></View>
-          </TouchableOpacity>
-          <Text className="text-center text-3xl font-bold mb-8">Comments</Text>
-        </View>
-        <FlatList
-          data={comments}
-          numColumns={1}
-          contentContainerStyle={{ gap: 25 }} // Add gap between columns
-          renderItem={({ item }) => (
-            <CommentCard
-              id={item.id}
-              image={item?.user?.image}
-              username={item?.user?.full_name}
-              content={item?.text}
-              count_favorite={item.favorite_count}
-              favorite={item.favorite}
-              handleFavoriteComment={() => handleFavoriteComment(item.id)}
-            />
-          )}
-        />
-
-        <View className="flex flex-row justify-center container mx-auto px-5 gap-x-2 items-center py-2">
-          <TextInput
-            className=" border-Quartz border-2 w-full rounded-full py-4"
-            placeholder="share your thoughts"
-            onChangeText={(content) => setComment(content)}
-          />
-          <TouchableOpacity onPress={handleComment}>
-            <CircleArrowUp size={36} />
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
-  );
-};
-
-interface IModalCommentReview {
-  isCommentOpen: boolean;
   isCommentClose: () => void;
-  comments: ICommentReview[];
+  comments: (ICommentReview)[];
   handleFavoriteComment: (comment_id: number) => void;
   handleComment: () => void;
   setComment: (content: string) => void;
 }
 
-export const ModalCommentReview: React.FC<IModalCommentReview> = ({
+export const ModalComment: React.FC<IModalComment> = ({
   isCommentOpen,
   isCommentClose,
   comments,
@@ -433,10 +373,11 @@ export const ModalCommentReview: React.FC<IModalCommentReview> = ({
       <View className="bg-white h-full rounded-t-3xl container mx-auto px-4 py-10">
         <View className="flex gap-y-4">
           <TouchableOpacity onPress={isCommentClose}>
-            <View className="bg-black h-1 container mx-auto w-4/12"></View>
+            <View className="bg-black h-1 container mx-auto w-2/12 rounded-lg"></View>
           </TouchableOpacity>
           <Text className="text-center text-3xl font-bold mb-8">Comments</Text>
         </View>
+
         <FlatList
           data={comments}
           numColumns={1}
@@ -453,6 +394,7 @@ export const ModalCommentReview: React.FC<IModalCommentReview> = ({
             />
           )}
         />
+
         <View className="flex flex-row justify-center container mx-auto px-5 gap-x-2 items-center py-2">
           <TextInput
             className="border-Quartz border-2 w-full rounded-full py-4"

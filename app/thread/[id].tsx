@@ -94,7 +94,7 @@ export default function ThreadDetails() {
     }
   };
 
-  const handleFavortieComment = async (comment_id: number) => {
+  const handleFavoriteComment = async (comment_id: number) => {
     try {
       const token = await AsyncStorage.getItem("token");
       const res = await axiosInstance.post(
@@ -255,10 +255,10 @@ export default function ThreadDetails() {
       </SafeAreaView>
 
       <ModalComment
-        isCommentCloase={closeComment}
+        isCommentClose={closeComment}
         comments={comment}
         isCommentOpen={isCommentOpen}
-        handleFavoriteComment={handleFavortieComment}
+        handleFavoriteComment={handleFavoriteComment}
         handleComment={handleComment}
         setComment={setCommentContent}
       />
