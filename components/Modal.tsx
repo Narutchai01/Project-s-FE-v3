@@ -28,7 +28,7 @@ import { useCompare } from "@/context/CompareContext";
 import { ISkincare } from "@/interface/skincare";
 import { CardPopularSkincare } from "./Card";
 import { useSkincareStore } from "@/store/skincare"; 
-import { ICommentThread } from "@/interface/comment";
+import { ICommentReview, ICommentThread } from "@/interface/comment";
 import { CommentCard } from "./Card";
 import { CircleArrowUp } from "lucide-react-native";
 
@@ -353,42 +353,41 @@ export const ModalSkincareDetail: FC<ModalSkincareDetailProps> = (props) => {
 };
 interface IModalComment {
   isCommentOpen: boolean;
-  comments: ICommentThread[];
+  isCommentClose: () => void;
+  comments: (ICommentReview | ICommentThread)[];
   handleFavoriteComment: (comment_id: number) => void;
-  isCommentCloase: () => void;
   handleComment: () => void;
   setComment: (content: string) => void;
 }
 
-export const ModalComment: FC<IModalComment> = (props) => {
-  const {
-    isCommentOpen,
-    comments,
-    handleFavoriteComment,
-    isCommentCloase,
-    handleComment,
-    setComment,
-  } = props;
-
+export const ModalComment: React.FC<IModalComment> = ({
+  isCommentOpen,
+  isCommentClose,
+  comments,
+  handleFavoriteComment,
+  handleComment,
+  setComment,
+}) => {
   return (
-    <Modal visible={isCommentOpen} animationType="slide" transparent={true}>
+    <Modal visible={isCommentOpen} animationType="slide" transparent={true} onRequestClose={isCommentClose}>
       <View className="bg-white h-full rounded-t-3xl container mx-auto px-4 py-10">
         <View className="flex gap-y-4">
-          <TouchableOpacity onPress={isCommentCloase}>
-            <View className="bg-black h-1 container mx-auto w-4/12"></View>
+          <TouchableOpacity onPress={isCommentClose}>
+            <View className="bg-black h-1 container mx-auto w-2/12 rounded-lg"></View>
           </TouchableOpacity>
           <Text className="text-center text-3xl font-bold mb-8">Comments</Text>
         </View>
+
         <FlatList
           data={comments}
           numColumns={1}
-          contentContainerStyle={{ gap: 25 }} // Add gap between columns
+          contentContainerStyle={{ gap: 25 }}
           renderItem={({ item }) => (
             <CommentCard
               id={item.id}
               image={item?.user?.image}
               username={item?.user?.full_name}
-              content={item?.text}
+              content={item?.content}
               count_favorite={item.favorite_count}
               favorite={item.favorite}
               handleFavoriteComment={() => handleFavoriteComment(item.id)}
@@ -398,9 +397,9 @@ export const ModalComment: FC<IModalComment> = (props) => {
 
         <View className="flex flex-row justify-center container mx-auto px-5 gap-x-2 items-center py-2">
           <TextInput
-            className=" border-Quartz border-2 w-full rounded-full py-4"
-            placeholder="share your thoughts"
-            onChangeText={(content) => setComment(content)}
+            className="border-Quartz border-2 w-full rounded-full py-4"
+            placeholder="Share your thoughts..."
+            onChangeText={setComment}
           />
           <TouchableOpacity onPress={handleComment}>
             <CircleArrowUp size={36} />

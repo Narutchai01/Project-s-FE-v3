@@ -4,7 +4,18 @@ export interface ICommentThread {
     user:           User;
     favorite:       boolean;
     favorite_count: number;
-    text:           string;
+    content:           string;
+}
+
+
+
+export interface ICommentReview {
+    id:             number;
+    review_id:      number;
+    user:           User;
+    favorite:       boolean;
+    favorite_count: number;
+    content:        string;
 }
 
 export interface User {
