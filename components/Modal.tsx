@@ -354,7 +354,7 @@ export const ModalSkincareDetail: FC<ModalSkincareDetailProps> = (props) => {
 interface IModalComment {
   isCommentOpen: boolean;
   isCommentClose: () => void;
-  comments: (ICommentReview)[];
+  comments: (ICommentReview | ICommentThread)[];
   handleFavoriteComment: (comment_id: number) => void;
   handleComment: () => void;
   setComment: (content: string) => void;

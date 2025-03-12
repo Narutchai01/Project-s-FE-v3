@@ -4,7 +4,7 @@ export interface ICommentThread {
     user:           User;
     favorite:       boolean;
     favorite_count: number;
-    text:           string;
+    content:           string;
 }
 
 
