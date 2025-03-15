@@ -26,18 +26,17 @@ import { ReviewCard } from "./Card";
 import Loading from "@/components/Loading";
 import { useCompare } from "@/context/CompareContext";
 import { ISkincare } from "@/interface/skincare";
-import { CardPopularSkincare } from "./Card";
-import { useSkincareStore } from "@/store/skincare"; 
+import { useSkincareStore } from "@/store/skincare";
 import { ICommentReview, ICommentThread } from "@/interface/comment";
 import { CommentCard } from "./Card";
 import { CircleArrowUp } from "lucide-react-native";
+import { Search } from "@/components/Search";
 
 interface PropsModalSensitiveSkin {
   isOpen: boolean;
   setSensitiveSkin: (sensitiveSkin: boolean) => void;
   onPres: () => void;
 }
-
 
 export const ModalSensitiveSkin: FC<PropsModalSensitiveSkin> = (props) => {
   const { isOpen, setSensitiveSkin, onPres } = props;
@@ -226,6 +225,11 @@ export const ModalCreateThread: FC<any> = (props) => {
 export function ModalSkincare({ isOpen, onClose, setSkincare, skincare }: any) {
   const { skincares } = useCompare();
   const { isLoading } = useLoading();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredSkincares = skincares?.filter((item) =>
+    item.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleSelectItem = (item: ISkincare) => {
     if (skincare.includes(item) || skincare.length >= 10) {
@@ -248,28 +252,25 @@ export function ModalSkincare({ isOpen, onClose, setSkincare, skincare }: any) {
 
   return (
     <Modal visible={isOpen} animationType="slide" onRequestClose={handleCancel}>
-      <SafeAreaView className="flex-1 bg-Snow p-8">
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            marginBottom: 16,
-          }}
-        >
+      <SafeAreaView className="bg-Snow p-4 border-b-2 border-gray-300 mb-4 relative">
+        <View className="flex flex-row items-center justify-between">
           <ButtonComponents
-            title="cancel"
-            textSize="text-md font-semibold"
+            title="Cancel"
+            textSize="text-label1 font-semibold"
             onPress={handleCancel}
           />
-          <ButtonComponents
-            title="Confirm"
-            className="bg-Bittersweet px-2 py-2 rounded-full"
-            textSize="text-md font-semibold"
-            onPress={handleConfirm}
-          />
+          <View className="flex flex-row items-center justify-between">
+            <Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+            <ButtonComponents
+              title="Confirm"
+              className="bg-Bittersweet px-2 py-2 rounded-full"
+              textSize="text-label1 font-semibold text-White"
+              onPress={handleConfirm}
+            />
+          </View>
         </View>
 
-        <View className="flex items-center mb-4">
+        <View className="flex items-center mb-4 mt-4">
           <Text className="text-Heading3 font-semibold text-center">
             Select skincares to review ({skincare?.length}/10)
           </Text>
@@ -279,7 +280,7 @@ export function ModalSkincare({ isOpen, onClose, setSkincare, skincare }: any) {
           <Loading />
         ) : (
           <FlatList
-            data={skincares}
+            data={filteredSkincares}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
               <ReviewCard
@@ -310,7 +311,10 @@ export const ModalSkincareDetail: FC<ModalSkincareDetailProps> = (props) => {
       <SafeAreaView>
         <View className="h-16 bg-Snow mb-4">
           <View className="h-full flex-row items-center justify-between px-3">
-            <TouchableOpacity className="flex flex-row gap-x-3 items-center" onPress={onClose}>
+            <TouchableOpacity
+              className="flex flex-row gap-x-3 items-center"
+              onPress={onClose}
+            >
               <SquareArrowLeft size={28} color="#4A4A4A" />
               <Text className="text-Heading3 font-semibold text-Quartz">
                 {skincare?.name || "Skincare Detail"}
@@ -325,16 +329,16 @@ export const ModalSkincareDetail: FC<ModalSkincareDetailProps> = (props) => {
           </View>
         ) : skincare ? (
           <ScrollView>
-            <Image 
-              source={{ uri: skincare.image }} 
-              style={{ 
-                width: width - 20, 
-                height: height * 0.5, 
-                borderRadius: 10, 
-                alignSelf: "center" 
-              }} 
+            <Image
+              source={{ uri: skincare.image }}
+              style={{
+                width: width - 20,
+                height: height * 0.5,
+                borderRadius: 10,
+                alignSelf: "center",
+              }}
             />
-            
+
             <Text className="text-label4 font-semibold mt-4 text-start px-4">
               {skincare.name}
             </Text>
@@ -369,7 +373,12 @@ export const ModalComment: React.FC<IModalComment> = ({
   setComment,
 }) => {
   return (
-    <Modal visible={isCommentOpen} animationType="slide" transparent={true} onRequestClose={isCommentClose}>
+    <Modal
+      visible={isCommentOpen}
+      animationType="slide"
+      transparent={true}
+      onRequestClose={isCommentClose}
+    >
       <View className="bg-white h-full rounded-t-3xl container mx-auto px-4 py-10">
         <View className="flex gap-y-4">
           <TouchableOpacity onPress={isCommentClose}>
