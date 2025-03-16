@@ -12,7 +12,7 @@ import {
   Dimensions,
 } from "react-native";
 import { RadioComponents } from "./Radio";
-import { ButtonComponents } from "./Buntton";
+import { BackButtonComponents, ButtonComponents } from "./Buntton";
 import { SquareArrowLeft, Image as ImageIcon } from "lucide-react-native";
 import { Image } from "expo-image";
 import * as DocumentPicker from "expo-document-picker";
@@ -60,7 +60,7 @@ export const ModalSensitiveSkin: FC<PropsModalSensitiveSkin> = (props) => {
 
 export const ModalCreateThread: FC<any> = (props) => {
   const router = useRouter();
-  const { isOpen } = props;
+  const { isOpen, onClose } = props;
   const { isLoading, startLoading, stopLoading } = useLoading();
 
   const [image, setImage] = useState<string[] | null>(null);
@@ -140,12 +140,11 @@ export const ModalCreateThread: FC<any> = (props) => {
           <View className="h-16 bg-White">
             {/* header zone  */}
             <View className=" h-full flex-row items-center justify-between px-3">
-              <TouchableOpacity className="flex flex-row gap-x-3 items-center">
-                <SquareArrowLeft size={28} color="#4A4A4A" />
-                <Text className="text-2xl font-semibold text-Quartz">
-                  New Thread
-                </Text>
-              </TouchableOpacity>
+              <BackButtonComponents
+                title={"New Thread"}
+                textSize="text-Heading3"
+                onPress={onClose}
+              />
             </View>
           </View>
           {/* header zone  */}
@@ -311,15 +310,11 @@ export const ModalSkincareDetail: FC<ModalSkincareDetailProps> = (props) => {
       <SafeAreaView>
         <View className="h-16 bg-Snow mb-4">
           <View className="h-full flex-row items-center justify-between px-3">
-            <TouchableOpacity
-              className="flex flex-row gap-x-3 items-center"
+            <BackButtonComponents
+              title={skincare?.name || "Skincare Detail"}
+              textSize="text-Heading3"
               onPress={onClose}
-            >
-              <SquareArrowLeft size={28} color="#4A4A4A" />
-              <Text className="text-Heading3 font-semibold text-Quartz">
-                {skincare?.name || "Skincare Detail"}
-              </Text>
-            </TouchableOpacity>
+            />
           </View>
         </View>
 
@@ -406,7 +401,7 @@ export const ModalComment: React.FC<IModalComment> = ({
 
         <View className="flex flex-row justify-center container mx-auto px-5 gap-x-2 items-center py-2">
           <TextInput
-            className="border-Quartz border-2 w-full rounded-full py-4"
+            className="border-Quartz border-2 w-full rounded-full py-4 px-4 mx-2"
             placeholder="Share your thoughts..."
             onChangeText={setComment}
           />

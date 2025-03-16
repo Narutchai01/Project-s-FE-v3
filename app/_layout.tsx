@@ -32,7 +32,7 @@ export default function RootLayout() {
                 options={{
                   headerTitle: "Result Analysis",
                   headerShadowVisible: false,
-                  headerShown: true,
+                  headerShown: false,
                 }}
               />
               <Stack.Screen

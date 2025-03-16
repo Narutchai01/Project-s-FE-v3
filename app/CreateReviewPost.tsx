@@ -98,7 +98,11 @@ export default function CreateReviewPost() {
 
   return (
     <SafeAreaView className="p-4">
-      <BackButtonComponents title="New review" textSize="text-Heading3" />
+      <BackButtonComponents
+        title={"New review"}
+        textSize="text-Heading3"
+        onPress={() => router.back()}
+      />
 
       <View className="mb-4">
         <Text className="text-Heading4">Thumbnail</Text>

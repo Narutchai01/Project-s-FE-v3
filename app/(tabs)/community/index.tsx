@@ -86,7 +86,7 @@ export default function CommonScreen() {
     <View className="bg-Snow p-4 border-b-2 border-gray-300 mb-4 relative">
       <View className="flex flex-row items-center justify-between">
         <Text className="text-Heading3 text-Quartz">
-          {isMode ? "Threads" : "Review"}
+          {isMode ? "Threads" : "Reviews"}
         </Text>
 
         <View className="flex flex-row items-center justify-between">

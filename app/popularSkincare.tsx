@@ -6,7 +6,6 @@ import { ISkincare } from "@/interface/skincare";
 import { SquareArrowLeft } from "lucide-react-native";
 import {
   FlatList,
-  Modal,
   SafeAreaView,
   TouchableOpacity,
   View,
@@ -35,7 +34,7 @@ export default function PopularSkincare() {
         <View className="h-full flex-row items-center justify-between px-3">
           <TouchableOpacity
             className="flex flex-row gap-x-3 items-center"
-            onPress={() => router.push("/")}
+            onPress={() => router.back()}
           >
             <SquareArrowLeft size={28} color="#4A4A4A" />
             <Text className="text-2xl font-semibold text-Quartz">
