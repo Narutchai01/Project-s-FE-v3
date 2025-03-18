@@ -29,9 +29,9 @@ export default function PopularSkincare() {
   };
 
   return (
-    <SafeAreaView>
-      <View className="h-16 bg-Snow mb-4">
-        <View className="h-full flex-row items-center justify-between px-3">
+    <SafeAreaView className="flex-1 bg-Snow p-4">
+      <View className="h-16 mb-4">
+        <View className="h-full flex-row items-center justify-between">
           <TouchableOpacity
             className="flex flex-row gap-x-3 items-center"
             onPress={() => router.back()}
@@ -58,12 +58,12 @@ export default function PopularSkincare() {
             </TouchableOpacity>
           )}
           contentContainerStyle={{
-            paddingHorizontal: 22,
-            paddingBottom: 50,
+            paddingHorizontal: 15,
+            paddingBottom: 0,
           }}
           columnWrapperStyle={{
             justifyContent: "space-between",
-            marginBottom: 16,
+            marginBottom: 15,
           }}
         />
       )}

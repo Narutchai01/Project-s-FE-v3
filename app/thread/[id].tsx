@@ -1,10 +1,4 @@
-import {
-  View,
-  Text,
-  FlatList,
-  Dimensions,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, FlatList, Dimensions } from "react-native";
 import React from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router, Stack, useLocalSearchParams } from "expo-router";
@@ -16,7 +10,6 @@ import useLoading from "@/hook/useLoading";
 import { Image } from "expo-image";
 import LoadingIndicator from "@/components/Loading";
 import { ActivityBar, UserBar } from "@/components/Bar";
-import { SquareArrowLeft } from "lucide-react-native";
 import { ICommentThread } from "@/interface/comment";
 import { ModalComment } from "@/components/Modal";
 import { BackButtonComponents } from "@/components/Buntton";
@@ -219,6 +212,17 @@ export default function ThreadDetails() {
                   const index = Math.round(contentOffset.x / (width - 20));
                   setCurrImage(index);
                 }}
+                ListEmptyComponent={() => (
+                  <Image
+                    source={require("@/assets/images/defaultImage.png")}
+                    style={{
+                      width: width - 20,
+                      height: height * 0.5,
+                      borderRadius: 10,
+                    }}
+                    contentFit="cover"
+                  />
+                )}
               />
             </View>
             <ActivityBar
@@ -239,7 +243,7 @@ export default function ThreadDetails() {
                   fontWeight: "bold",
                 }}
               >
-                {thread?.title}
+                {thread?.title ? thread.title : "No title"}
               </Text>
               <Text
                 style={{
@@ -247,7 +251,7 @@ export default function ThreadDetails() {
                   fontWeight: "medium",
                 }}
               >
-                {thread?.caption}
+                {thread?.caption ? thread.caption : "No caption"}
               </Text>
             </View>
           </View>
@@ -261,6 +265,7 @@ export default function ThreadDetails() {
         handleFavoriteComment={handleFavoriteComment}
         handleComment={handleComment}
         setComment={setCommentContent}
+        commentContent={commentContent}
       />
     </SafeAreaProvider>
   );

@@ -56,7 +56,7 @@ const ResultAnalysis = () => {
   const skincareData = useMemo(() => result?.skincare || [], [result]);
 
   return (
-    <SafeAreaView style={{ backgroundColor: "#ffffff", height: "100%" }}>
+    <SafeAreaView className="flex-1 bg-Snow p-4">
       <ScrollView
         style={{ backgroundColor: "#ffffff", height: "100%" }}
         refreshControl={

@@ -16,7 +16,7 @@ export default function SkincareScreen() {
   const { skincares } = useCompare();
 
   return (
-    <ScrollView className="px-4 pt-8 bg-Snow">
+    <ScrollView className="px-4 pt-8 bg-Snow flex-1">
       <View className="flex-row items-center mb-6">
         <Image
           source={require("../../assets/images/ucare-logo.png")}

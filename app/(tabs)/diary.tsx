@@ -9,6 +9,8 @@ import { axiosInstance } from "@/lib/axios_instance";
 import dayjs, { Dayjs } from "dayjs";
 import { CalendarPicker } from "@/components/CalendarPicker";
 import { CalendarDays } from "lucide-react-native";
+import useLoading from "@/hook/useLoading";
+import LoadingIndicator from "@/components/Loading";
 
 export default function DiaryScreen() {
   const { setIsCompare, isCompare, compare, setCompare } = useCompare();
@@ -19,8 +21,10 @@ export default function DiaryScreen() {
     startDate: null,
     endDate: null,
   });
+  const { isLoading, startLoading, stopLoading } = useLoading();
 
   const fetchResults = async () => {
+    startLoading();
     try {
       const token = await AsyncStorage.getItem("token");
       if (token) {
@@ -33,7 +37,11 @@ export default function DiaryScreen() {
     } catch (error) {
       console.log("Error fetching results:", error);
     }
+    finally {
+      stopLoading();
+    }
   };
+
 
   useEffect(() => {
     fetchResults();
@@ -71,7 +79,10 @@ export default function DiaryScreen() {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView className="flex-1 bg-Snow p-8">
+       {isLoading ? (
+        <LoadingIndicator />
+      ) : (
+      <SafeAreaView className="flex-1 bg-Snow p-4">
         
         <TouchableOpacity 
           onPress={() => setIsCalendarOpen(true)}
@@ -111,6 +122,7 @@ export default function DiaryScreen() {
           }}
         />
       </SafeAreaView>
+      )}
     </SafeAreaProvider>
   );
 }

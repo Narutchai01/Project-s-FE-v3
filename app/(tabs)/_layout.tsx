@@ -49,12 +49,13 @@ export default function _layout() {
           headerLeft: () =>
             isCompare ? (
               <ButtonComponents
-                title="cancel"
-                textSize="text-md font-semibold"
+                title="Cancel"
+                textSize="text-label8 font-semibold"
                 onPress={() => {
                   setIsCompare(!isCompare);
                   setCompare([]);
                 }}
+                className="px-2 py-2"
               />
             ) : null,
           headerStyle: {
@@ -92,7 +93,7 @@ const CompareButton = () => {
     <ButtonComponents
       title="Compare"
       className="bg-Bittersweet px-2 py-2 rounded-full"
-      textSize="text-md font-semibold text-white"
+      textSize="text-label8 font-semibold text-white"
       onPress={() => setIsCompare(!isCompare)}
     />
   );
@@ -105,7 +106,7 @@ const ConfirmButton = () => {
     <ButtonComponents
       title="Confirm"
       className="bg-Bittersweet px-2 py-2 rounded-full"
-      textSize="text-md font-semibold text-white"
+      textSize="text-label8 font-semibold text-white"
       onPress={() => {
         setIsCompare(!isCompare);
         router.push("/compare");

@@ -133,11 +133,13 @@ export const PopularThreadCard: FC<ThreadCardProps> = (props) => {
 
 export const ThreadCard: FC<ThreadCardProps> = (props) => {
   const { image, title, user, userAvatar } = props;
+  const defaultImage = require("@/assets/images/defaultImage.png");
+
   return (
     <View className="bg-white rounded-2xl shadow w-[175px] h-[220px] mx-5 mb-6 relative overflow-hidden">
       <View className="w-[175px] h-[165px] relative overflow-hidden">
         <Image
-          source={{ uri: image }}
+          source={image ? { uri: image } : defaultImage}
           className="w-full h-full rounded-t-2xl object-cover"
           style={{ borderBottomRightRadius: 32.5 }}
         />
@@ -153,7 +155,7 @@ export const ThreadCard: FC<ThreadCardProps> = (props) => {
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {title}
+            {title?.trim() ? title : "No title"}
           </Text>
           <View className="flex-row items-center justify-between mt-2">
             <View className="flex-row items-center">
@@ -177,6 +179,7 @@ export const ThreadCard: FC<ThreadCardProps> = (props) => {
 export const ReviewCard: FC<CardReviewProps> = (props) => {
   const { data, selectArray = [], setItem } = props;
   const check = selectArray.includes(data);
+  const defaultImage = require("@/assets/images/defaultImage.png");
 
   return (
     <Pressable onPress={() => setItem(data)}>
@@ -186,7 +189,7 @@ export const ReviewCard: FC<CardReviewProps> = (props) => {
         }`}
       >
         <Image
-          source={{ uri: data.image }}
+          source={data.image ? { uri: data.image } : defaultImage}
           className="w-[88px] h-[118px] rounded-lg ml-4 mr-6"
         />
         <View className="flex-1">

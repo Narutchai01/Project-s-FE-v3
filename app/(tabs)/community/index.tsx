@@ -10,7 +10,7 @@ import useLoading from "@/hook/useLoading";
 import LoadingIndicator from "@/components/Loading";
 import { IReview } from "@/interface/review";
 import { IThread } from "@/interface/threads";
-import { ModalCreateThread } from "@/components/Modal";
+import { ModalCreateReviewPost, ModalCreateThread } from "@/components/Modal";
 import { CopyPlus, Plus, MessageCircleQuestion } from "lucide-react-native";
 import axios from "axios";
 import { Search } from "@/components/Search";
@@ -22,7 +22,8 @@ export default function CommonScreen() {
   const { startLoading, stopLoading, isLoading } = useLoading();
   const router = useRouter();
   const [isMode, setIsMode] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isThreadModalOpen, setIsThreadModalOpen] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
   const fetchThread = async () => {
     startLoading();
@@ -85,7 +86,7 @@ export default function CommonScreen() {
   const CustomHeader = () => (
     <View className="bg-Snow p-4 border-b-2 border-gray-300 mb-4 relative">
       <View className="flex flex-row items-center justify-between">
-        <Text className="text-Heading3 text-Quartz">
+        <Text className="text-Heading3 text-Black">
           {isMode ? "Threads" : "Reviews"}
         </Text>
 
@@ -97,7 +98,7 @@ export default function CommonScreen() {
               size={24}
               color="white"
               onPress={() =>
-                isMode ? setIsModalOpen(true) : router.push("/CreateReviewPost")
+                isMode ? setIsThreadModalOpen(true) : setIsReviewModalOpen(true)
               }
             />
           </TouchableOpacity>
@@ -134,7 +135,7 @@ export default function CommonScreen() {
         }}
       />
       <SafeAreaView>
-        <View>
+        <View className="flex justify-center items-center">
           {isMode ? (
             isLoading && !threads ? (
               <LoadingIndicator />
@@ -176,7 +177,8 @@ export default function CommonScreen() {
           )}
         </View>
       </SafeAreaView>
-      <ModalCreateThread isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <ModalCreateThread isOpen={isThreadModalOpen} onClose={() => setIsThreadModalOpen(false)} />
+      <ModalCreateReviewPost isOpen={isReviewModalOpen} onClose={() => setIsReviewModalOpen(false)} />
     </SafeAreaProvider>
   );
 }
