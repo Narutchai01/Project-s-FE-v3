@@ -154,7 +154,7 @@ export default function ReviewDetails() {
               <View className=" h-full flex-row items-center justify-between px-3">
                 <BackButtonComponents
                   title={"Reviews"}
-                  textSize="text-Heading3"
+                  textSize="text-Heading3 text-Quartz"
                   onPress={() => router.back()}
                 />
               </View>

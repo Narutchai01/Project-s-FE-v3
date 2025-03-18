@@ -1,12 +1,15 @@
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { AuthProvider } from "@/context/AuthContext";
 import { AppRegistry } from "react-native";
 import { PaperProvider } from "react-native-paper";
 import { expo } from "@/app.json";
 import { CompareProvider } from "@/context/CompareContext";
 import { ReviewProvider } from "@/context/ReviewContext";
+import { BackButtonComponents } from "@/components/Buntton";
 
 export default function RootLayout() {
+  const router = useRouter(); 
+
   return (
     <PaperProvider>
       <AuthProvider>
@@ -23,8 +26,15 @@ export default function RootLayout() {
               <Stack.Screen
                 name="compare"
                 options={{
-                  headerTitle: "Compare",
+                  headerTitle: "",
                   headerShown: true,
+                  headerLeft: () => (
+                    <BackButtonComponents
+                      title="Compare"
+                      textSize="text-Heading3 text-Quartz"
+                      onPress={() => router.back()} 
+                    />
+                  ),
                 }}
               />
               <Stack.Screen
@@ -35,18 +45,9 @@ export default function RootLayout() {
                   headerShown: false,
                 }}
               />
-              <Stack.Screen
-                name="create-review"
-                options={{
-                  headerTitle: "Review",
-                  headerShown: true,
-                }}
-              />
               <Stack.Screen name="thread/[id]" />
               <Stack.Screen name="review/[id]" />
-              <Stack.Screen
-                name="popularSkincare"
-              />
+              <Stack.Screen name="popularSkincare" />
             </Stack>
           </ReviewProvider>
         </CompareProvider>
