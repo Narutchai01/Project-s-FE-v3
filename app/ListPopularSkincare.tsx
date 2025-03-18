@@ -16,7 +16,7 @@ import { ModalSkincareDetail } from "@/components/Modal";
 import { useSkincareStore } from "@/store/skincare";
 import { useRouter } from "expo-router";
 
-export default function PopularSkincare() {
+export default function ListPopularSkincare() {
   const router = useRouter();
   const { skincares } = useCompare();
   const { isLoading } = useLoading();

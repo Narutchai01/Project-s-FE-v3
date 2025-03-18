@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Image, ScrollView } from "react-native";
 import { SkinAnalysisCard } from "@/components/SkinAnalysisCard";
-import PopularThreads from "@/components/PopularThreads";
+import {PopularReviews} from "@/components/PopularReviews";
 import { PopularSkincare } from "@/components/PopularSkincare";
 import dayjs from "dayjs";
 import { useCompare } from "@/context/CompareContext";
@@ -33,7 +33,7 @@ export default function SkincareScreen() {
       </View>
 
       {/* <SkinAnalysisCard resultLatest={resultLatest} skins={Array.isArray(skins) ? skins : []} acnes={Array.isArray(acnes) ? acnes : []} facials={Array.isArray(facials) ? facials : []} /> */}
-      <PopularThreads />
+      <PopularReviews />
       <PopularSkincare skincares={skincares} />
     </ScrollView>
   );

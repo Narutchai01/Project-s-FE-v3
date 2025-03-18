@@ -47,7 +47,7 @@ export default function RootLayout() {
               />
               <Stack.Screen name="thread/[id]" />
               <Stack.Screen name="review/[id]" />
-              <Stack.Screen name="popularSkincare" />
+              <Stack.Screen name="ListPopularSkincare" />
             </Stack>
           </ReviewProvider>
         </CompareProvider>
