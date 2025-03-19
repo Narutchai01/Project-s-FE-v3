@@ -70,6 +70,7 @@ export default function CommonScreen() {
     fetchReview();
   }, []);
 
+
   const filteredThreads = threads?.filter((thread) =>
     thread.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -144,6 +145,8 @@ export default function CommonScreen() {
                 data={filteredThreads}
                 keyExtractor={(item) => item.id.toString()}
                 numColumns={2}
+                onRefresh={fetchThread}
+                refreshing={isLoading}
                 renderItem={({ item }) => (
                   <TouchableOpacity onPress={() => handleRouter(item.id)}>
                     <ThreadCard
@@ -163,6 +166,8 @@ export default function CommonScreen() {
               data={filteredReviews} 
               keyExtractor={(item) => item.id.toString()}
               numColumns={2}
+              onRefresh={fetchReview}
+              refreshing={isLoading}
               renderItem={({ item }) => (
                 <TouchableOpacity onPress={() => handleRouter(item.id)}>
                   <ThreadCard
@@ -177,8 +182,8 @@ export default function CommonScreen() {
           )}
         </View>
       </SafeAreaView>
-      <ModalCreateThread isOpen={isThreadModalOpen} onClose={() => setIsThreadModalOpen(false)} />
-      <ModalCreateReviewPost isOpen={isReviewModalOpen} onClose={() => setIsReviewModalOpen(false)} />
+      <ModalCreateThread isOpen={isThreadModalOpen} onClose={() => setIsThreadModalOpen(false)} isMode={isMode} />
+      <ModalCreateReviewPost isOpen={isReviewModalOpen} onClose={() => setIsReviewModalOpen(false)} isMode={isMode}/>
     </SafeAreaProvider>
   );
 }
