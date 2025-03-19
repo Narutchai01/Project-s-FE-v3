@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import React from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useState, useEffect } from "react";
 import { IThread } from "@/interface/threads";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -19,6 +19,7 @@ import { ActivityBar, UserBar } from "@/components/Bar";
 import { SquareArrowLeft } from "lucide-react-native";
 import { ICommentThread } from "@/interface/comment";
 import { ModalComment } from "@/components/Modal";
+import { BackButtonComponents } from "@/components/Buntton";
 
 export default function ThreadDetails() {
   const { id } = useLocalSearchParams();
@@ -131,7 +132,7 @@ export default function ThreadDetails() {
         return;
       }
       fetchComments();
-      setCommentContent("")
+      setCommentContent("");
     } catch (error) {
       console.log(error);
     }
@@ -173,12 +174,11 @@ export default function ThreadDetails() {
           header: () => (
             <View className="h-16 bg-White">
               <View className=" h-full flex-row items-center justify-between px-3">
-                <TouchableOpacity className="flex flex-row gap-x-3 items-center">
-                  <SquareArrowLeft size={28} color="#4A4A4A" />
-                  <Text className="text-2xl font-semibold text-Quartz">
-                    Thread
-                  </Text>
-                </TouchableOpacity>
+                <BackButtonComponents
+                  title={"Threads"}
+                  textSize="text-Heading3"
+                  onPress={() => router.back()}
+                />
               </View>
             </View>
           ),

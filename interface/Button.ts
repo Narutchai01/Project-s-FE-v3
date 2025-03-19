@@ -9,4 +9,5 @@ export interface ButtonProps {
 export interface BackButtonProps {
     title: string;
     textSize: string;
+    onPress?: () => void; 
 }

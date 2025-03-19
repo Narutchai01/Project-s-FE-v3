@@ -92,7 +92,7 @@ const CompareButton = () => {
     <ButtonComponents
       title="Compare"
       className="bg-Bittersweet px-2 py-2 rounded-full"
-      textSize="text-md font-semibold"
+      textSize="text-md font-semibold text-white"
       onPress={() => setIsCompare(!isCompare)}
     />
   );
@@ -105,7 +105,7 @@ const ConfirmButton = () => {
     <ButtonComponents
       title="Confirm"
       className="bg-Bittersweet px-2 py-2 rounded-full"
-      textSize="text-md font-semibold"
+      textSize="text-md font-semibold text-white"
       onPress={() => {
         setIsCompare(!isCompare);
         router.push("/compare");

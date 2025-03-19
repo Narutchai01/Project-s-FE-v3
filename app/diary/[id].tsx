@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { IResult } from "@/interface/result";
 import { axiosInstance } from "@/lib/axios_instance";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -18,6 +18,7 @@ import { useFacialStore } from "@/store/facialStore";
 import { useSkinsStore } from "@/store/skinStore";
 import { Image } from "expo-image";
 import { useCompare } from "@/context/CompareContext";
+import { BackButtonComponents } from "@/components/Buntton";
 
 const ResultAnalysis = () => {
   const { id } = useLocalSearchParams();
@@ -62,6 +63,16 @@ const ResultAnalysis = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
+        <View className="h-16 bg-Snow">
+          <View className="h-full flex-row items-center justify-between px-3">
+            <BackButtonComponents
+              title={"Result Analysis"}
+              textSize="text-Heading3"
+              onPress={() => router.push("/diary")} 
+            />
+          </View>
+        </View>
+                
         <View className="flex justify-center items-center p-4">
           {image && (
             <View
