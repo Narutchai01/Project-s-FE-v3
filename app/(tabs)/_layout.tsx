@@ -1,17 +1,16 @@
 import React from "react";
 import { Tabs } from "expo-router";
 import {
-  SquareArrowLeftIcon,
   House,
   BookAIcon,
   CameraIcon,
   MessageCircleMore,
 } from "lucide-react-native";
 import { useRouter } from "expo-router";
+import { BackButtonComponents } from "@/components/Buntton";
 
 export default function _layout() {
   const router = useRouter();
-
 
   return (
     <Tabs
@@ -52,11 +51,12 @@ export default function _layout() {
             <CameraIcon size={size} color={color} />
           ),
           headerLeft: () => (
-            <SquareArrowLeftIcon
-              size={28}
-              color="#4A4A4A"
+            <BackButtonComponents
+              title="Camera"
+              textSize="text-Heading3 text-Quartz"
               onPress={() => router.back()}
             />
+
           ),
           // hide the tab bar
           tabBarStyle: { display: "none" },

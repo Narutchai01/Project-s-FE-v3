@@ -169,7 +169,7 @@ export default function ThreadDetails() {
               <View className=" h-full flex-row items-center justify-between px-3">
                 <BackButtonComponents
                   title={"Threads"}
-                  textSize="text-Heading3"
+                  textSize="text-Heading3 text-Quartz"
                   onPress={() => router.back()}
                 />
               </View>
