@@ -1,7 +1,7 @@
 import React from "react";
 import { View, Text, Image, ScrollView } from "react-native";
 import { SkinAnalysisCard } from "@/components/SkinAnalysisCard";
-import {PopularReviews} from "@/components/PopularReviews";
+import { PopularReviews } from "@/components/PopularReviews";
 import { PopularSkincare } from "@/components/PopularSkincare";
 import dayjs from "dayjs";
 import { useCompare } from "@/context/CompareContext";
@@ -12,7 +12,6 @@ export default function SkincareScreen() {
   const weekday = today.format("dddd");
   const month = today.format("MMM");
   const year = today.year();
-
   const { skincares } = useCompare();
 
   return (
@@ -32,7 +31,8 @@ export default function SkincareScreen() {
         </View>
       </View>
 
-      {/* <SkinAnalysisCard resultLatest={resultLatest} skins={Array.isArray(skins) ? skins : []} acnes={Array.isArray(acnes) ? acnes : []} facials={Array.isArray(facials) ? facials : []} /> */}
+      <SkinAnalysisCard />
+
       <PopularReviews />
       <PopularSkincare skincares={skincares} />
     </ScrollView>

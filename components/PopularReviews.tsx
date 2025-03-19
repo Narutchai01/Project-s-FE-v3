@@ -5,7 +5,6 @@ import { PopularThreadCard } from "@/components/Card";
 import { useRouter } from "expo-router";
 import useLoading from "@/hook/useLoading";
 import { IReview } from "@/interface/review";
-import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
 import LoadingIndicator from "@/components/Loading";
@@ -23,17 +22,18 @@ export const PopularReviews: FC = () => {
         headers: { token },
       });
 
-      if (res.data.status) {
-        setReviews(res.data.data);
+      const data = res.data;
+      if (data.status) {
+        setReviews(data.data);
+        stopLoading();
       }
-    } catch (err) {
-      if (axios.isAxiosError(err) && err.response?.status === 401) {
-        console.log("Unauthorized");
-      }
+    } catch (error) {
+      console.log(error);
+      stopLoading();
     } finally {
       stopLoading();
     }
-  };
+  }
 
   useEffect(() => {
     fetchReviews();
