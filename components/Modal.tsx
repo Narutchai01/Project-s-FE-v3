@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { RadioComponents } from "./Radio";
 import { BackButtonComponents, ButtonComponents } from "./Buntton";
-import { SquareArrowLeft, Image as ImageIcon } from "lucide-react-native";
+import { Image as ImageIcon } from "lucide-react-native";
 import { Image } from "expo-image";
 import * as DocumentPicker from "expo-document-picker";
 import { axiosInstance } from "@/lib/axios_instance";
@@ -31,6 +31,7 @@ import { ICommentReview, ICommentThread } from "@/interface/comment";
 import { CommentCard } from "./Card";
 import { CircleArrowUp } from "lucide-react-native";
 import { Search } from "@/components/Search";
+import * as ImagePicker from "expo-image-picker";
 
 interface PropsModalSensitiveSkin {
   isOpen: boolean;
@@ -142,7 +143,7 @@ export const ModalCreateThread: FC<any> = (props) => {
             <View className=" h-full flex-row items-center justify-between px-3">
               <BackButtonComponents
                 title={"New Thread"}
-                textSize="text-Heading3"
+                textSize="text-Heading3 text-Quartz"
                 onPress={onClose}
               />
             </View>
@@ -163,17 +164,18 @@ export const ModalCreateThread: FC<any> = (props) => {
                       height: 350,
                       width: 250,
                       borderRadius: 10,
-                      borderColor: "black",
-                      borderWidth: 1,
+                      backgroundColor: "#FCECEC",
+                      borderColor: "#FF6F61",
+                      borderWidth: 2,
                       display: "flex",
                       justifyContent: "center",
                       alignItems: "center",
                       marginRight: 10, // Add gap between elements
                     }}
                   >
-                    <View>
-                      <ImageIcon size={100} color="#4A4A4A" />
-                      <Text>Tap a photo</Text>
+                    <View className="flex items-center justify-center">
+                      <ImageIcon size={50} color="#4A4A4A" />
+                      <Text className="text-label8 mt-2">Tap a photo</Text>
                     </View>
                   </TouchableOpacity>
                 );
@@ -251,7 +253,7 @@ export function ModalSkincare({ isOpen, onClose, setSkincare, skincare }: any) {
 
   return (
     <Modal visible={isOpen} animationType="slide" onRequestClose={handleCancel}>
-      <SafeAreaView className="bg-Snow p-4 border-b-2 border-gray-300 mb-4 relative">
+      <SafeAreaView className="bg-Snow p-4 flex-1">
         <View className="flex flex-row items-center justify-between">
           <ButtonComponents
             title="Cancel"
@@ -277,7 +279,7 @@ export function ModalSkincare({ isOpen, onClose, setSkincare, skincare }: any) {
 
         {isLoading ? (
           <Loading />
-        ) : (
+        ) : filteredSkincares.length > 0 ? (
           <FlatList
             data={filteredSkincares}
             keyExtractor={(item) => item.id.toString()}
@@ -289,6 +291,10 @@ export function ModalSkincare({ isOpen, onClose, setSkincare, skincare }: any) {
               />
             )}
           />
+        ) : (
+          <View className="flex items-center justify-center h-40">
+            <Text className="text-label8">No results found</Text>
+          </View>
         )}
       </SafeAreaView>
     </Modal>
@@ -307,7 +313,7 @@ export const ModalSkincareDetail: FC<ModalSkincareDetailProps> = (props) => {
 
   return (
     <Modal visible={isOpen} animationType="slide" onRequestClose={onClose}>
-      <SafeAreaView>
+      <SafeAreaView className="flex-1 bg-Snow p-4">
         <View className="h-16 bg-Snow mb-4">
           <View className="h-full flex-row items-center justify-between px-3">
             <BackButtonComponents
@@ -357,6 +363,7 @@ interface IModalComment {
   handleFavoriteComment: (comment_id: number) => void;
   handleComment: () => void;
   setComment: (content: string) => void;
+  commentContent: string;
 }
 
 export const ModalComment: React.FC<IModalComment> = ({
@@ -366,6 +373,7 @@ export const ModalComment: React.FC<IModalComment> = ({
   handleFavoriteComment,
   handleComment,
   setComment,
+  commentContent,
 }) => {
   return (
     <Modal
@@ -403,13 +411,222 @@ export const ModalComment: React.FC<IModalComment> = ({
           <TextInput
             className="border-Quartz border-2 w-full rounded-full py-4 px-4 mx-2"
             placeholder="Share your thoughts..."
+            value={commentContent}
             onChangeText={setComment}
           />
-          <TouchableOpacity onPress={handleComment}>
+          <TouchableOpacity
+            onPress={() => {
+              handleComment();
+              setComment("");
+            }}
+          >
             <CircleArrowUp size={36} />
           </TouchableOpacity>
         </View>
       </View>
+    </Modal>
+  );
+};
+
+export const ModalCreateReviewPost: FC<any> = (props) => {
+  const router = useRouter();
+  const { isOpen, onClose } = props;
+
+  const { isLoading, startLoading, stopLoading } = useLoading();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [skincare, setSkincare] = useState<ISkincare[]>([]);
+  const [image, setImage] = useState<string | null>(null);
+  const [review, setReview] = useState({
+    title: "",
+    content: "",
+  });
+
+  const handleChange = (key: string, value: string) => {
+    setReview({ ...review, [key]: value });
+  };
+
+  const handleSelectSkincare = () => {
+    setIsModalOpen(true);
+  };
+
+  const pickImageAsync = async () => {
+    const result: ImagePicker.ImagePickerResult =
+      await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 1,
+      });
+
+    if (!result.canceled && result.assets && result.assets[0].uri) {
+      setImage(result.assets[0].uri);
+    } else {
+      alert("You did not select any image.");
+    }
+  };
+
+  const handlePostReview = async () => {
+    startLoading();
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        throw new Error("No token found");
+      }
+      const formData = new FormData();
+      formData.append("title", review.title);
+      formData.append("content", review.content);
+      formData.append(
+        "skincare_id",
+        JSON.stringify(skincare.map((item) => item.id))
+      );
+      if (image) {
+        const file = {
+          uri: image,
+          name: "image.jpg",
+          type: "image/jpeg",
+        };
+        formData.append("file", file as unknown as Blob);
+      }
+      await axiosInstance
+        .post("/reviews", formData, {
+          headers: {
+            token: token,
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((res) => {
+          if (res.data.status) {
+            router.push(`/review/${res.data.data.id}`);
+          }
+        });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      stopLoading();
+    }
+  };
+
+  return (
+    <Modal visible={isOpen} animationType="slide">
+      {isLoading ? (
+        <LoadingIndicator />
+      ) : (
+        <ScrollView className="p-4">
+          <BackButtonComponents
+            title="New Review"
+            textSize="text-Heading3 text-Quartz"
+            onPress={onClose}
+          />
+
+          <View className="mb-4">
+            <Text className="text-Heading4">Thumbnail</Text>
+          </View>
+
+          <View className="mb-4 flex items-center justify-center">
+            <TouchableOpacity
+              onPress={pickImageAsync}
+              style={{
+                height: 350,
+                width: 250,
+                borderRadius: 10,
+                backgroundColor: "#FCECEC",
+                borderColor: "#FF6F61",
+                borderWidth: 2,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {image ? (
+                <Image
+                  source={{ uri: image }}
+                  style={{ width: 250, height: 350, borderRadius: 10 }}
+                />
+              ) : (
+                <View className="flex items-center justify-center">
+                  <ImageIcon size={50} color="#4A4A4A" />
+                  <Text className="text-label8 mt-2">Tap a photo</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          </View>
+
+          <View className="mb-4">
+            <View className="border-b-2 border-gray-300 mb-4"></View>
+            <View className="flex flex-row items-center justify-between mb-2">
+              <Text className="text-Heading4">Select skincare</Text>
+              <ButtonComponents
+                title="Select"
+                className="bg-Bittersweet px-2 py-2 rounded-full w-[80px] flex items-center justify-center"
+                textSize="text-md font-semibold text-white"
+                onPress={handleSelectSkincare}
+              />
+            </View>
+            <ScrollView
+              horizontal={true}
+              showsHorizontalScrollIndicator={false}
+            >
+              {skincare.length > 0 ? (
+                skincare.map((item: ISkincare) => (
+                  <View key={item.id} className="mb-4 mr-2">
+                    <Image
+                      source={{ uri: item.image }}
+                      style={{ width: 100, height: 120, borderRadius: 10 }}
+                    />
+                    <View className="flex items-center justify-center mt-2">
+                      <Text
+                        numberOfLines={1}
+                        ellipsizeMode="tail"
+                        style={{ width: 100, textAlign: "center" }}
+                      >
+                        {item.name}
+                      </Text>
+                    </View>
+                  </View>
+                ))
+              ) : (
+                <Text>No skincare selected</Text>
+              )}
+            </ScrollView>
+          </View>
+
+          <View className="mb-4">
+            <TextInput
+              placeholder="Title"
+              onChangeText={(title) => handleChange("title", title)}
+              className="border-2 w-full rounded-full p-6 border-BrightGray"
+            />
+          </View>
+
+          <View className="mb-4">
+            <TextInput
+              placeholder="Add Content"
+              multiline
+              style={{
+                minHeight: 100,
+                borderRadius: 30,
+              }}
+              className=" border-2  w-full  p-6 border-BrightGray"
+              onChangeText={(content) => handleChange("content", content)}
+            />
+          </View>
+
+          <View className="flex flex-row items-center justify-center mb-2">
+            <ButtonComponents
+              title="Post"
+              className="bg-Bittersweet px-2 py-2 rounded-full w-[80px] flex items-center justify-center"
+              textSize="text-md font-semibold text-white"
+              onPress={handlePostReview}
+            />
+          </View>
+
+          <ModalSkincare
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            skincare={skincare}
+            setSkincare={setSkincare}
+          />
+        </ScrollView>
+      )}
     </Modal>
   );
 };

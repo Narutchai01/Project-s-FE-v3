@@ -4,31 +4,38 @@ import { Camera, CameraView } from "expo-camera";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
+import useLoading from "@/hook/useLoading";
+import LoadingIndicator from "@/components/Loading";
 
 export default function FaceScan() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isCameraReady, setIsCameraReady] = useState(false);
   const cameraRef = useRef<CameraView | null>(null);
   const router = useRouter();
+  const { startLoading, stopLoading, isLoading } = useLoading();
 
   useEffect(() => {
-    (async () => {
+    const requestPermission = async () => {
+      startLoading();
       const { status } = await Camera.requestCameraPermissionsAsync();
       console.log("Camera permission status:", status);
       setHasPermission(status === "granted");
-    })();
+      stopLoading();
+    };
+
+    requestPermission();
   }, []);
 
-  useEffect(() => {
-    console.log("CameraView Ref:", cameraRef.current);
-  }, [isCameraReady]);
-
   const takePicture = async () => {
-    if (cameraRef.current && isCameraReady) {
+    if (!cameraRef.current || !isCameraReady) return;
+
+    startLoading();
+    try {
       const photo = await cameraRef.current.takePictureAsync();
 
       if (!photo || !photo.uri) {
         console.error("Failed to capture photo.");
+        stopLoading();
         return;
       }
 
@@ -43,26 +50,31 @@ export default function FaceScan() {
 
       formData.append("file", photoFile);
 
-      try {
-        const token = await AsyncStorage.getItem("token");
-        const response = await axiosInstance.post("/results", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            token: token,
-          },
-        });
-        console.log("Upload response:", response.data);
-        router.push(`/diary/${response.data.data.id}`);
-      } catch (error) {
-        console.error("Failed to upload photo:", error);
-      }
+      const token = await AsyncStorage.getItem("token");
+      const response = await axiosInstance.post("/results", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          token: token,
+        },
+      });
+
+      console.log("Upload response:", response.data);
+      router.push(`/diary/${response.data.data.id}`);
+    } catch (error) {
+      console.error("Failed to upload photo:", error);
+    } finally {
+      stopLoading();
     }
   };
+
+  if (isLoading) {
+    return <LoadingIndicator />;
+  }
 
   if (hasPermission === null) {
     return (
       <Text className="text-center text-white">
-        requesting permission to use the camera...
+        Requesting permission to use the camera...
       </Text>
     );
   }
@@ -90,8 +102,9 @@ export default function FaceScan() {
         <TouchableOpacity
           className="absolute bottom-14 left-1/2 transform -translate-x-1/2"
           onPress={takePicture}
+          disabled={isLoading}
         >
-          <View className="w-20 h-20 bg-white rounded-full border-4 border-gray-400" />
+          <View className={`w-20 h-20 rounded-full border-4 ${isLoading ? "bg-gray-300" : "bg-white border-gray-400"}`} />
         </TouchableOpacity>
 
         <View className="absolute bottom-32 w-4/5 left-1/2 transform -translate-x-1/2">

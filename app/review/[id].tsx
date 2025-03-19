@@ -154,7 +154,7 @@ export default function ReviewDetails() {
               <View className=" h-full flex-row items-center justify-between px-3">
                 <BackButtonComponents
                   title={"Reviews"}
-                  textSize="text-Heading3"
+                  textSize="text-Heading3 text-Quartz"
                   onPress={() => router.back()}
                 />
               </View>
@@ -195,6 +195,17 @@ export default function ReviewDetails() {
                   const index = Math.round(contentOffset.x / (width - 20));
                   setCurrImage(index);
                 }}
+                ListEmptyComponent={() => (
+                  <Image
+                    source={require("@/assets/images/defaultImage.png")}
+                    style={{
+                      width: width - 20,
+                      height: height * 0.5,
+                      borderRadius: 10,
+                    }}
+                    contentFit="cover"
+                  />
+                )}
               />
             </View>
             <ActivityBar
@@ -210,10 +221,10 @@ export default function ReviewDetails() {
             />
             <View className="container mx-auto px-3">
               <Text style={{ fontSize: width * 0.05, fontWeight: "bold" }}>
-                {review?.title}
+                {review?.title ? review?.title : "No title"}
               </Text>
               <Text style={{ fontSize: width * 0.0375, fontWeight: "medium" }}>
-                {review?.content}
+                {review?.content ? review?.content : "No content"}
               </Text>
             </View>
           </View>
@@ -227,6 +238,7 @@ export default function ReviewDetails() {
         handleFavoriteComment={handleFavoriteComment}
         handleComment={handleComment}
         setComment={setCommentContent}
+        commentContent={commentContent}
       />
     </SafeAreaProvider>
   );
