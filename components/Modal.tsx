@@ -61,14 +61,19 @@ export const ModalSensitiveSkin: FC<PropsModalSensitiveSkin> = (props) => {
 
 export const ModalCreateThread: FC<any> = (props) => {
   const router = useRouter();
-  const { isOpen, onClose } = props;
+  const { isOpen, onClose, isMode } = props;
   const { isLoading, startLoading, stopLoading } = useLoading();
-
   const [image, setImage] = useState<string[] | null>(null);
   const [thread, setThread] = useState({
     title: "",
     caption: "",
   });
+
+  const handleCancel = () => {
+    setThread({ title: "", caption: "" });
+    setImage(null);
+    onClose();
+  }
 
   const handleChange = (key: string, value: string) => {
     setThread({ ...thread, [key]: value });
@@ -129,11 +134,12 @@ export const ModalCreateThread: FC<any> = (props) => {
       console.log(error);
     } finally {
       stopLoading();
+      handleCancel();
     }
   };
 
   return (
-    <Modal visible={isOpen} animationType="slide">
+    <Modal visible={isOpen && isMode} animationType="slide">
       {isLoading ? (
         <LoadingIndicator />
       ) : (
@@ -144,7 +150,7 @@ export const ModalCreateThread: FC<any> = (props) => {
               <BackButtonComponents
                 title={"New Thread"}
                 textSize="text-Heading3 text-Quartz"
-                onPress={onClose}
+                onPress={handleCancel}
               />
             </View>
           </View>
@@ -430,8 +436,7 @@ export const ModalComment: React.FC<IModalComment> = ({
 
 export const ModalCreateReviewPost: FC<any> = (props) => {
   const router = useRouter();
-  const { isOpen, onClose } = props;
-
+  const { isOpen, onClose , isMode } = props;
   const { isLoading, startLoading, stopLoading } = useLoading();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [skincare, setSkincare] = useState<ISkincare[]>([]);
@@ -440,6 +445,13 @@ export const ModalCreateReviewPost: FC<any> = (props) => {
     title: "",
     content: "",
   });
+
+  const handleCancel = () => {
+    setReview({ title: "", content: "" });
+    setSkincare([]);
+    setImage(null);
+    onClose();
+  }
 
   const handleChange = (key: string, value: string) => {
     setReview({ ...review, [key]: value });
@@ -502,11 +514,12 @@ export const ModalCreateReviewPost: FC<any> = (props) => {
       console.error(error);
     } finally {
       stopLoading();
+      handleCancel();
     }
   };
 
   return (
-    <Modal visible={isOpen} animationType="slide">
+    <Modal visible={!isMode && isOpen} animationType="slide">
       {isLoading ? (
         <LoadingIndicator />
       ) : (
@@ -514,7 +527,7 @@ export const ModalCreateReviewPost: FC<any> = (props) => {
           <BackButtonComponents
             title="New Review"
             textSize="text-Heading3 text-Quartz"
-            onPress={onClose}
+            onPress={handleCancel}
           />
 
           <View className="mb-4">
