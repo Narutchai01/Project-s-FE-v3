@@ -1,10 +1,4 @@
-import {
-  View,
-  Text,
-  FlatList,
-  Dimensions,
-  TouchableOpacity,
-} from "react-native";
+import { View, Text, FlatList, Dimensions } from "react-native";
 import React, { useState, useEffect, useMemo } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router, Stack, useLocalSearchParams } from "expo-router";
@@ -14,7 +8,6 @@ import useLoading from "@/hook/useLoading";
 import { Image } from "expo-image";
 import LoadingIndicator from "@/components/Loading";
 import { ActivityBar, UserBar } from "@/components/Bar";
-import { SquareArrowLeft } from "lucide-react-native";
 import { ICommentReview } from "@/interface/comment";
 import { ModalComment } from "@/components/Modal";
 import { IReview } from "@/interface/review";
@@ -171,7 +164,29 @@ export default function ReviewDetails() {
               userImage={review?.user?.image}
               username={review?.user?.full_name}
             />
+
             <View style={{ padding: 10 }}>
+              {imagesList.length > 0 && (
+                <View
+                  style={{
+                    position: "absolute",
+                    top: 20,
+                    right: 20,
+                    backgroundColor: "#4A4A4ACC",
+                    paddingVertical: 5,
+                    paddingHorizontal: 10,
+                    borderRadius: 20,
+                    zIndex: 10,
+                  }}
+                >
+                  <Text
+                    style={{ color: "white", fontSize: 14, fontWeight: "bold" }}
+                  >
+                    {currImage + 1} / {imagesList.length}
+                  </Text>
+                </View>
+              )}
+
               <FlatList
                 data={imagesList}
                 renderItem={({ item, index }) => (
@@ -208,6 +223,7 @@ export default function ReviewDetails() {
                 )}
               />
             </View>
+
             <ActivityBar
               isOpenComment={() => setIsCommentOpen(true)}
               hadleFavorite={handleFavorite}
