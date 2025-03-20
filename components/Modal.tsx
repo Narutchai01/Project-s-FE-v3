@@ -32,6 +32,7 @@ import { CommentCard } from "./Card";
 import { CircleArrowUp } from "lucide-react-native";
 import { Search } from "@/components/Search";
 import * as ImagePicker from "expo-image-picker";
+import { Ionicons } from "@expo/vector-icons";
 
 interface PropsModalSensitiveSkin {
   isOpen: boolean;
@@ -69,11 +70,20 @@ export const ModalCreateThread: FC<any> = (props) => {
     caption: "",
   });
 
+  const handleRemoveImage = (index: number) => {
+    setImage((prev) => {
+      if (!prev) return null;
+      const updatedImages = [...prev];
+      updatedImages.splice(index, 1);
+      return updatedImages.length > 0 ? updatedImages : null;
+    });
+  };
+
   const handleCancel = () => {
     setThread({ title: "", caption: "" });
     setImage(null);
     onClose();
-  }
+  };
 
   const handleChange = (key: string, value: string) => {
     setThread({ ...thread, [key]: value });
@@ -157,48 +167,99 @@ export const ModalCreateThread: FC<any> = (props) => {
           {/* header zone  */}
 
           <View className="flex justify-center items-center">
-            <FlatList
-              data={image}
-              keyExtractor={(_, index: number) => index.toString()}
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              ListHeaderComponent={() => {
-                return (
-                  <TouchableOpacity
-                    onPress={handleChooseImage}
+            {!image ? (
+              <TouchableOpacity
+                onPress={handleChooseImage}
+                style={{
+                  height: 350,
+                  width: 250,
+                  borderRadius: 10,
+                  backgroundColor: "#FCECEC",
+                  borderColor: "#FF6F61",
+                  borderWidth: 2,
+                  display: "flex",
+                  marginTop: 11,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <View className="flex items-center justify-center">
+                  <ImageIcon size={50} color="#4A4A4A" />
+                  <Text className="text-label8 mt-2">Tap a photo</Text>
+                </View>
+              </TouchableOpacity>
+            ) : (
+              <FlatList
+                data={image}
+                keyExtractor={(_, index: number) => index.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                ListHeaderComponent={() => {
+                  return (
+                    <TouchableOpacity
+                      onPress={handleChooseImage}
+                      style={{
+                        height: 350,
+                        width: 250,
+                        borderRadius: 10,
+                        backgroundColor: "#FCECEC",
+                        borderColor: "#FF6F61",
+                        borderWidth: 2,
+                        display: "flex",
+                        marginTop: 11,
+                        justifyContent: "center",
+                        alignItems: "center",
+                        marginRight: 10,
+                      }}
+                    >
+                      <View className="flex items-center justify-center">
+                        <ImageIcon size={50} color="#4A4A4A" />
+                        <Text className="text-label8 mt-2">Tap a photo</Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                }}
+                renderItem={({
+                  item,
+                  index,
+                }: {
+                  item: string;
+                  index: number;
+                }) => (
+                  <View
                     style={{
-                      height: 350,
-                      width: 250,
-                      borderRadius: 10,
-                      backgroundColor: "#FCECEC",
-                      borderColor: "#FF6F61",
-                      borderWidth: 2,
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      marginRight: 10, // Add gap between elements
+                      position: "relative",
+                      marginRight: 10,
+                      marginTop: 10,
                     }}
                   >
-                    <View className="flex items-center justify-center">
-                      <ImageIcon size={50} color="#4A4A4A" />
-                      <Text className="text-label8 mt-2">Tap a photo</Text>
-                    </View>
-                  </TouchableOpacity>
-                );
-              }}
-              renderItem={({ item }: { item: string }) => (
-                <Image
-                  source={{ uri: item }}
-                  style={{
-                    width: 250,
-                    height: 350,
-                    borderRadius: 10,
-                    marginTop: 10,
-                    marginRight: 10, // Add gap between elements
-                  }}
-                />
-              )}
-            />
+                    <Image
+                      source={{ uri: item }}
+                      style={{
+                        width: 250,
+                        height: 350,
+                        borderRadius: 10,
+                      }}
+                    />
+                    <TouchableOpacity
+                      onPress={() => handleRemoveImage(index)}
+                      style={{
+                        position: "absolute",
+                        top: 10,
+                        right: 10,
+                      }}
+                    >
+                      <Ionicons
+                        name="close-circle"
+                        size={30}
+                        color="#4A4A4ACC"
+                      />
+                    </TouchableOpacity>
+                  </View>
+                )}
+              />
+            )}
+
             <View className="w-full container mx-auto px-10 py-10 gap-y-4">
               <TextInput
                 placeholder="Title"
@@ -436,7 +497,7 @@ export const ModalComment: React.FC<IModalComment> = ({
 
 export const ModalCreateReviewPost: FC<any> = (props) => {
   const router = useRouter();
-  const { isOpen, onClose , isMode } = props;
+  const { isOpen, onClose, isMode } = props;
   const { isLoading, startLoading, stopLoading } = useLoading();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [skincare, setSkincare] = useState<ISkincare[]>([]);
@@ -451,7 +512,7 @@ export const ModalCreateReviewPost: FC<any> = (props) => {
     setSkincare([]);
     setImage(null);
     onClose();
-  }
+  };
 
   const handleChange = (key: string, value: string) => {
     setReview({ ...review, [key]: value });
