@@ -26,6 +26,7 @@ module.exports = {
         'label4': ['0.9375rem', { fontWeight: '500' }], /* 15px */
         'label2': ['0.8125rem', { fontWeight: '400' }], /* 13px */
         'label6': ['0.625rem', { fontWeight: '500' }], /* 10px */
+        'card1': ['1.25rem', { fontWeight: '400' }], /* 20px */
         'label8': ['1.125rem', { fontWeight: '400' }], /* 18px */
         'label12': ['0.5625rem', { fontWeight: '300' }], /* 9px */
         'label13': ['0.5rem', { fontWeight: '400' }], /* 8px */
