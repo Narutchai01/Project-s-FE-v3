@@ -6,3 +6,10 @@ export interface LogoutConfirmAlertProps {
     confirm?: string;
     cancel?: string;
   }
+
+export interface ConfirmAlertProps {
+    visible: boolean;
+    onClose: () => void;
+    title?: string;
+    confirm?: string;
+  }
