@@ -2,13 +2,13 @@ import { View, Text, TouchableOpacity, Modal, StyleSheet } from "react-native";
 import React, { FC, useState } from "react";
 import DateTimePicker from "react-native-ui-datepicker";
 import dayjs from "dayjs";
-import { ISignUp } from "@/interface/user";
+import { ISignUp, IUser } from "@/interface/user";
 
 interface DatePickerProps {
   visible: boolean;
   onClose: () => void;
-  setSignupData: (data: ISignUp) => void;
-  signupData: ISignUp;
+  setSignupData: (data: ISignUp | IUser) => void;
+  signupData: ISignUp | IUser;
 }
 
 export const DatePicker: FC<DatePickerProps> = (props) => {
@@ -18,7 +18,7 @@ export const DatePicker: FC<DatePickerProps> = (props) => {
 const handleSave = () => {
     setSignupData({
       ...signupData,
-      birthday: dayjs(date),
+      birthday: dayjs(date)
     });
     onClose();
 };

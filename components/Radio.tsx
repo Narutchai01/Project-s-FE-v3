@@ -1,13 +1,14 @@
 import { Text, View, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import "../global.css";
 
 interface RadioProps {
+  value: boolean | null;
   setValue: (value: boolean) => void;
 }
 
-export function RadioComponents({ setValue }: RadioProps) {
+export function RadioComponents({ value, setValue }: RadioProps) {
   const [selected, setSelected] = useState<number | null>(null);
 
   const RadioValue = [
@@ -15,6 +16,10 @@ export function RadioComponents({ setValue }: RadioProps) {
     { id: 2, label: "Not Sensitive", value: false },
   ];
 
+  useEffect(() => {
+    const found = RadioValue.find((item) => item.value === value);
+    if (found) setSelected(found.id);
+  }, [value]);
   const OnPress = (value: boolean, id: number) => {
     setSelected(id);
     setValue(value);
