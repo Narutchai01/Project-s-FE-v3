@@ -1,14 +1,17 @@
 import React, { useState } from "react";
-import { View, SafeAreaView, Text, TextInput } from "react-native";
+import { View, SafeAreaView, Text, TextInput, TouchableOpacity } from "react-native";
 import { BackButtonComponents, ButtonComponents } from "@/components/Buntton";
 import { router } from "expo-router";
 import { ConfirmAlert } from "@/components/Alert";
+import { Eye, EyeOff } from "lucide-react-native";
 
 export default function ChangePasswordScreen() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showAlert, setShowAlert] = useState(false);
   const [alertTitle, setAlertTitle] = useState("Change Password Success");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChangePassword = () => {
     if (!newPassword || !confirmPassword) {
@@ -37,24 +40,38 @@ export default function ChangePasswordScreen() {
         />
       </View>
       <View className="px-4">
-        <Text className="text-Heading4 text-Quartz mb-4 mt-4">
-          New Password
-        </Text>
-        <TextInput
-          value={newPassword}
-          onChangeText={setNewPassword}
-          secureTextEntry={true}
-          className="border-2 w-full rounded-full p-6 border-BrightGray mb-4"
-        />
-        <Text className="text-Heading4 text-Quartz mb-4 mt-4">
-          Confirm Password
-        </Text>
-        <TextInput
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-          secureTextEntry={true}
-          className="border-2 w-full rounded-full p-6 border-BrightGray mb-8"
-        />
+        <Text className="text-Heading4 text-Quartz mb-2 mt-4">New Password</Text>
+        <View className="relative mb-4">
+          <TextInput
+            value={newPassword}
+            onChangeText={setNewPassword}
+            secureTextEntry={!showPassword}
+            className="border-2 w-full rounded-full p-6 pr-12 border-BrightGray"
+          />
+          <TouchableOpacity
+            onPress={() => setShowPassword(!showPassword)}
+            className="absolute right-4 top-6"
+          >
+            {showPassword ? <Eye size={20} color="#000" /> : <EyeOff size={20} color="#000" />}
+          </TouchableOpacity>
+        </View>
+    
+        <Text className="text-Heading4 text-Quartz mb-2 mt-4">Confirm Password</Text>
+        <View className="relative mb-8">
+          <TextInput
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry={!showConfirmPassword}
+            className="border-2 w-full rounded-full p-6 pr-12 border-BrightGray"
+          />
+          <TouchableOpacity
+            onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+            className="absolute right-4 top-6"
+          >
+            {showConfirmPassword ? <Eye size={20} color="#000" /> : <Eye size={20} color="#000" />}
+          </TouchableOpacity>
+        </View>
+
         <ButtonComponents
           onPress={handleChangePassword}
           title="Confirm"
