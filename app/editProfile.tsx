@@ -10,7 +10,7 @@ import {
 import { BackButtonComponents, ButtonComponents } from "@/components/Buntton";
 import { router } from "expo-router";
 import { RadioComponents } from "@/components/Radio";
-import { PencilLine } from "lucide-react-native";
+import { Eye, EyeOff, PencilLine } from "lucide-react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
 import useLoading from "@/hook/useLoading";
@@ -37,6 +37,7 @@ export default function EditProfileScreen() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const defaultImage = require("@/assets/images/user-default.png");
   const [showAlert, setShowAlert] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const fetchUserProfile = async () => {
     startLoading();
@@ -200,14 +201,26 @@ export default function EditProfileScreen() {
         />
 
         <Text className="text-Heading4 text-Quartz mb-2">Password</Text>
-        <TextInput
-          value={user.password}
-          onChangeText={(text) =>
-            setUser((prev) => ({ ...prev, password: text }))
-          }
-          secureTextEntry
-          className="border-2 w-full rounded-full p-6 border-BrightGray mb-4"
-        />
+        <View className="relative mb-4">
+          <TextInput
+            value={user.password}
+            onChangeText={(text) =>
+              setUser((prev) => ({ ...prev, password: text }))
+            }
+            secureTextEntry={!showPassword}
+            className="border-2 w-full rounded-full p-6 pr-12 border-BrightGray"
+          />
+          <TouchableOpacity
+            onPress={() => setShowPassword(!showPassword)}
+            className="absolute right-4 top-6"
+          >
+            {showPassword ? (
+              <Eye size={20} color="#000" />
+            ) : (
+              <EyeOff size={20} color="#000" />
+            )}
+          </TouchableOpacity>
+        </View>
 
         <View className="flex flex-col gap-y-2 mb-8">
           <Text>Do you have sensitive facial skin?</Text>
