@@ -19,7 +19,7 @@ import * as DocumentPicker from "expo-document-picker";
 import { axiosInstance } from "@/lib/axios_instance";
 import { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter } from "expo-router";
+import { router, useRouter } from "expo-router";
 import LoadingIndicator from "@/components/Loading";
 import useLoading from "@/hook/useLoading";
 import { ReviewCard } from "./Card";
@@ -59,7 +59,6 @@ export const ModalSensitiveSkin: FC<PropsModalSensitiveSkin> = (props) => {
     </Modal>
   );
 };
-
 
 interface IModalCreateThreadProps {
   isOpen: boolean;
@@ -300,7 +299,9 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
 interface IModalSkincare {
   isOpen: boolean;
   onClose: () => void;
-  setSkincare: (skincare: ISkincare[] | ((prev: ISkincare[]) => ISkincare[])) => void;
+  setSkincare: (
+    skincare: ISkincare[] | ((prev: ISkincare[]) => ISkincare[])
+  ) => void;
   skincare: ISkincare[];
 }
 
@@ -315,13 +316,16 @@ export const ModalSkincare: FC<IModalSkincare> = (props) => {
   );
 
   const handleSelectItem = (item: ISkincare) => {
-    if (skincare.some((selected) => selected.id === item.id) || skincare.length >= 10) {
+    if (
+      skincare.some((selected) => selected.id === item.id) ||
+      skincare.length >= 10
+    ) {
       setSkincare((prev) => prev.filter((prevItem) => prevItem.id !== item.id));
     } else {
       setSkincare((prev) => [...prev, item]);
     }
   };
-  
+
   const handleConfirm = () => {
     onClose();
   };
@@ -379,7 +383,7 @@ export const ModalSkincare: FC<IModalSkincare> = (props) => {
       </SafeAreaView>
     </Modal>
   );
-}
+};
 
 interface ModalSkincareDetailProps {
   isOpen: boolean;
@@ -514,7 +518,9 @@ interface IModalCreateReviewPostProps {
   isMode: boolean;
 }
 
-export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (props) => {
+export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (
+  props
+) => {
   const router = useRouter();
   const { isOpen, onClose, isMode } = props;
   const { isLoading, startLoading, stopLoading } = useLoading();
@@ -720,6 +726,43 @@ export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (props) =>
           />
         </ScrollView>
       )}
+    </Modal>
+  );
+};
+
+interface ModalChangePassworkSuccessProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const ModalChangePassworkSuccess: FC<ModalChangePassworkSuccessProps> = (
+  props
+) => {
+  const { isOpen, onClose } = props;
+
+  return (
+    <Modal
+      visible={isOpen}
+      animationType="slide"
+      onRequestClose={onClose}
+      transparent
+    >
+      <SafeAreaView className="flex-1 bg-Snow justify-center items-center">
+        <View className="flex flex-col w-full container mx-auto px-10">
+          <Text className="text-Heading3 mb-8 text-center">
+            Password changed !
+          </Text>
+
+          <ButtonComponents
+            onPress={() => {
+              router.push("/login");
+            }}
+            title="Back to login"
+            className="flex flex-row items-center justify-center rounded-full border-2 border-BrightGray p-6 bg-Bittersweet"
+            textSize="text-white text-xl font-bold"
+          />
+        </View>
+      </SafeAreaView>
     </Modal>
   );
 };

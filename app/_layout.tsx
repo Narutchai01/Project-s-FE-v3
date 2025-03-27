@@ -51,6 +51,9 @@ export default function RootLayout() {
               <Stack.Screen name="setting" />
               <Stack.Screen name="editProfile" />
               <Stack.Screen name="changePassword" />
+              <Stack.Screen name="forgetPassword" />
+              <Stack.Screen name="checkEmail" />
+              <Stack.Screen name="recoverPassword" />
             </Stack>
           </ReviewProvider>
         </CompareProvider>
