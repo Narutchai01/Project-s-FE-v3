@@ -48,7 +48,7 @@ export const ModalSensitiveSkin: FC<PropsModalSensitiveSkin> = (props) => {
         <Text className=" text-Heading3">
           Do you have sensitive facial skin?
         </Text>
-        <RadioComponents setValue={setSensitiveSkin} />
+        <RadioComponents setValue={setSensitiveSkin} value={null} />
         <ButtonComponents
           title="Save"
           onPress={onPres}

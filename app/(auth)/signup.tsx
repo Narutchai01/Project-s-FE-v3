@@ -72,13 +72,10 @@ export default function SignUP() {
           <View className="flex flex-col gap-y-4">
             <Text>Do you have sensitive facial skin?</Text>
             <RadioComponents
-              setValue={(value: boolean) =>
-                setSignupData({
-                  ...signupData,
-                  sensitive_skin: value,
-                })
-              }
-            />
+              setValue={(value: boolean) => setSignupData({
+                ...signupData,
+                sensitive_skin: value,
+              })} value={null}            />
           </View>
           <ButtonComponents
             onPress={handleSignup}
