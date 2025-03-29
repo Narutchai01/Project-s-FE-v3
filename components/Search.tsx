@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   View,
   TextInput,
@@ -20,16 +20,7 @@ export const Search: React.FC<SearchProps> = ({ searchQuery, setSearchQuery }) =
   const inputRef = useRef<TextInput>(null);
   const [inputValue, setInputValue] = useState(searchQuery);
 
-  useEffect(() => {
-    if (searchQuery) {
-      if (!isSearchOpen) {
-        expandSearchBar();
-      }
-      setInputValue(searchQuery);
-    }
-  }, [searchQuery]);
-
-  const expandSearchBar = () => {
+  const expandSearchBar = useCallback( () => {
     setIsSearchOpen(true);
     Animated.timing(searchBarWidth, {
       toValue: 290,
@@ -41,7 +32,17 @@ export const Search: React.FC<SearchProps> = ({ searchQuery, setSearchQuery }) =
         inputRef.current?.focus();
       }, 50);
     });
-  };
+  },[searchBarWidth])
+
+  useEffect(() => {
+    if (searchQuery) {
+      if (!isSearchOpen) {
+        expandSearchBar();
+      }
+      setInputValue(searchQuery);
+    }
+  }, [expandSearchBar, isSearchOpen, searchQuery]);
+
 
   const collapseSearchBar = () => {
     setSearchQuery("");

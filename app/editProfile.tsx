@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   SafeAreaView,
@@ -39,7 +39,7 @@ export default function EditProfileScreen() {
   const [showAlert, setShowAlert] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
-  const fetchUserProfile = async () => {
+  const fetchUserProfile = useCallback( async () => {
     startLoading();
     try {
       const token = await AsyncStorage.getItem("token");
@@ -68,7 +68,7 @@ export default function EditProfileScreen() {
     } finally {
       stopLoading();
     }
-  };
+  },[startLoading, stopLoading])
 
   useEffect(() => {
     fetchUserProfile();

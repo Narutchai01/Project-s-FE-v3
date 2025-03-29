@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { View, FlatList, Text, TouchableOpacity } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Stack } from "expo-router";
@@ -25,7 +25,7 @@ export default function CommonScreen() {
   const [isThreadModalOpen, setIsThreadModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
-  const fetchThread = async () => {
+  const fetchThread = useCallback( async () => {
     startLoading();
     const token = await AsyncStorage.getItem("token");
     await axiosInstance
@@ -43,9 +43,9 @@ export default function CommonScreen() {
           console.log("Unauthorized");
         }
       });
-  };
+  },[startLoading, stopLoading])
 
-  const fetchReview = async () => {
+  const fetchReview = useCallback( async () => {
     startLoading();
     const token = await AsyncStorage.getItem("token");
     await axiosInstance
@@ -63,7 +63,7 @@ export default function CommonScreen() {
           console.log("Unauthorized");
         }
       });
-  };
+  },[startLoading, stopLoading])
 
   useEffect(() => {
     fetchThread();

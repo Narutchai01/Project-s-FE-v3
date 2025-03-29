@@ -32,7 +32,7 @@ export default function Login() {
       }
     };
     checkLogin();
-  }, [user]);
+  }, [router, user]);
 
   const handleChange = (key: string, value: string) => {
     setLoginData({ ...loginData, [key]: value });

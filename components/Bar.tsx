@@ -99,11 +99,13 @@ export const UserBar: FC<any> = (props) => {
         <Text>{username}</Text>
       </View>
       <View>
-        <ButtonComponents
+        {/* <ButtonComponents
           title="follow"
           className="bg-Bittersweet px-10 py-2 rounded-full"
           textSize="text-xl font-semibold text-white"
-        />
+        /> */}
+
+        
       </View>
     </View>
   );

@@ -1,5 +1,5 @@
 import { View, Text, FlatList, Dimensions } from "react-native";
-import React from "react";
+import React, { useCallback } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useState, useEffect } from "react";
@@ -25,7 +25,7 @@ export default function ThreadDetails() {
   const [isCommentOpen, setIsCommentOpen] = useState(false);
   const [commentContent, setCommentContent] = useState("");
 
-  const fecThread = async () => {
+  const fecThread = useCallback( async () => {
     startLoading();
     try {
       const token = await AsyncStorage.getItem("token");
@@ -46,7 +46,7 @@ export default function ThreadDetails() {
     } finally {
       stopLoading();
     }
-  };
+  },[id, startLoading, stopLoading])
 
   useEffect(() => {
     fecThread();

@@ -33,7 +33,7 @@ const ResultAnalysis = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const { setSkincare } = useSkincareStore();
 
-  const fetchResult = async () => {
+  const fetchResult = useCallback(async () => {
     startLoading();
     try {
       const token = await AsyncStorage.getItem("token");
@@ -53,7 +53,7 @@ const ResultAnalysis = () => {
     } finally {
       stopLoading();
     }
-  };
+  }, [id, startLoading, stopLoading]);
 
   useEffect(() => {
     fetchResult();
@@ -62,7 +62,7 @@ const ResultAnalysis = () => {
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetchResult().then(() => setRefreshing(false));
-  }, [id]);
+  }, [fetchResult]);
 
   const image = result?.image;
 

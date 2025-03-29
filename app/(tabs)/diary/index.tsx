@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   View,
   Text,
@@ -81,7 +81,7 @@ export default function DiaryScreen() {
   });
   const { isLoading, startLoading, stopLoading } = useLoading();
 
-  const fetchResults = async () => {
+  const fetchResults = useCallback( async () => {
     startLoading();
     try {
       const token = await AsyncStorage.getItem("token");
@@ -95,7 +95,7 @@ export default function DiaryScreen() {
     } finally {
       stopLoading();
     }
-  };
+  },[startLoading, stopLoading])
 
   useEffect(() => {
     fetchResults();

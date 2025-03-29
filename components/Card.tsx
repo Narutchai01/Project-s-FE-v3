@@ -13,6 +13,7 @@ import { useRouter } from "expo-router";
 import { Heart } from "lucide-react-native";
 import { LucideImage } from "lucide-react-native";
 import { MediaType, launchImageLibrary } from "react-native-image-picker";
+const defaultImage = require("@/assets/images/defaultImage.png");
 
 export const CardSkincare: FC<CardSkincareProps> = (props) => {
   const { image, name } = props;
@@ -21,7 +22,7 @@ export const CardSkincare: FC<CardSkincareProps> = (props) => {
     <View className="bg-white rounded-2xl shadow w-[115px] h-[130px] mx-2 mb-2 relative overflow-hidden">
       <View className="w-[115px] h-[115px] relative overflow-hidden">
         <Image
-          source={{ uri: image || undefined }}
+          source={image ? { uri: image } : defaultImage}
           className="w-full h-full rounded-t-2xl object-cover"
           style={{ borderBottomRightRadius: 32.5 }}
         />
@@ -74,7 +75,7 @@ export const CardDiary: FC<DiaryCardProps> = (props) => {
         }`}
       >
         <Image
-          source={{ uri: data.image }}
+          source={data.image ? { uri: data.image } : defaultImage}
           className="w-[88px] h-[118px] rounded-lg ml-4 mr-6"
         />
         <View className="flex-1">
@@ -94,7 +95,7 @@ export const PopularThreadCard: FC<ThreadCardProps> = (props) => {
     <View className="bg-white rounded-2xl shadow w-[120px] h-[155px] mx-2 mb-2 relative overflow-hidden">
       <View className="w-[120px] h-[120px] relative overflow-hidden">
         <Image
-          source={{ uri: image }}
+          source={image ? { uri: image } : defaultImage}
           className="w-full h-full rounded-t-2xl object-cover"
           style={{ borderBottomRightRadius: 32.5 }}
         />
@@ -115,7 +116,7 @@ export const PopularThreadCard: FC<ThreadCardProps> = (props) => {
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center">
               <Image
-                source={{ uri: userAvatar }}
+                source={userAvatar ? { uri: userAvatar } : defaultImage}
                 className="w-5 h-5 rounded-full mr-2"
               />
               <Text className="text-label13 text-gray-600">{user}</Text>
@@ -133,7 +134,6 @@ export const PopularThreadCard: FC<ThreadCardProps> = (props) => {
 
 export const ThreadCard: FC<ThreadCardProps> = (props) => {
   const { image, title, user, userAvatar } = props;
-  const defaultImage = require("@/assets/images/defaultImage.png");
 
   return (
     <View className="bg-white rounded-2xl shadow w-[175px] h-[220px] mx-5 mb-6 relative overflow-hidden">
@@ -179,8 +179,6 @@ export const ThreadCard: FC<ThreadCardProps> = (props) => {
 export const ReviewCard: FC<CardReviewProps> = (props) => {
   const { data, selectArray = [], setItem } = props;
   const check = selectArray.includes(data);
-  const defaultImage = require("@/assets/images/defaultImage.png");
-
   return (
     <Pressable onPress={() => setItem(data)}>
       <View
@@ -237,7 +235,7 @@ export const AddPhoto: FC<AddPhotoProps> = (props) => {
       >
         {image ? (
           <Image
-            source={{ uri: image }}
+            source={image ? { uri: image } : defaultImage}
             className="w-[190px] h-[260px] rounded-lg object-cover"
           />
         ) : (
@@ -249,7 +247,7 @@ export const AddPhoto: FC<AddPhotoProps> = (props) => {
       </TouchableOpacity>
     </View>
   );
-}
+};
 
 export const CardPopularSkincare: FC<CardSkincareProps> = (props) => {
   const { image, name } = props;
@@ -258,7 +256,7 @@ export const CardPopularSkincare: FC<CardSkincareProps> = (props) => {
     <View className="bg-white rounded-2xl shadow w-[165px] h-[200px] mx-3 mb-4 relative overflow-hidden">
       <View className="w-full h-[165px] relative overflow-hidden">
         <Image
-          source={{ uri: image }}
+          source={image ? { uri: image } : defaultImage}
           className="w-full h-full rounded-t-2xl object-cover"
           style={{ borderBottomRightRadius: 32.5 }}
         />
@@ -281,13 +279,20 @@ export const CardPopularSkincare: FC<CardSkincareProps> = (props) => {
 };
 
 export const CommentCard: FC<ICommentCardProps> = (props) => {
-  const { image, username, content, count_favorite = 1, favorite, handleFavoriteComment } = props;
+  const {
+    image,
+    username,
+    content,
+    count_favorite = 1,
+    favorite,
+    handleFavoriteComment,
+  } = props;
 
   return (
     <View className="flex flex-row justify-between">
       <View className="flex flex-row gap-x-4">
         <Image
-          source={{ uri: image || undefined }}
+          source={image ? { uri: image } : defaultImage}
           style={{ width: 50, height: 50, borderRadius: 50 }}
         />
         <View className="flex justify-center gap-y-4">
@@ -297,7 +302,7 @@ export const CommentCard: FC<ICommentCardProps> = (props) => {
       </View>
       <View className="flex justify-center items-center">
         <TouchableOpacity onPress={handleFavoriteComment}>
-              <Heart size={24} color={favorite ? "red" : "gray"} />
+          <Heart size={24} color={favorite ? "red" : "gray"} />
         </TouchableOpacity>
         <Text>{count_favorite > 0 ? count_favorite : ""}</Text>
       </View>

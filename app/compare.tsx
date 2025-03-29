@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { View, ScrollView, Text } from "react-native";
 import { useCompare } from "@/context/CompareContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -17,14 +17,19 @@ export default function CompareScreen() {
   const [compareData, setCompareData] = useState<IResult[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
+  const loadAcnesStore = useCallback(loadAcnes, [loadAcnes]);
+  const fetchAcnesStore = useCallback(fetchAcnes, [fetchAcnes]);
+  const loadFacialsStore = useCallback(loadFacials, [loadFacials]);
+  const fetchFacialsStore = useCallback(fetchFacials, [fetchFacials]);
+
   useEffect(() => {
-    loadAcnes();
-    fetchAcnes();
-    loadFacials();
-    fetchFacials();
+    loadAcnesStore();
+    fetchAcnesStore();
+    loadFacialsStore();
+    fetchFacialsStore();
   }, []);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     const token = await AsyncStorage.getItem("token");
     if (!token) return;
@@ -41,7 +46,7 @@ export default function CompareScreen() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [compare]);
 
   useEffect(() => {
     fetchData();
@@ -75,7 +80,9 @@ export default function CompareScreen() {
     Object.keys(labels).map((id) => ({
       label: labels[Number(id)],
       data: compareData.map((item) => {
-        const found = (item[key] as Type[]).find((entry) => entry.id === Number(id));
+        const found = (item[key] as Type[]).find(
+          (entry) => entry.id === Number(id)
+        );
         return found ? found.count : 0;
       }),
     }));
@@ -87,12 +94,24 @@ export default function CompareScreen() {
     <ScrollView className="flex-1 bg-Snow p-4">
       <View className="flex-row justify-center mb-6">
         {compareData?.map((item) => (
-          <CompareDiary key={item.create_at.toString()} image={item.image} date={item.create_at} />
+          <CompareDiary
+            key={item.create_at.toString()}
+            image={item.image}
+            date={item.create_at}
+          />
         ))}
       </View>
 
-      <LineChartComponent title="Summary of Acne Types" labels={dates} genres={acneGenres} />
-      <LineChartComponent title="Summary of Skin Problems" labels={dates} genres={skinProblemGenres} />
+      <LineChartComponent
+        title="Summary of Acne Types"
+        labels={dates}
+        genres={acneGenres}
+      />
+      <LineChartComponent
+        title="Summary of Skin Problems"
+        labels={dates}
+        genres={skinProblemGenres}
+      />
     </ScrollView>
   );
 }

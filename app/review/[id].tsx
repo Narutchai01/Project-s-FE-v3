@@ -5,7 +5,7 @@ import {
   Dimensions,
   TouchableOpacity,
 } from "react-native";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -31,7 +31,7 @@ export default function ReviewDetails() {
   const [isCommentOpen, setIsCommentOpen] = useState(false);
   const [commentContent, setCommentContent] = useState("");
 
-  const fetchReview = async () => {
+  const fetchReview = useCallback( async () => {
     startLoading();
     try {
       const token = await AsyncStorage.getItem("token");
@@ -49,7 +49,7 @@ export default function ReviewDetails() {
     } finally {
       stopLoading();
     }
-  };
+  },[id, startLoading, stopLoading])
 
   useEffect(() => {
     fetchReview();
