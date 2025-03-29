@@ -5,6 +5,7 @@ import { FC } from "react";
 import { Image } from "expo-image";
 import { ButtonComponents } from "./Buntton";
 import { Dimensions } from "react-native";
+import {ThreeDotMenu} from "@/components/ThreeDotMenu";
 
 const { width, height } = Dimensions.get("window");
 
@@ -105,6 +106,7 @@ export const UserBar: FC<any> = (props) => {
           textSize="text-xl font-semibold text-white"
         /> */}
 
+        <ThreeDotMenu />
         
       </View>
     </View>

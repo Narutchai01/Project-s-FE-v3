@@ -1,26 +1,32 @@
-import React, { useState } from 'react';
-import { View, TouchableOpacity, Modal, Text, StyleSheet } from 'react-native';
-import { MoreVertical } from 'lucide-react-native'; 
+import React, { useState } from "react";
+import { View, TouchableOpacity, Modal, Text } from "react-native";
+import { Ellipsis, PencilLine, Trash2 } from "lucide-react-native";
+import { LogoutConfirmAlert } from "./Alert";
+import { router } from "expo-router";
 
-const ThreeDotMenu = () => {
+export const ThreeDotMenu = () => {
   const [modalVisible, setModalVisible] = useState(false);
-
+  const [showAlert, setShowAlert] = useState(false);
+  
   const handleEdit = () => {
     setModalVisible(false);
-    console.log('Edit clicked');
   };
 
   const handleDelete = () => {
     setModalVisible(false);
-    console.log('Delete clicked');
+    setShowAlert(true);  
+  };
+  
+  const handleDeleteConfirm = () => {
+    setShowAlert(false);
+    router.back();       
   };
 
   return (
-    <View style={{ alignItems: 'flex-end', padding: 10 }}>
+    <View style={{ alignItems: "flex-end", padding: 10 }}>
       <TouchableOpacity onPress={() => setModalVisible(true)}>
-        <MoreVertical size={24} />
+        <Ellipsis size={24} />
       </TouchableOpacity>
-
       <Modal
         transparent={true}
         animationType="fade"
@@ -28,47 +34,57 @@ const ThreeDotMenu = () => {
         onRequestClose={() => setModalVisible(false)}
       >
         <TouchableOpacity
-          style={styles.overlay}
+          className="flex-1 justify-start items-end pt-24 pr-5 bg-black/10"
           onPress={() => setModalVisible(false)}
         >
-          <View style={styles.menu}>
-            <TouchableOpacity onPress={handleEdit} style={styles.menuItem}>
-              <Text>Edit</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleDelete} style={styles.menuItem}>
-              <Text style={{ color: 'red' }}>Delete</Text>
-            </TouchableOpacity>
+          <View className="mr-2 mt-4 items-end">
+            <View
+              style={{
+                width: 0,
+                height: 0,
+                backgroundColor: "transparent",
+                borderStyle: "solid",
+                borderLeftWidth: 8,
+                borderRightWidth: 8,
+                borderBottomWidth: 15,
+                borderLeftColor: "transparent",
+                borderRightColor: "transparent",
+                borderBottomColor: "white",
+                marginRight: 4,
+                marginBottom: -4,
+                transform: [{ rotate: '20deg' }],
+              }}
+            />
+            <View className="bg-white rounded-2xl py-2 w-44">
+              <TouchableOpacity
+                onPress={handleEdit}
+                className="py-3 px-2 border-b border-BrightGray"
+              >
+                <View className="flex flex-row items-center gap-x-2">
+                  <PencilLine size={20} color="black" />
+                  <Text className="text-label11">Edit</Text>
+                </View>
+              </TouchableOpacity>
+
+              <TouchableOpacity onPress={handleDelete} className="py-3 px-2">
+                <View className="flex flex-row items-center gap-x-2">
+                  <Trash2 size={20} color="black" />
+                  <Text className="text-label11">Delete</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
           </View>
         </TouchableOpacity>
       </Modal>
+
+      <LogoutConfirmAlert 
+      visible={showAlert}
+      onClose={() => setShowAlert(false)}
+      onConfirm={handleDeleteConfirm}
+      title="Confirm Delete ?"
+      confirm="Delete"
+      cancel="Cancel"
+      />
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'flex-end',
-    paddingTop: 50,
-    paddingRight: 15,
-    backgroundColor: 'rgba(0,0,0,0.1)',
-  },
-  menu: {
-    backgroundColor: 'white',
-    borderRadius: 8,
-    paddingVertical: 8,
-    width: 120,
-    shadowColor: '#000',
-    shadowOpacity: 0.2,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 5,
-  },
-  menuItem: {
-    padding: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-});
-
-export default ThreeDotMenu;
