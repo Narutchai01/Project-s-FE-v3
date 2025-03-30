@@ -60,7 +60,14 @@ export const ModalSensitiveSkin: FC<PropsModalSensitiveSkin> = (props) => {
   );
 };
 
-export const ModalCreateThread: FC<any> = (props) => {
+
+interface IModalCreateThreadProps {
+  isOpen: boolean;
+  onClose: () => void;
+  isMode: boolean;
+}
+
+export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
   const router = useRouter();
   const { isOpen, onClose, isMode } = props;
   const { isLoading, startLoading, stopLoading } = useLoading();
@@ -290,7 +297,15 @@ export const ModalCreateThread: FC<any> = (props) => {
   );
 };
 
-export function ModalSkincare({ isOpen, onClose, setSkincare, skincare }: any) {
+interface IModalSkincare {
+  isOpen: boolean;
+  onClose: () => void;
+  setSkincare: (skincare: ISkincare[] | ((prev: ISkincare[]) => ISkincare[])) => void;
+  skincare: ISkincare[];
+}
+
+export const ModalSkincare: FC<IModalSkincare> = (props) => {
+  const { isOpen, onClose, setSkincare, skincare } = props;
   const { skincares } = useCompare();
   const { isLoading } = useLoading();
   const [searchQuery, setSearchQuery] = useState("");
@@ -300,15 +315,13 @@ export function ModalSkincare({ isOpen, onClose, setSkincare, skincare }: any) {
   );
 
   const handleSelectItem = (item: ISkincare) => {
-    if (skincare.includes(item) || skincare.length >= 10) {
-      setSkincare((prev: ISkincare[]) =>
-        prev.filter((prevItem: ISkincare) => prevItem.id !== item.id)
-      );
+    if (skincare.some((selected) => selected.id === item.id) || skincare.length >= 10) {
+      setSkincare((prev) => prev.filter((prevItem) => prevItem.id !== item.id));
     } else {
-      setSkincare((prev: ISkincare[]) => [...prev, item]);
+      setSkincare((prev) => [...prev, item]);
     }
   };
-
+  
   const handleConfirm = () => {
     onClose();
   };
@@ -495,7 +508,13 @@ export const ModalComment: React.FC<IModalComment> = ({
   );
 };
 
-export const ModalCreateReviewPost: FC<any> = (props) => {
+interface IModalCreateReviewPostProps {
+  isOpen: boolean;
+  onClose: () => void;
+  isMode: boolean;
+}
+
+export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (props) => {
   const router = useRouter();
   const { isOpen, onClose, isMode } = props;
   const { isLoading, startLoading, stopLoading } = useLoading();
