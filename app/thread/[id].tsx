@@ -159,6 +159,8 @@ export default function ThreadDetails() {
     setIsCommentOpen(false);
   };
 
+  // console.log("Image", currImage);
+
   return (
     <SafeAreaProvider style={{ backgroundColor: "#fff" }}>
       <Stack.Screen
@@ -186,22 +188,42 @@ export default function ThreadDetails() {
               userImage={thread?.user?.image}
               username={thread?.user?.full_name}
             />
+
             <View style={{ padding: 10 }}>
+              {thread?.images && thread?.images.length > 0 && (
+                <View
+                  style={{
+                    position: "absolute",
+                    top: 20,
+                    right: 20,
+                    backgroundColor: "#4A4A4ACC",
+                    paddingVertical: 5,
+                    paddingHorizontal: 10,
+                    borderRadius: 20,
+                    zIndex: 10, 
+                  }}
+                >
+                  <Text
+                    style={{ color: "white", fontSize: 14, fontWeight: "bold" }}
+                  >
+                    {currImage + 1} / {thread?.images?.length}
+                  </Text>
+                </View>
+              )}
+
               <FlatList
                 data={thread?.images}
-                renderItem={({ item, index }) => {
-                  return (
-                    <Image
-                      source={{ uri: item.image }}
-                      style={{
-                        width: width - 20,
-                        height: height * 0.5,
-                        borderRadius: 10,
-                      }}
-                      key={index}
-                    />
-                  );
-                }}
+                renderItem={({ item, index }) => (
+                  <Image
+                    source={{ uri: item.image }}
+                    style={{
+                      width: width - 20,
+                      height: height * 0.5,
+                      borderRadius: 10,
+                    }}
+                    key={index}
+                  />
+                )}
                 keyExtractor={(item) => item.id.toString()}
                 pagingEnabled
                 bounces={false}
@@ -210,7 +232,9 @@ export default function ThreadDetails() {
                 onScroll={(e) => {
                   const { contentOffset } = e.nativeEvent;
                   const index = Math.round(contentOffset.x / (width - 20));
-                  setCurrImage(index);
+                  if (index !== currImage) {
+                    setCurrImage(index);
+                  }
                 }}
                 ListEmptyComponent={() => (
                   <Image
@@ -225,6 +249,7 @@ export default function ThreadDetails() {
                 )}
               />
             </View>
+
             <ActivityBar
               isOpenComment={isOpenComment}
               hadleFavorite={handleFavorite}
