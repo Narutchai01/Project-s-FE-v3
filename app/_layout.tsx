@@ -26,15 +26,9 @@ export default function RootLayout() {
               <Stack.Screen
                 name="compare"
                 options={{
-                  headerTitle: "",
-                  headerShown: true,
-                  headerLeft: () => (
-                    <BackButtonComponents
-                      title="Compare"
-                      textSize="text-Heading3 text-Quartz"
-                      onPress={() => router.back()} 
-                    />
-                  ),
+                  headerTitle: "Compare",
+                  headerShadowVisible: false,
+                  headerShown: false,
                 }}
               />
               <Stack.Screen

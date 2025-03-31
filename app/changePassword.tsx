@@ -28,7 +28,7 @@ export default function ChangePasswordScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-Snow p-4">
+    <SafeAreaView className="flex-1 bg-Snow p-6">
       <View className="h-14 bg-Snow">
         <BackButtonComponents
           title={"Change Password"}
@@ -37,29 +37,29 @@ export default function ChangePasswordScreen() {
         />
       </View>
       <View className="px-4">
-        <Text className="text-Heading4 text-Quartz mb-4 mt-4">
+        <Text className="text-Heading4 text-Quartz mb-2 mt-2">
           New Password
         </Text>
         <TextInput
           value={newPassword}
           onChangeText={setNewPassword}
           secureTextEntry={true}
-          className="border-2 w-full rounded-full p-6 border-BrightGray mb-4"
+          className="border-2 w-full rounded-full p-4 border-BrightGray mb-4"
         />
-        <Text className="text-Heading4 text-Quartz mb-4 mt-4">
+        <Text className="text-Heading4 text-Quartz mb-2 mt-4">
           Confirm Password
         </Text>
         <TextInput
           value={confirmPassword}
           onChangeText={setConfirmPassword}
           secureTextEntry={true}
-          className="border-2 w-full rounded-full p-6 border-BrightGray mb-8"
+          className="border-2 w-full rounded-full p-4 border-BrightGray mb-8"
         />
         <ButtonComponents
           onPress={handleChangePassword}
           title="Confirm"
-          className="flex flex-row items-center justify-center rounded-full border-4 border-BrightGray p-6 bg-Bittersweet"
-          textSize="text-white text-xl font-bold"
+          className="flex flex-row items-center justify-center rounded-full border-2 border-BrightGray p-4 bg-Bittersweet"
+                textSize="text-white text-xl font-bold"
         />
       </View>
 

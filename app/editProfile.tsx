@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   Image,
+  ScrollView,
 } from "react-native";
 import { BackButtonComponents, ButtonComponents } from "@/components/Buntton";
 import { router } from "expo-router";
@@ -128,7 +129,8 @@ export default function EditProfileScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-Snow p-4">
+    <SafeAreaView className="flex-1 bg-Snow p-6">
+      <ScrollView>
       {isLoading && <LoadingIndicator />}
       <View className="h-16 bg-Snow">
         <BackButtonComponents
@@ -165,13 +167,13 @@ export default function EditProfileScreen() {
           onChangeText={(text) =>
             setUser((prev) => ({ ...prev, full_name: text }))
           }
-          className="border-2 w-full rounded-full p-6 border-BrightGray mb-4"
+          className="border-2 w-full rounded-full p-4 border-BrightGray mb-4"
         />
 
         <Text className="text-Heading4 text-Quartz mb-2">Birthday</Text>
 
         <TouchableOpacity
-          className="border-2 w-full rounded-full p-6 border-BrightGray mb-4"
+          className="border-2 w-full rounded-full p-4 border-BrightGray mb-4"
           onPress={() => setShowDatePicker(true)}
         >
           <Text>
@@ -197,7 +199,7 @@ export default function EditProfileScreen() {
         <TextInput
           value={user.email}
           onChangeText={(text) => setUser((prev) => ({ ...prev, email: text }))}
-          className="border-2 w-full rounded-full p-6 border-BrightGray mb-4"
+          className="border-2 w-full rounded-full p-4 border-BrightGray mb-4"
         />
 
         <Text className="text-Heading4 text-Quartz mb-2">Password</Text>
@@ -208,7 +210,7 @@ export default function EditProfileScreen() {
               setUser((prev) => ({ ...prev, password: text }))
             }
             secureTextEntry={!showPassword}
-            className="border-2 w-full rounded-full p-6 pr-12 border-BrightGray"
+            className="border-2 w-full rounded-full p-4 pr-12 border-BrightGray"
           />
           <TouchableOpacity
             onPress={() => setShowPassword(!showPassword)}
@@ -222,7 +224,7 @@ export default function EditProfileScreen() {
           </TouchableOpacity>
         </View>
 
-        <View className="flex flex-col gap-y-2 mb-8">
+        <View className="flex flex-col gap-y-2 mb-6 mt-2">
           <Text>Do you have sensitive facial skin?</Text>
           <RadioComponents
             value={isSensitive}
@@ -239,8 +241,8 @@ export default function EditProfileScreen() {
         <ButtonComponents
           onPress={handleChangeProfile}
           title="Save"
-          className="flex flex-row items-center justify-center rounded-full border-4 border-BrightGray p-6 bg-Bittersweet"
-          textSize="text-white text-xl font-bold"
+          className="flex flex-row items-center justify-center rounded-full border-2 border-BrightGray p-4 bg-Bittersweet"
+                textSize="text-white text-xl font-bold"
         />
       </View>
 
@@ -253,6 +255,7 @@ export default function EditProfileScreen() {
         title="Profile updated successfully!"
         confirm="Done"
       />
+      </ScrollView>
     </SafeAreaView>
   );
 }

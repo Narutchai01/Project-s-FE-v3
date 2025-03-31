@@ -1,20 +1,20 @@
 import React, { useState } from "react";
-import { CardPopularSkincare } from "@/components/Card";
+import { CardListPopularSkincare } from "@/components/Card";
 import { useCompare } from "@/context/CompareContext";
 import useLoading from "@/hook/useLoading";
 import { ISkincare } from "@/interface/skincare";
-import { SquareArrowLeft } from "lucide-react-native";
 import {
   FlatList,
   SafeAreaView,
   TouchableOpacity,
   View,
-  Text,
 } from "react-native";
 import LoadingIndicator from "@/components/Loading";
 import { ModalSkincareDetail } from "@/components/Modal";
 import { useSkincareStore } from "@/store/skincare";
 import { useRouter } from "expo-router";
+import { BackButtonComponents } from "@/components/Buntton";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function ListPopularSkincare() {
   const router = useRouter();
@@ -29,48 +29,48 @@ export default function ListPopularSkincare() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-Snow p-4">
-      <View className="h-16 mb-4">
-        <View className="h-full flex-row items-center justify-between">
-          <TouchableOpacity
-            className="flex flex-row gap-x-3 items-center"
-            onPress={() => router.back()}
-          >
-            <SquareArrowLeft size={28} color="#4A4A4A" />
-            <Text className="text-2xl font-semibold text-Quartz">
-              Popular Skincare
-            </Text>
-          </TouchableOpacity>
+    <SafeAreaProvider>
+      <SafeAreaView className="flex-1 bg-Snow p-4">
+        <View className="h-16 mb-2 bg-Snow">
+          <View className="h-full flex-row items-center justify-between px-3">
+            <BackButtonComponents
+              title={"Popular Skincare"}
+              textSize="text-Heading3 text-Quartz"
+              onPress={() => router.back()}
+            />
+          </View>
         </View>
-      </View>
-
-      {isLoading ? (
-        <LoadingIndicator />
-      ) : (
-        <FlatList
-          key={"skincare-list"}
-          numColumns={2}
-          data={skincares}
-          keyExtractor={(item) => item.id.toString()}
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => handleSelectSkincare(item)}>
-              <CardPopularSkincare image={item.image} name={item.name} />
-            </TouchableOpacity>
+        <View className="flex justify-center items-center mb-10">
+          {isLoading ? (
+            <LoadingIndicator />
+          ) : (
+            <FlatList
+              key={"skincare-list"}
+              numColumns={2}
+              data={skincares}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => (
+                <TouchableOpacity onPress={() => handleSelectSkincare(item)}>
+                  <CardListPopularSkincare
+                    image={item.image}
+                    name={item.name}
+                  />
+                </TouchableOpacity>
+              )}
+              columnWrapperStyle={{
+                justifyContent: "space-between",
+                marginBottom: 15,
+                paddingHorizontal: 5,
+              }}
+            />
           )}
-          contentContainerStyle={{
-            paddingHorizontal: 15,
-            paddingBottom: 0,
-          }}
-          columnWrapperStyle={{
-            justifyContent: "space-between",
-            marginBottom: 15,
-          }}
+        </View>
+
+        <ModalSkincareDetail
+          isOpen={modalVisible}
+          onClose={() => setModalVisible(false)}
         />
-      )}
-      <ModalSkincareDetail
-        isOpen={modalVisible}
-        onClose={() => setModalVisible(false)}
-      />
-    </SafeAreaView>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }

@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC } from "react";
 import {
   Modal,
   Text,
@@ -48,7 +48,7 @@ export const ModalSensitiveSkin: FC<PropsModalSensitiveSkin> = (props) => {
         <Text className=" text-Heading3">
           Do you have sensitive facial skin?
         </Text>
-        <RadioComponents setValue={setSensitiveSkin} />
+        <RadioComponents setValue={setSensitiveSkin} value={null} />
         <ButtonComponents
           title="Save"
           onPress={onPres}
@@ -159,26 +159,23 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
       {isLoading ? (
         <LoadingIndicator />
       ) : (
+        <SafeAreaView className="flex-1 bg-Snow p-6">
         <ScrollView>
-          <View className="h-16 bg-White">
             {/* header zone  */}
-            <View className=" h-full flex-row items-center justify-between px-3">
               <BackButtonComponents
                 title={"New Thread"}
                 textSize="text-Heading3 text-Quartz"
                 onPress={handleCancel}
               />
-            </View>
-          </View>
-          {/* header zone  */}
 
+          {/* header zone  */}
           <View className="flex justify-center items-center">
             {!image ? (
               <TouchableOpacity
                 onPress={handleChooseImage}
                 style={{
-                  height: 350,
-                  width: 250,
+                  height: 300,
+                  width: 200,
                   borderRadius: 10,
                   backgroundColor: "#FCECEC",
                   borderColor: "#FF6F61",
@@ -190,8 +187,8 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
                 }}
               >
                 <View className="flex items-center justify-center">
-                  <ImageIcon size={50} color="#4A4A4A" />
-                  <Text className="text-label8 mt-2">Tap a photo</Text>
+                  <ImageIcon size={35} color="#4A4A4A" />
+                  <Text className="text-label1 mt-2">Tap a photo</Text>
                 </View>
               </TouchableOpacity>
             ) : (
@@ -205,8 +202,8 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
                     <TouchableOpacity
                       onPress={handleChooseImage}
                       style={{
-                        height: 350,
-                        width: 250,
+                        height: 300,
+                        width: 200,
                         borderRadius: 10,
                         backgroundColor: "#FCECEC",
                         borderColor: "#FF6F61",
@@ -219,8 +216,8 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
                       }}
                     >
                       <View className="flex items-center justify-center">
-                        <ImageIcon size={50} color="#4A4A4A" />
-                        <Text className="text-label8 mt-2">Tap a photo</Text>
+                        <ImageIcon size={35} color="#4A4A4A" />
+                        <Text className="text-label1 mt-2">Tap a photo</Text>
                       </View>
                     </TouchableOpacity>
                   );
@@ -269,7 +266,7 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
             <View className="w-full container mx-auto px-10 py-10 gap-y-4">
               <TextInput
                 placeholder="Title"
-                className=" border-2  w-full rounded-full p-6 border-BrightGray"
+                className=" border-2  w-full rounded-full p-4 border-BrightGray"
                 onChangeText={(title) => handleChange("title", title)}
               />
               <TextInput
@@ -279,18 +276,19 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
                   minHeight: 100,
                   borderRadius: 30,
                 }}
-                className=" border-2  w-full  p-6 border-BrightGray"
+                className=" border-2  w-full  p-4 border-BrightGray"
                 onChangeText={(caption) => handleChange("caption", caption)}
               />
             </View>
             <ButtonComponents
               title="Create Thread"
               onPress={handleCreateThread}
-              className="bg-Bittersweet px-10 py-4 rounded-full"
+              className="bg-Bittersweet px-6 py-3 rounded-full"
               textSize="text-lg font-semibold text-White"
             />
           </View>
         </ScrollView>
+        </SafeAreaView>
       )}
     </Modal>
   );
@@ -341,15 +339,15 @@ export const ModalSkincare: FC<IModalSkincare> = (props) => {
         <View className="flex flex-row items-center justify-between">
           <ButtonComponents
             title="Cancel"
-            textSize="text-label1 font-semibold"
+            textSize="text-label4 font-semibold text-Bittersweet"
             onPress={handleCancel}
           />
           <View className="flex flex-row items-center justify-between">
             <Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
             <ButtonComponents
               title="Confirm"
-              className="bg-Bittersweet px-2 py-2 rounded-full"
-              textSize="text-label1 font-semibold text-White"
+              className="bg-Bittersweet px-2 rounded-full h-8 flex items-center justify-center"
+            textSize="text-label4 text-white font-semibold"
               onPress={handleConfirm}
             />
           </View>
@@ -609,7 +607,8 @@ export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (
       {isLoading ? (
         <LoadingIndicator />
       ) : (
-        <ScrollView className="p-4">
+        <SafeAreaView className="flex-1 bg-Snow p-6">
+          <ScrollView>
           <BackButtonComponents
             title="New Review"
             textSize="text-Heading3 text-Quartz"
@@ -620,12 +619,12 @@ export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (
             <Text className="text-Heading4">Thumbnail</Text>
           </View>
 
-          <View className="mb-4 flex items-center justify-center">
+          <View className="mb-6 flex items-center justify-center">
             <TouchableOpacity
               onPress={pickImageAsync}
               style={{
-                height: 350,
-                width: 250,
+                height: 300,
+                width: 200,
                 borderRadius: 10,
                 backgroundColor: "#FCECEC",
                 borderColor: "#FF6F61",
@@ -638,25 +637,25 @@ export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (
               {image ? (
                 <Image
                   source={{ uri: image }}
-                  style={{ width: 250, height: 350, borderRadius: 10 }}
+                  style={{ width: 200, height: 300, borderRadius: 10 }}
                 />
               ) : (
                 <View className="flex items-center justify-center">
-                  <ImageIcon size={50} color="#4A4A4A" />
-                  <Text className="text-label8 mt-2">Tap a photo</Text>
+                  <ImageIcon size={35} color="#4A4A4A" />
+                  <Text className="text-label1 mt-2">Tap a photo</Text>
                 </View>
               )}
             </TouchableOpacity>
           </View>
 
           <View className="mb-4">
-            <View className="border-b-2 border-gray-300 mb-4"></View>
+            <View className="border-b-2 border-gray-300 mb-4 w-full"></View>
             <View className="flex flex-row items-center justify-between mb-2">
               <Text className="text-Heading4">Select skincare</Text>
               <ButtonComponents
                 title="Select"
-                className="bg-Bittersweet px-2 py-2 rounded-full w-[80px] flex items-center justify-center"
-                textSize="text-md font-semibold text-white"
+                className="bg-Bittersweet px-3 py-2 rounded-full flex items-center justify-center"
+            textSize="text-label4 text-white font-semibold"
                 onPress={handleSelectSkincare}
               />
             </View>
@@ -692,11 +691,11 @@ export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (
             <TextInput
               placeholder="Title"
               onChangeText={(title) => handleChange("title", title)}
-              className="border-2 w-full rounded-full p-6 border-BrightGray"
+              className="border-2 w-full rounded-full p-4 border-BrightGray"
             />
           </View>
 
-          <View className="mb-4">
+          <View className="mb-6">
             <TextInput
               placeholder="Add Content"
               multiline
@@ -704,16 +703,16 @@ export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (
                 minHeight: 100,
                 borderRadius: 30,
               }}
-              className=" border-2  w-full  p-6 border-BrightGray"
+              className=" border-2  w-full  p-4 border-BrightGray"
               onChangeText={(content) => handleChange("content", content)}
             />
           </View>
 
           <View className="flex flex-row items-center justify-center mb-2">
             <ButtonComponents
-              title="Post"
-              className="bg-Bittersweet px-2 py-2 rounded-full w-[80px] flex items-center justify-center"
-              textSize="text-md font-semibold text-white"
+              title="Create Review"
+              className="bg-Bittersweet px-6 py-3 rounded-full"
+              textSize="text-lg font-semibold text-White"
               onPress={handlePostReview}
             />
           </View>
@@ -724,7 +723,8 @@ export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (
             skincare={skincare}
             setSkincare={setSkincare}
           />
-        </ScrollView>
+          </ScrollView>
+      </SafeAreaView>
       )}
     </Modal>
   );

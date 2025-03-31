@@ -1,4 +1,4 @@
-import { View, Text, SafeAreaView, Image, TextInput, TouchableOpacity } from "react-native";
+import { View, Text, SafeAreaView, Image, TextInput, TouchableOpacity, ScrollView } from "react-native";
 import React, { useEffect, useState } from "react";
 import { ButtonComponents, GoogleButtonSignIn } from "@/components/Buntton";
 import DividerWithText from "@/components/DividerWithText";
@@ -40,20 +40,22 @@ export default function Login() {
 
   return (
     <SafeAreaProvider>
-      <SafeAreaView className="flex-1 bg-Snow justify-center items-center">
+      <SafeAreaView className="flex-1 bg-Snow">
+        <ScrollView>
         <View className="w-full container mx-auto px-10">
           <View className="flex flex-col items-center justify-center">
+            <View className="w-[150px] h-[170px] mb-4 mt-12">
             <Image
               source={require("@/assets/images/ucare-logo.png")}
-              width={350}
-              height={350}
+              className="w-full h-full"
             />
-            <Text className="text-5xl font-bold mb-10">UCare</Text>
+            </View>
+            <Text className="text-5xl font-bold mb-8">UCare</Text>
 
-            <View className="w-full flex gap-10">
+            <View className="w-full flex gap-8">
               <TextInput
                 placeholder="Email"
-                className="border-2 w-full rounded-full p-6 border-BrightGray"
+                className="border-2 w-full rounded-full p-4 border-BrightGray"
                 onChangeText={(email) => handleChange("email", email)}
               />
 
@@ -61,17 +63,17 @@ export default function Login() {
                 <TextInput
                   placeholder="Password"
                   secureTextEntry={!showPassword}
-                  className="border-2 w-full rounded-full p-6 pr-16 border-BrightGray"
+                  className="border-2 w-full rounded-full p-4 pr-16 border-BrightGray"
                   onChangeText={(password) => handleChange("password", password)}
                 />
                 <TouchableOpacity
-                  className="absolute right-4 top-6"
+                  className="absolute right-4 top-5"
                   onPress={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
-                    <Eye size={24} color="#000" />
+                    <Eye size={18} color="#000" />
                   ) : (
-                    <EyeOff size={24} color="#000" />
+                    <EyeOff size={18} color="#000" />
                   )}
                 </TouchableOpacity>
               </View>
@@ -87,7 +89,7 @@ export default function Login() {
               <ButtonComponents
                 onPress={handleLogin}
                 title="Login"
-                className="flex flex-row items-center justify-center rounded-full border-2 border-BrightGray p-6 bg-Bittersweet"
+                className="flex flex-row items-center justify-center rounded-full border-2 border-BrightGray p-4 bg-Bittersweet"
                 textSize="text-white text-xl font-bold"
               />
             </View>
@@ -95,7 +97,7 @@ export default function Login() {
 
           <DividerWithText />
 
-          <View className="flex flex-col gap-10">
+          <View className="flex flex-col gap-8 mb-10">
             <GoogleButtonSignIn googleSignIn={googleSignIn} />
             <Link
               href="/signup"
@@ -112,6 +114,7 @@ export default function Login() {
           setSensitiveSkin={setSensitiveSkin}
           onPres={UpdateSenSitiveSkincare}
         />
+        </ScrollView>
       </SafeAreaView>
     </SafeAreaProvider>
   );

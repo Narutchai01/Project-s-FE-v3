@@ -23,7 +23,7 @@ export const Search: React.FC<SearchProps> = ({ searchQuery, setSearchQuery }) =
   const expandSearchBar = useCallback( () => {
     setIsSearchOpen(true);
     Animated.timing(searchBarWidth, {
-      toValue: 290,
+      toValue: 180,
       duration: 300,
       easing: Easing.out(Easing.ease),
       useNativeDriver: false,
@@ -69,14 +69,14 @@ export const Search: React.FC<SearchProps> = ({ searchQuery, setSearchQuery }) =
       <Animated.View style={{ width: searchBarWidth }}>
         {!isSearchOpen ? (
           <TouchableOpacity
-            className="bg-Bittersweet w-15 h-10 rounded-full flex items-center justify-center"
+            className="bg-Bittersweet w-15 h-8 rounded-full flex items-center justify-center"
             onPress={expandSearchBar}
           >
-            <Ionicons name="search" size={20} color="white" />
+            <Ionicons name="search" size={18} color="white" />
           </TouchableOpacity>
         ) : (
-          <View className="flex-row items-center bg-Bittersweet rounded-full px-4 w-full h-10">
-            <Ionicons name="search" size={20} color="white" className="mr-2" />
+          <View className="flex-row items-center bg-Bittersweet rounded-full px-4 w-full h-8">
+            <Ionicons name="search" size={18} color="white" className="mr-2" />
             <TextInput
               ref={inputRef}
               className="flex-1 text-white text-label1 h-6 p-0"

@@ -30,8 +30,8 @@ export default function RecoverPasswordScreen() {
       return;
     }
 
-    setErrorMessage(""); // clear error
-    setModalVisible(true); // success
+    setErrorMessage(""); 
+    setModalVisible(true); 
   };
 
   return (
@@ -58,16 +58,16 @@ export default function RecoverPasswordScreen() {
                 value={newPassword}
                 onChangeText={setNewPassword}
                 secureTextEntry={!showPassword}
-                className="border-2 w-full rounded-full p-6 pr-12 border-BrightGray"
+                className="border-2 w-full rounded-full p-4 pr-12 border-BrightGray"
               />
               <TouchableOpacity
                 onPress={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-6"
+                className="absolute right-4 top-5"
               >
                 {showPassword ? (
-                  <Eye size={20} color="#000" />
+                  <Eye size={18} color="#000" />
                 ) : (
-                  <EyeOff size={20} color="#000" />
+                  <EyeOff size={18} color="#000" />
                 )}
               </TouchableOpacity>
             </View>
@@ -78,11 +78,11 @@ export default function RecoverPasswordScreen() {
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 secureTextEntry={!showConfirmPassword}
-                className="border-2 w-full rounded-full p-6 pr-12 border-BrightGray"
+                className="border-2 w-full rounded-full p-4 pr-12 border-BrightGray"
               />
               <TouchableOpacity
                 onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-4 top-6"
+                className="absolute right-4 top-5"
               >
                 {showConfirmPassword ? (
                   <Eye size={20} color="#000" />
@@ -101,8 +101,8 @@ export default function RecoverPasswordScreen() {
             <ButtonComponents
               onPress={handleChangePassword}
               title="Submit"
-              className="flex flex-row items-center justify-center rounded-full border-2 border-BrightGray p-6 bg-Bittersweet"
-              textSize="text-white text-xl font-bold"
+              className="flex flex-row items-center justify-center rounded-full border-2 border-BrightGray p-4 bg-Bittersweet"
+                textSize="text-white text-xl font-bold"
             />
 
             <View className="flex flex-col">

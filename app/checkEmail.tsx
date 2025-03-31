@@ -21,17 +21,17 @@ export default function CheckEmailScreen() {
           <View className="w-full flex gap-10">
             <TextInput
               placeholder="otp"
-              className=" border-2  w-full rounded-full p-6 border-BrightGray"
+              className=" border-2  w-full rounded-full p-4 border-BrightGray"
             />
 
             <ButtonComponents
               onPress={() => {router.push("/recoverPassword")}}
               title="Submit"
-              className="flex flex-row items-center justify-center rounded-full border-2 border-BrightGray p-6 bg-Bittersweet"
-              textSize="text-white text-xl font-bold"
+              className="flex flex-row items-center justify-center rounded-full border-2 border-BrightGray p-4 bg-Bittersweet"
+                textSize="text-white text-xl font-bold"
             />
 
-            <View className="flex flex-col">
+            <View className="flex flex-col -mt-6">
               <Link
                 href="/login"
                 className=" text-center text-OldSilver text-label4 font-bold"

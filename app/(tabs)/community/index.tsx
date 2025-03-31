@@ -5,7 +5,7 @@ import { Stack } from "expo-router";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
-import { ThreadCard } from "@/components/Card";
+import { CommunityCard } from "@/components/Card";
 import useLoading from "@/hook/useLoading";
 import LoadingIndicator from "@/components/Loading";
 import { IReview } from "@/interface/review";
@@ -85,8 +85,8 @@ export default function CommonScreen() {
   };
 
   const CustomHeader = () => (
-    <View className="bg-Snow p-4 border-b-2 border-gray-300 mb-4 relative">
-      <View className="flex flex-row items-center justify-between">
+    <View className="bg-Snow p-4 border-b-2 border-gray-300 relative">
+      <View className="flex flex-row items-center justify-between ml-2">
         <Text className="text-Heading3 text-Black">
           {isMode ? "Threads" : "Reviews"}
         </Text>
@@ -94,9 +94,9 @@ export default function CommonScreen() {
         <View className="flex flex-row items-center justify-between">
           <Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
 
-          <TouchableOpacity className="bg-Bittersweet w-10 h-10 rounded-lg flex items-center justify-center">
+          <TouchableOpacity className="bg-Bittersweet w-8 h-8 rounded-lg flex items-center justify-center mr-2">
             <Plus
-              size={24}
+              size={18}
               color="white"
               onPress={() =>
                 isMode ? setIsThreadModalOpen(true) : setIsReviewModalOpen(true)
@@ -107,19 +107,19 @@ export default function CommonScreen() {
       </View>
       <View className="flex flex-row items-center justify-around mt-4">
         <TouchableOpacity onPress={() => setIsMode(false)}>
-          <View className="flex items-center relative">
-            <CopyPlus size={34} />
+          <View className="flex items-center relative -mb-2">
+            <CopyPlus size={30} />
             {!isMode && (
-              <View className="absolute bottom-[-15px] w-full border-b-2 border-black" />
+              <View className="absolute bottom-[-8px] w-full border-b-2 border-black" />
             )}
           </View>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => setIsMode(true)}>
-          <View className="flex items-center relative">
-            <MessageCircleQuestion size={34} />
+          <View className="flex items-center relative -mb-2">
+            <MessageCircleQuestion size={30} />
             {isMode && (
-              <View className="absolute bottom-[-15px] w-full border-b-2 border-black" />
+              <View className="absolute bottom-[-8px] w-full border-b-2 border-black" />
             )}
           </View>
         </TouchableOpacity>
@@ -135,8 +135,8 @@ export default function CommonScreen() {
           header: () => <CustomHeader />,
         }}
       />
-      <SafeAreaView>
-        <View className="flex justify-center items-center">
+       <SafeAreaView className="flex-1 bg-Snow p-4">
+        <View className="flex justify-center items-center mt-2">
           {isMode ? (
             isLoading && !threads ? (
               <LoadingIndicator />
@@ -145,11 +145,16 @@ export default function CommonScreen() {
                 data={filteredThreads}
                 keyExtractor={(item) => item.id.toString()}
                 numColumns={2}
+                columnWrapperStyle={{
+                  justifyContent: 'center',
+                  columnGap: 6,
+                  paddingHorizontal: 0,
+                }}
                 onRefresh={fetchThread}
                 refreshing={isLoading}
                 renderItem={({ item }) => (
                   <TouchableOpacity onPress={() => handleRouter(item.id)}>
-                    <ThreadCard
+                    <CommunityCard
                       image={item.images?.[0]?.image}
                       title={item.title}
                       user={item.user?.full_name}
@@ -166,11 +171,17 @@ export default function CommonScreen() {
               data={filteredReviews} 
               keyExtractor={(item) => item.id.toString()}
               numColumns={2}
+              columnWrapperStyle={{
+                justifyContent: 'center',
+                columnGap: 6,
+                paddingHorizontal: 0,
+              }}
+              
               onRefresh={fetchReview}
               refreshing={isLoading}
               renderItem={({ item }) => (
                 <TouchableOpacity onPress={() => handleRouter(item.id)}>
-                  <ThreadCard
+                  <CommunityCard
                     image={item.image}
                     title={item.title}
                     user={item.user?.full_name}

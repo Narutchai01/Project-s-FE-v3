@@ -159,8 +159,6 @@ export default function ThreadDetails() {
     setIsCommentOpen(false);
   };
 
-  // console.log("Image", currImage);
-
   return (
     <SafeAreaProvider style={{ backgroundColor: "#fff" }}>
       <Stack.Screen

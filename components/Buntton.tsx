@@ -22,7 +22,7 @@ export const GoogleButtonSignIn = ({
 }) => {
   return (
     <TouchableOpacity
-      className="flex flex-row items-center justify-center rounded-full border-2 border-BrightGray p-6"
+      className="flex flex-row items-center justify-center rounded-full border-2 border-BrightGray p-4"
       onPress={googleSignIn}
     >
       <Image

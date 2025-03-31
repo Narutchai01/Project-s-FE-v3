@@ -24,14 +24,30 @@ export const CardSkincare: FC<CardSkincareProps> = (props) => {
         <Image
           source={image ? { uri: image } : defaultImage}
           className="w-full h-full rounded-t-2xl object-cover"
-          style={{ borderBottomRightRadius: 32.5 }}
         />
       </View>
 
       <View
-        className="absolute bottom-0 left-0 w-[120px] h-[30px] bg-white"
-        style={{ borderTopLeftRadius: 13, borderTopRightRadius: 5 }}
+        className="absolute -bottom-2 left-0 w-[100%] h-[35px] bg-white"
+        style={{ borderTopLeftRadius: 13 }}
       >
+        <View
+          style={{
+            position: "absolute",
+            top: -12,
+            right: 0,
+            width: 0,
+            height: 0,
+            backgroundColor: "transparent",
+            borderStyle: "solid",
+            borderLeftWidth: 12,
+            borderRightWidth: 0,
+            borderBottomWidth: 20,
+            borderLeftColor: "transparent",
+            borderRightColor: "transparent",
+            borderBottomColor: "white",
+          }}
+        />
         <View className="p-2">
           <Text
             className="text-label12 font-medium w-full"
@@ -66,23 +82,33 @@ export const CardDiary: FC<DiaryCardProps> = (props) => {
       onPress={() =>
         compareMode && selectItem
           ? selectItem()
-          : router.push(`/diary/${result_id}` as any)
+          : router.push(`/diary/${result_id}`)
       }
     >
+       <View style={{ alignItems: 'center' }}>
       <View
-        className={`flex-row items-center rounded-lg shadow p-4 mb-4 ${
+        className={`flex-row items-center rounded-lg p-2 mb-4 mt-2 ${
           check && compareMode ? "bg-[#CAC9C9]" : "bg-white"
         }`}
+        style={{
+          width: '90%',
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.25,
+          shadowRadius: 4,
+          elevation: 5,
+        }}
       >
         <Image
           source={data.image ? { uri: data.image } : defaultImage}
-          className="w-[88px] h-[118px] rounded-lg ml-4 mr-6"
+          className="w-[70px] h-[100px] rounded-lg ml-4 mr-6 mt-2 mb-2"
         />
         <View className="flex-1">
           <Text className={`text-label4 font-semibold `}>Date: {date}</Text>
           <Text className={`text-label6`}>Skin Type: {skinType}</Text>
           <Text className={`text-label6 `}>Acnes: {countAcne}</Text>
           <Text className={`text-label6`}>Skin Problems: {skinProblems}</Text>
+        </View>
         </View>
       </View>
     </Pressable>
@@ -97,21 +123,37 @@ export const PopularThreadCard: FC<ThreadCardProps> = (props) => {
         <Image
           source={image ? { uri: image } : defaultImage}
           className="w-full h-full rounded-t-2xl object-cover"
-          style={{ borderBottomRightRadius: 32.5 }}
         />
       </View>
 
       <View
         className="absolute bottom-0 left-0 w-[120px] bg-white"
-        style={{ borderTopLeftRadius: 13, borderTopRightRadius: 5 }}
+        style={{ borderTopLeftRadius: 13 }}
       >
+        <View
+          style={{
+            position: "absolute",
+            top: -12,
+            right: 0,
+            width: 0,
+            height: 0,
+            backgroundColor: "transparent",
+            borderStyle: "solid",
+            borderLeftWidth: 12,
+            borderRightWidth: 0,
+            borderBottomWidth: 20,
+            borderLeftColor: "transparent",
+            borderRightColor: "transparent",
+            borderBottomColor: "white",
+          }}
+        />
         <View className="p-2">
           <Text
             className="text-label12 font-medium mb-1"
             numberOfLines={1}
             ellipsizeMode="tail"
           >
-            {title}
+            {title?.trim() ? title : "No title"}
           </Text>
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center">
@@ -132,44 +174,68 @@ export const PopularThreadCard: FC<ThreadCardProps> = (props) => {
   );
 };
 
-export const ThreadCard: FC<ThreadCardProps> = (props) => {
+export const CommunityCard: FC<ThreadCardProps> = (props) => {
   const { image, title, user, userAvatar } = props;
 
   return (
-    <View className="bg-white rounded-2xl shadow w-[175px] h-[220px] mx-5 mb-6 relative overflow-hidden">
-      <View className="w-[175px] h-[165px] relative overflow-hidden">
+    <View
+      className="bg-white rounded-2xl shadow mb-6 relative overflow-hidden"
+      style={{ width: 140, height: 185, marginHorizontal: 8 }}
+    >
+      <View className="w-[160px] h-[135px] relative overflow-hidden">
         <Image
           source={image ? { uri: image } : defaultImage}
           className="w-full h-full rounded-t-2xl object-cover"
-          style={{ borderBottomRightRadius: 32.5 }}
         />
       </View>
 
       <View
-        className="absolute bottom-0 left-0 w-[175px] bg-white"
-        style={{ borderTopLeftRadius: 13, borderTopRightRadius: 5 }}
+        className="absolute -bottom-2 left-0 w-[100%] bg-white p-3"
+        style={{ borderTopLeftRadius: 13 }}
       >
-        <View className="p-3">
-          <Text
-            className="text-label2 font-medium"
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {title?.trim() ? title : "No title"}
-          </Text>
-          <View className="flex-row items-center justify-between mt-2">
-            <View className="flex-row items-center">
-              <Image
-                source={{ uri: userAvatar }}
-                className="w-5 h-5 rounded-full mr-2"
-              />
-              <Text className="text-label6 text-gray-600">{user}</Text>
-            </View>
-
-            <TouchableOpacity className="w-7 h-7 bg-White rounded-full flex items-center justify-center">
-              <Heart size={12} color="gray" />
-            </TouchableOpacity>
+        <View
+          style={{
+            position: "absolute",
+            top: -12,
+            right: 0,
+            width: 0,
+            height: 0,
+            backgroundColor: "transparent",
+            borderStyle: "solid",
+            borderLeftWidth: 12,
+            borderRightWidth: 0,
+            borderBottomWidth: 20,
+            borderLeftColor: "transparent",
+            borderRightColor: "transparent",
+            borderBottomColor: "white",
+          }}
+        />
+        <Text
+          className="text-label2 font-medium"
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          {title?.trim() ? title : "No title"}
+        </Text>
+        <View className="flex-row items-center justify-between mt-2">
+          <View className="flex-row items-center">
+            <Image
+              source={{ uri: userAvatar }}
+              className="w-5 h-5 rounded-full mr-2"
+            />
+            <Text
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              className="text-label6 text-gray-600"
+              style={{ width: 60 }}
+            >
+              {user}
+            </Text>
           </View>
+
+          <TouchableOpacity className="w-7 h-7 bg-White rounded-full flex items-center justify-center">
+            <Heart size={12} color="gray" />
+          </TouchableOpacity>
         </View>
       </View>
     </View>
@@ -249,29 +315,49 @@ export const AddPhoto: FC<AddPhotoProps> = (props) => {
   );
 };
 
-export const CardPopularSkincare: FC<CardSkincareProps> = (props) => {
+export const CardListPopularSkincare: FC<CardSkincareProps> = (props) => {
   const { image, name } = props;
 
   return (
-    <View className="bg-white rounded-2xl shadow w-[165px] h-[200px] mx-3 mb-4 relative overflow-hidden">
-      <View className="w-full h-[165px] relative overflow-hidden">
+    <View
+      className="bg-white rounded-2xl shadow mb-6 relative overflow-hidden"
+      style={{ width: 140, height: 185, marginHorizontal: 8 }}
+    >
+      <View className="w-[165px] h-[160px] relative overflow-hidden">
         <Image
           source={image ? { uri: image } : defaultImage}
           className="w-full h-full rounded-t-2xl object-cover"
-          style={{ borderBottomRightRadius: 32.5 }}
         />
       </View>
 
       <View
-        className="absolute bottom-0 left-0 w-full h-[45px] bg-white flex-row items-center px-2"
-        style={{ borderTopLeftRadius: 13, borderTopRightRadius: 5 }}
+        className="absolute -bottom-2 left-0 w-[100%] h-[50px] p-3 bg-white"
+        style={{ borderTopLeftRadius: 13 }}
       >
+        <View
+          style={{
+            position: "absolute",
+            top: -12,
+            right: 0,
+            width: 0,
+            height: 0,
+            backgroundColor: "transparent",
+            borderStyle: "solid",
+            borderLeftWidth: 12,
+            borderRightWidth: 0,
+            borderBottomWidth: 20,
+            borderLeftColor: "transparent",
+            borderRightColor: "transparent",
+            borderBottomColor: "white",
+          }}
+        />
+
         <Text
           className="text-label2 font-medium w-full"
           numberOfLines={1}
           ellipsizeMode="tail"
         >
-          {name}
+          {name?.trim() ? name : "Not found"}
         </Text>
       </View>
     </View>
@@ -305,6 +391,76 @@ export const CommentCard: FC<ICommentCardProps> = (props) => {
           <Heart size={24} color={favorite ? "red" : "gray"} />
         </TouchableOpacity>
         <Text>{count_favorite > 0 ? count_favorite : ""}</Text>
+      </View>
+    </View>
+  );
+};
+
+interface CompareDiaryProps {
+  image: string;
+  date: Date;
+}
+
+export const CompareDiary: FC<CompareDiaryProps> = (props) => {
+  const { image, date } = props;
+  const formattedDate = dayjs(date).format("DD/MM/YYYY");
+
+  return (
+    <View className="items-center bg-white shadow-md p-3 rounded-lg mx-2 w-[30%] h-[160px]">
+      <View className="w-[95%] h-[100px] rounded-md ">
+        <Image
+          source={{ uri: image }}
+          className="w-full h-full rounded-md object-cover "
+        />
+      </View>
+      <Text className="text-label2 mt-2 self-start">Date</Text>
+      <Text className="text-label2 mb-2 self-start">{formattedDate}</Text>
+    </View>
+  );
+};
+
+export const CardSkincareReccommemded: FC<CardSkincareProps> = (props) => {
+  const { image, name } = props;
+
+  return (
+    <View className="bg-white rounded-2xl shadow w-[90%] h-[105px] relative overflow-hidden">
+      <View
+        style={{
+          position: "absolute",
+          top: 65,
+          right: 0,
+          width: 0,
+          height: 0,
+          borderStyle: "solid",
+          borderLeftWidth: 12,
+          borderRightWidth: 0,
+          borderBottomWidth: 20,
+          borderLeftColor: "transparent",
+          borderRightColor: "transparent",
+          borderBottomColor: "white",
+          zIndex: 10,
+        }}
+      />
+      <View className="w-[100px] h-[100px] relative overflow-hidden rounded-2xl">
+        <Image
+          source={image ? { uri: image } : defaultImage}
+          className="w-full h-full object-cover"
+        />
+      </View>
+
+      <View
+        className="absolute bottom-0 left-0 w-[120px] h-[30px] bg-white"
+        style={{ borderTopLeftRadius: 13 }}
+      >
+        <View className="p-2">
+          <Text
+            className="text-label12 font-medium w-full"
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {name}
+          </Text>
+        </View>
       </View>
     </View>
   );

@@ -21,7 +21,7 @@ export default function ProfileScreen() {
   );
 
   const CustomHeader = () => (
-    <View className="bg-Snow p-4 border-b-2 border-gray-300 mb-4 relative">
+    <View className="bg-Snow p-6 border-b-2 border-gray-300 mb-4 relative">
       <View className="flex flex-row justify-end items-center">
         <TouchableOpacity onPress={() => router.push("/setting")}>
           <AlignJustify size={24} />
@@ -49,7 +49,7 @@ export default function ProfileScreen() {
       <View className="flex flex-row items-center justify-around mt-4">
         <TouchableOpacity onPress={() => setMode("reviews")}>
           <View className="flex items-center relative">
-            <CopyPlus size={34} />
+            <CopyPlus size={30} />
             {mode === "reviews" && (
               <View className="absolute bottom-[-15px] w-full border-b-2 border-black" />
             )}
@@ -58,7 +58,7 @@ export default function ProfileScreen() {
 
         <TouchableOpacity onPress={() => setMode("threads")}>
           <View className="flex items-center relative">
-            <MessageCircleQuestion size={34} />
+            <MessageCircleQuestion size={30} />
             {mode === "threads" && (
               <View className="absolute bottom-[-15px] w-full border-b-2 border-black" />
             )}
@@ -67,7 +67,7 @@ export default function ProfileScreen() {
 
         <TouchableOpacity onPress={() => setMode("bookmark")}>
           <View className="flex items-center relative">
-            <Bookmark size={34} />
+            <Bookmark size={30} />
             {mode === "bookmark" && (
               <View className="absolute bottom-[-15px] w-full border-b-2 border-black" />
             )}

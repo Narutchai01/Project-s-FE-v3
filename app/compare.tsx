@@ -3,12 +3,14 @@ import { View, ScrollView, Text } from "react-native";
 import { useCompare } from "@/context/CompareContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
-import CompareDiary from "@/components/CompareDiary";
+import { CompareDiary } from "@/components/Card";
 import LineChartComponent from "@/components/LineChart";
 import LoadingIndicator from "@/components/Loading";
 import { IResult, Type } from "@/interface/result";
 import { useAcneStore } from "@/store/acneStore";
 import { useFacialStore } from "@/store/facialStore";
+import { BackButtonComponents } from "@/components/Buntton";
+import { router } from "expo-router";
 
 export default function CompareScreen() {
   const { compare } = useCompare();
@@ -92,6 +94,16 @@ export default function CompareScreen() {
 
   return (
     <ScrollView className="flex-1 bg-Snow p-4">
+      <View className="h-14 bg-Snow">
+        <View className="h-full flex-row items-center justify-between px-3">
+          <BackButtonComponents
+            title={"Result Analysis"}
+            textSize="text-Heading3 text-Quartz"
+            onPress={() => router.back()}
+          />
+        </View>
+      </View>
+      <View className="p-4">
       <View className="flex-row justify-center mb-6">
         {compareData?.map((item) => (
           <CompareDiary
@@ -112,6 +124,7 @@ export default function CompareScreen() {
         labels={dates}
         genres={skinProblemGenres}
       />
+      </View>
     </ScrollView>
   );
 }

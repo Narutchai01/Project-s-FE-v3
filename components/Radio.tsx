@@ -32,10 +32,10 @@ export function RadioComponents({ value, setValue }: RadioProps) {
           key={item.id}
           onPress={() => OnPress(item.value, item.id)}
           style={{
-            gap: 10,
+            gap: 8,
             flexDirection: "row",
             alignItems: "center",
-            marginRight: 10,
+            marginRight: 24,
           }}
         >
           <View

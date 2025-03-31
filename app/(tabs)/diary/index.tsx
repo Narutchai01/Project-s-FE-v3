@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { router, Stack } from "expo-router";
+import { router, Stack, useFocusEffect } from "expo-router";
 import { CardDiary } from "@/components/Card";
 import { useCompare } from "@/context/CompareContext";
 import { IResult } from "@/interface/result";
@@ -19,20 +19,24 @@ import { CalendarDays } from "lucide-react-native";
 import useLoading from "@/hook/useLoading";
 import LoadingIndicator from "@/components/Loading";
 import { ButtonComponents } from "@/components/Buntton";
+import { ConfirmAlert } from "@/components/Alert";
 
 interface CustomHeaderProps {
   openCalendar: () => void;
+  onConfirmPress: () => void;
 }
 
-const CustomHeader: React.FC<CustomHeaderProps> = ({ openCalendar }) => {
+const CustomHeader: React.FC<CustomHeaderProps> = (props) => {
   const { setIsCompare, isCompare, compare, setCompare } = useCompare();
+  const { openCalendar, onConfirmPress } = props;
+
   return (
-    <View className="bg-Snow p-4 border-b-2 border-gray-300 relative">
+    <View className="bg-Snow p-6 border-b-2 border-gray-300 relative">
       <View className="flex flex-row items-center justify-between">
         {isCompare ? (
           <ButtonComponents
             title="Cancel"
-            textSize="text-label8 font-semibold text-black"
+            textSize="text-label4 font-semibold text-Bittersweet"
             onPress={() => {
               setIsCompare(false);
               setCompare([]);
@@ -43,21 +47,23 @@ const CustomHeader: React.FC<CustomHeaderProps> = ({ openCalendar }) => {
         )}
 
         <View className="flex flex-row items-center gap-x-2">
-          <TouchableOpacity onPress={openCalendar}>
+          <TouchableOpacity onPress={openCalendar} className="bg-Bittersweet w-8 h-8 rounded-lg flex items-center justify-center mr-2">
             <View className="bg-Bittersweet px-4 py-2 rounded-full">
-              <CalendarDays size={24} color="white" />
+              <CalendarDays size={18} color="white" />
             </View>
           </TouchableOpacity>
 
           <ButtonComponents
             title={isCompare ? "Confirm" : "Compare"}
-            className="bg-Bittersweet px-2 py-2 rounded-full"
-            textSize="text-label8 font-semibold text-white"
-            onPress={() =>
-              isCompare
-                ? (setIsCompare(false), router.push("/compare"))
-                : setIsCompare(true)
-            }
+            className="bg-Bittersweet px-2 rounded-full h-8 flex items-center justify-center"
+            textSize="text-label4 text-white font-semibold"
+            onPress={() => {
+              if (isCompare) {
+                onConfirmPress();
+              } else {
+                setIsCompare(true);
+              }
+            }}
           />
         </View>
       </View>
@@ -80,8 +86,10 @@ export default function DiaryScreen() {
     endDate: null,
   });
   const { isLoading, startLoading, stopLoading } = useLoading();
+  const [showAlert, setShowAlert] = useState(false);
+  const [showSelectMaxAlert, setShowSelectMaxAlert] = useState(false);
 
-  const fetchResults = useCallback( async () => {
+  const fetchResults = useCallback(async () => {
     startLoading();
     try {
       const token = await AsyncStorage.getItem("token");
@@ -95,7 +103,7 @@ export default function DiaryScreen() {
     } finally {
       stopLoading();
     }
-  },[startLoading, stopLoading])
+  }, [startLoading, stopLoading]);
 
   useEffect(() => {
     fetchResults();
@@ -126,12 +134,19 @@ export default function DiaryScreen() {
       setCompare(compare.filter((compareId) => compareId !== id));
     } else {
       if (compare && compare.length >= 3) {
-        console.error("Cannot compare more than 3 items");
+        setShowSelectMaxAlert(true);
         return;
       }
       setCompare(compare ? [...compare, id] : [id]);
     }
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      setCompare([]);
+      setIsCompare(false);
+    }, [setCompare, setIsCompare])
+  );
 
   return (
     <SafeAreaProvider>
@@ -139,7 +154,18 @@ export default function DiaryScreen() {
         options={{
           headerShown: true,
           header: () => (
-            <CustomHeader openCalendar={() => setIsCalendarOpen(true)} />
+            <CustomHeader
+              openCalendar={() => setIsCalendarOpen(true)}
+              onConfirmPress={() => {
+                if (compare.length < 2) {
+                  setShowAlert(true);
+                } else {
+                  setIsCompare(false);
+                  router.push("/compare");
+                }
+              }}
+              
+            />
           ),
         }}
       />
@@ -177,6 +203,20 @@ export default function DiaryScreen() {
               setSelectedRange({ startDate, endDate });
               setIsCalendarOpen(false);
             }}
+          />
+
+          <ConfirmAlert
+            visible={showAlert}
+            onClose={() => setShowAlert(false)}
+            title="Please select at least 2 diary to compare."
+            confirm="OK"
+          />
+
+          <ConfirmAlert
+            visible={showSelectMaxAlert}
+            onClose={() => setShowSelectMaxAlert(false)}
+            title="You can compare up to 3 diaries only."
+            confirm="OK"
           />
         </SafeAreaView>
       )}

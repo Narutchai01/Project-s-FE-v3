@@ -14,7 +14,7 @@ export default function SettingScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-Snow p-4">
+    <SafeAreaView className="flex-1 bg-Snow p-6">
       <View className="h-14 bg-Snow">
         <BackButtonComponents
           title={"Settings"}

@@ -3,7 +3,6 @@ import {
   Text,
   FlatList,
   Dimensions,
-  TouchableOpacity,
 } from "react-native";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
@@ -14,7 +13,6 @@ import useLoading from "@/hook/useLoading";
 import { Image } from "expo-image";
 import LoadingIndicator from "@/components/Loading";
 import { ActivityBar, UserBar } from "@/components/Bar";
-import { SquareArrowLeft } from "lucide-react-native";
 import { ICommentReview } from "@/interface/comment";
 import { ModalComment } from "@/components/Modal";
 import { IReview } from "@/interface/review";
