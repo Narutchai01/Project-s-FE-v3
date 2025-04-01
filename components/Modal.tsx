@@ -239,8 +239,8 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
                     <Image
                       source={{ uri: item }}
                       style={{
-                        width: 250,
-                        height: 350,
+                        width: 200,
+                        height: 300,
                         borderRadius: 10,
                       }}
                     />
@@ -467,9 +467,9 @@ export const ModalComment: React.FC<IModalComment> = ({
       <View className="bg-white h-full rounded-t-3xl container mx-auto px-4 py-10">
         <View className="flex gap-y-4">
           <TouchableOpacity onPress={isCommentClose}>
-            <View className="bg-black h-1 container mx-auto w-2/12 rounded-lg"></View>
+            <View className="bg-Quartz h-1 container mx-auto w-2/12 rounded-lg"></View>
           </TouchableOpacity>
-          <Text className="text-center text-3xl font-bold mb-8">Comments</Text>
+          <Text className="text-center text-2xl font-bold mb-4">Comments</Text>
         </View>
 
         <FlatList
@@ -489,9 +489,9 @@ export const ModalComment: React.FC<IModalComment> = ({
           )}
         />
 
-        <View className="flex flex-row justify-center container mx-auto px-5 gap-x-2 items-center py-2">
+        <View className="flex flex-row justify-center container mx-auto px-8 gap-x-2 items-center py-2">
           <TextInput
-            className="border-Quartz border-2 w-full rounded-full py-4 px-4 mx-2"
+            className="border-Quartz border-2 w-full rounded-full py-4 px-4 mx-1"
             placeholder="Share your thoughts..."
             value={commentContent}
             onChangeText={setComment}
@@ -502,7 +502,7 @@ export const ModalComment: React.FC<IModalComment> = ({
               setComment("");
             }}
           >
-            <CircleArrowUp size={36} />
+            <CircleArrowUp size={34} color="#4A4A4A"/>
           </TouchableOpacity>
         </View>
       </View>

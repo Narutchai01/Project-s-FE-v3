@@ -140,13 +140,17 @@ export default function CommonScreen() {
           {isMode ? (
             isLoading && !threads ? (
               <LoadingIndicator />
+            ) : !threads ? (
+              <Text className="text-gray-500 text-center mt-4">
+                No threads found.
+              </Text>
             ) : (
               <FlatList
                 data={filteredThreads}
                 keyExtractor={(item) => item.id.toString()}
                 numColumns={2}
                 columnWrapperStyle={{
-                  justifyContent: 'center',
+                  justifyContent: 'space-between',
                   columnGap: 6,
                   paddingHorizontal: 0,
                 }}
@@ -166,13 +170,17 @@ export default function CommonScreen() {
             )
           ) : isLoading && !reviews ? (
             <LoadingIndicator />
+          ) : !reviews ? (
+            <Text className="text-gray-500 text-center mt-4">
+              No reviews found.
+            </Text>
           ) : (
             <FlatList
               data={filteredReviews} 
               keyExtractor={(item) => item.id.toString()}
               numColumns={2}
               columnWrapperStyle={{
-                justifyContent: 'center',
+                justifyContent: 'space-between',
                 columnGap: 6,
                 paddingHorizontal: 0,
               }}

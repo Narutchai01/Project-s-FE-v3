@@ -63,7 +63,9 @@ export default function ReviewDetails() {
     try {
       const token = await AsyncStorage.getItem("token");
       const res = await axiosInstance.get(`/comment/reviews/skincare/${id}`, {
-        headers: { token },
+        headers: { 
+          token: token,
+         },
       });
 
       const data = res.data;
@@ -71,6 +73,7 @@ export default function ReviewDetails() {
         setComment(data.data);
         setCommentCount(data.data.length);
       }
+      fetchComments();
     } catch (error: any) {
       console.log(error);
     }
@@ -79,10 +82,13 @@ export default function ReviewDetails() {
   const handleFavorite = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      await axiosInstance.post(`/favorite/review/skincare/${id}`, null, {
-        headers: { token },
+      const res = await axiosInstance.post(`/favorite/review/skincare/${id}`, null, {
+        headers: { 
+          token: token,
+        },
       });
 
+      console.log(res)
       fetchReview();
     } catch (error: any) {
       console.log(error.response.data);
@@ -92,7 +98,7 @@ export default function ReviewDetails() {
   const handleFavoriteComment = async (comment_id: number) => {
     try {
       const token = await AsyncStorage.getItem("token");
-      await axiosInstance.post(
+      const res = await axiosInstance.post(
         `/favorite/comment/review/skincare/${comment_id}`,
         null,
         {
@@ -100,7 +106,9 @@ export default function ReviewDetails() {
         }
       );
 
-      fetchComments();
+      if (res.data) {
+        fetchComments();
+      }
     } catch (error: any) {
       console.log(error.response.data);
     }
@@ -129,17 +137,31 @@ export default function ReviewDetails() {
     }
   };
 
+    useEffect(() => {
+      fetchComments();
+    }, [comment]);
+  
+
   const handleBookmark = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      await axiosInstance.post(`/bookmark/review/${id}`, null, {
+      const res = await axiosInstance.post(`/bookmark/review/${id}`, null, {
         headers: { token },
       });
 
+      console.log(res);
       fetchReview();
     } catch (error: any) {
       console.log(error.response.data);
     }
+  };
+
+  const isOpenComment = () => {
+    setIsCommentOpen(true);
+  };
+
+  const closeComment = () => {
+    setIsCommentOpen(false);
   };
 
   return (
@@ -148,7 +170,7 @@ export default function ReviewDetails() {
         options={{
           headerShown: true,
           header: () => (
-            <View className="h-16 bg-White">
+            <View className="h-16 bg-Snow ml-1">
               <View className=" h-full flex-row items-center justify-between px-3">
                 <BackButtonComponents
                   title={"Reviews"}
@@ -160,7 +182,7 @@ export default function ReviewDetails() {
           ),
         }}
       />
-      <SafeAreaView className="flex-1">
+      <SafeAreaView className="flex-1 bg-Snow">
         {isLoading && review === null ? (
           <LoadingIndicator />
         ) : (
@@ -230,7 +252,7 @@ export default function ReviewDetails() {
             </View>
 
             <ActivityBar
-              isOpenComment={() => setIsCommentOpen(true)}
+              isOpenComment={isOpenComment}
               hadleFavorite={handleFavorite}
               handleBookmark={handleBookmark}
               favorite={review?.favorite}
@@ -240,7 +262,7 @@ export default function ReviewDetails() {
               currImage={currImage}
               bookmark={review?.bookmark}
             />
-            <View className="container mx-auto px-3">
+            <View className="container mx-auto px-6">
               <Text style={{ fontSize: width * 0.05, fontWeight: "bold" }}>
                 {review?.title ? review?.title : "No title"}
               </Text>
@@ -253,7 +275,7 @@ export default function ReviewDetails() {
       </SafeAreaView>
 
       <ModalComment
-        isCommentClose={() => setIsCommentOpen(false)}
+        isCommentClose={closeComment}
         comments={comment}
         isCommentOpen={isCommentOpen}
         handleFavoriteComment={handleFavoriteComment}

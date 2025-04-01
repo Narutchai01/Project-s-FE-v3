@@ -58,6 +58,8 @@ export const PopularReviews: FC = () => {
 
       {isLoading ? (
         <LoadingIndicator />
+      ) : !reviews ? (
+        <Text className="text-gray-500 text-center mt-4">No reviews found.</Text>
       ) : (
         <FlatList
           horizontal

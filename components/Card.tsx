@@ -149,9 +149,10 @@ export const PopularThreadCard: FC<ThreadCardProps> = (props) => {
         />
         <View className="p-2">
           <Text
-            className="text-label12 font-medium mb-1"
+            className="text-label12 font-medium mb-1 " 
             numberOfLines={1}
             ellipsizeMode="tail"
+            style={{ width: 100 }}
           >
             {title?.trim() ? title : "No title"}
           </Text>
@@ -161,7 +162,12 @@ export const PopularThreadCard: FC<ThreadCardProps> = (props) => {
                 source={userAvatar ? { uri: userAvatar } : defaultImage}
                 className="w-5 h-5 rounded-full mr-2"
               />
-              <Text className="text-label13 text-gray-600">{user}</Text>
+              <Text 
+              className="text-label13 text-gray-600"
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              style={{ width: 60 }}
+              >{user}</Text>
             </View>
 
             <TouchableOpacity className="w-7 h-7 bg-White rounded-full flex items-center justify-center">
@@ -227,7 +233,7 @@ export const CommunityCard: FC<ThreadCardProps> = (props) => {
               numberOfLines={1}
               ellipsizeMode="tail"
               className="text-label6 text-gray-600"
-              style={{ width: 60 }}
+              style={{ width: 75 }}
             >
               {user}
             </Text>
@@ -355,7 +361,8 @@ export const CardListPopularSkincare: FC<CardSkincareProps> = (props) => {
         <Text
           className="text-label2 font-medium w-full"
           numberOfLines={1}
-          ellipsizeMode="tail"
+              ellipsizeMode="tail"
+              style={{ width: 120 }}
         >
           {name?.trim() ? name : "Not found"}
         </Text>
@@ -375,15 +382,15 @@ export const CommentCard: FC<ICommentCardProps> = (props) => {
   } = props;
 
   return (
-    <View className="flex flex-row justify-between">
+    <View className="flex flex-row justify-between ml-3 mr-3">
       <View className="flex flex-row gap-x-4">
         <Image
           source={image ? { uri: image } : defaultImage}
-          style={{ width: 50, height: 50, borderRadius: 50 }}
+          style={{ width: 40, height: 40, borderRadius: 50 }}
         />
-        <View className="flex justify-center gap-y-4">
-          <Text className="text-xl">{username}</Text>
-          <Text className=" text-lg">{content}</Text>
+        <View className="flex justify-center gap-y-3">
+          <Text className="text-lg">{username}</Text>
+          <Text className="text-base -mt-2">{content}</Text>
         </View>
       </View>
       <View className="flex justify-center items-center">
@@ -457,6 +464,7 @@ export const CardSkincareReccommemded: FC<CardSkincareProps> = (props) => {
             className="text-label12 font-medium w-full"
             numberOfLines={1}
             ellipsizeMode="tail"
+            style={{ width: 60 }}
           >
             {name}
           </Text>

@@ -1,12 +1,8 @@
 import { Heart, MessageCircle, Bookmark } from "lucide-react-native";
-import { Text, Touchable, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { ImagePagination } from "./paginate";
 import { FC } from "react";
 import { Image } from "expo-image";
-import { ButtonComponents } from "./Buntton";
-import { Dimensions } from "react-native";
-
-const { width, height } = Dimensions.get("window");
 
 interface IActivityBar {
   favorite: boolean | undefined;
@@ -40,6 +36,9 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
         flexDirection: "row",
         justifyContent: "space-between",
         padding: 10,
+        marginLeft: 10,
+        marginTop: -15,
+        marginBottom: -10,
       }}
     >
       <View>
@@ -52,7 +51,7 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
             }}
           >
             <TouchableOpacity onPress={hadleFavorite}>
-              <Heart size={24} color={favorite ? "red" : "gray"} />
+              <Heart size={24} color={favorite ? "#FF6F61" : "#4A4A4A"} />
             </TouchableOpacity>
             <Text style={{ fontSize: 20 }}>{favoriteCount}</Text>
           </View>
@@ -64,7 +63,7 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
             }}
           >
             <TouchableOpacity onPress={isOpenComment}>
-              <MessageCircle size={24} />
+              <MessageCircle size={24} color="#4A4A4A" />
             </TouchableOpacity>
             <Text style={{ fontSize: 20 }}>{commnetCount}</Text>
           </View>
@@ -75,7 +74,7 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
       </View>
       <View className="px-10">
         <TouchableOpacity onPress={handleBookmark}>
-          <Bookmark size={24} color={bookmark ? "red" : "gray"} />
+          <Bookmark size={24} color={bookmark ? "#FF6F61" : "#4A4A4A"} />
         </TouchableOpacity>
       </View>
     </View>
@@ -86,7 +85,7 @@ export const UserBar: FC<any> = (props) => {
   const { userImage, username } = props;
 
   return (
-    <View className="flex flex-row justify-between items-center px-3 py-2">
+    <View className="flex flex-row justify-between items-center px-3 py-2 ml-2">
       <View className="flex flex-row items-center gap-x-2 ">
         <Image
           source={{ uri: userImage }}

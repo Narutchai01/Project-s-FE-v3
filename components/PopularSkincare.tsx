@@ -40,7 +40,9 @@ export const PopularSkincare: FC<PopularSkincareProps> = (props) => {
 
       {isLoading ? (
         <LoadingIndicator />
-      ) : (
+      ) : !skincares ? (
+        <Text className="text-gray-500 text-center mt-4">No skincares found.</Text>
+              ) : (
         <FlatList
           horizontal
           showsHorizontalScrollIndicator={false}

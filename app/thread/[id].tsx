@@ -165,7 +165,7 @@ export default function ThreadDetails() {
         options={{
           headerShown: true,
           header: () => (
-            <View className="h-16 bg-White">
+            <View className="h-16 bg-Snow ml-1">
               <View className=" h-full flex-row items-center justify-between px-3">
                 <BackButtonComponents
                   title={"Threads"}
@@ -177,7 +177,7 @@ export default function ThreadDetails() {
           ),
         }}
       />
-      <SafeAreaView className="flex-1">
+      <SafeAreaView className="flex-1 bg-Snow">
         {isLoading && thread === null ? (
           <LoadingIndicator />
         ) : (

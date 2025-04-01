@@ -74,12 +74,12 @@ export const SkinAnalysisCard: FC = () => {
       className="flex justify-center items-center mt-2"
       onPress={() => router.push(`/diary/${resultLatest.id}`)}
     >
-      <View className="bg-white rounded-3xl shadow-md flex items-center justify-center w-[85%] h-[240px]">
+      <View className="bg-white rounded-3xl shadow-md flex items-center justify-center w-[90%] h-[240px]">
         <View className="flex-row items-center justify-center">
           <View className="w-[45%] h-[180px]">
             <Image
               source={{ uri: resultLatest?.image }}
-              className="w-[138px] h-[180px] rounded-2xl object-cover"
+              className="w-[125px] h-[175px] rounded-2xl object-cover"
             />
           </View>
 

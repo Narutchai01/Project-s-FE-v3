@@ -187,7 +187,14 @@ const Section: React.FC<SectionProps> = ({ title, items }) => (
             style={{ width: 65, height: 65, borderRadius: 50 }}
           />
           <View className="flex items-center justify-center mt-2 mb-4">
-            <Text className="text-label6">{item.name}</Text>
+            <Text 
+             numberOfLines={1}
+                        ellipsizeMode="tail"
+                        style={{ width: 60, textAlign: "center"}}
+            className="text-label6"
+            >
+              {item.name}
+              </Text>
           </View>
         </View>
       ))}
