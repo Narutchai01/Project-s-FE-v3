@@ -55,19 +55,19 @@ export const ThreeDotMenu = () => {
                 transform: [{ rotate: '20deg' }],
               }}
             />
-            <View className="bg-white rounded-2xl py-2 w-44">
+            <View className="bg-white rounded-2xl py-2 w-40 ">
               <TouchableOpacity
                 onPress={handleEdit}
                 className="py-3 px-2 border-b border-BrightGray"
               >
-                <View className="flex flex-row items-center gap-x-2">
+                <View className="flex flex-row items-center gap-x-2 ml-2">
                   <PencilLine size={20} color="black" />
                   <Text className="text-label11">Edit</Text>
                 </View>
               </TouchableOpacity>
 
               <TouchableOpacity onPress={handleDelete} className="py-3 px-2">
-                <View className="flex flex-row items-center gap-x-2">
+                <View className="flex flex-row items-center gap-x-2 ml-2">
                   <Trash2 size={20} color="black" />
                   <Text className="text-label11">Delete</Text>
                 </View>
