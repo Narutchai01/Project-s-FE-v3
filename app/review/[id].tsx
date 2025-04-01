@@ -169,7 +169,29 @@ export default function ReviewDetails() {
               userImage={review?.user?.image}
               username={review?.user?.full_name}
             />
+
             <View style={{ padding: 10 }}>
+              {imagesList.length > 0 && (
+                <View
+                  style={{
+                    position: "absolute",
+                    top: 20,
+                    right: 20,
+                    backgroundColor: "#4A4A4ACC",
+                    paddingVertical: 5,
+                    paddingHorizontal: 10,
+                    borderRadius: 20,
+                    zIndex: 10,
+                  }}
+                >
+                  <Text
+                    style={{ color: "white", fontSize: 14, fontWeight: "bold" }}
+                  >
+                    {currImage + 1} / {imagesList.length}
+                  </Text>
+                </View>
+              )}
+
               <FlatList
                 data={imagesList}
                 renderItem={({ item, index }) => (
@@ -206,6 +228,7 @@ export default function ReviewDetails() {
                 )}
               />
             </View>
+
             <ActivityBar
               isOpenComment={() => setIsCommentOpen(true)}
               hadleFavorite={handleFavorite}
