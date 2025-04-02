@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { View, SafeAreaView, Text, TextInput } from "react-native";
+import { View, SafeAreaView, Text, TextInput, TouchableOpacity } from "react-native";
 import { BackButtonComponents, ButtonComponents } from "@/components/Buntton";
 import { router } from "expo-router";
 import { ConfirmAlert } from "@/components/Alert";
 import useLoading from "@/hook/useLoading";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
+import { Eye, EyeOff } from "lucide-react-native";
 
 export default function ChangePasswordScreen() {
   const [newPassword, setNewPassword] = useState("");
@@ -13,6 +14,8 @@ export default function ChangePasswordScreen() {
   const [showAlert, setShowAlert] = useState(false);
   const [alertTitle, setAlertTitle] = useState("Change Password Success");
   const { startLoading, stopLoading, isLoading } = useLoading();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleNewPassword = async (password: string) => {
     startLoading();
@@ -73,6 +76,13 @@ export default function ChangePasswordScreen() {
           secureTextEntry={true}
           className="border-2 w-full rounded-full p-4 border-BrightGray mb-4"
         />
+         <TouchableOpacity
+            onPress={() => setShowPassword(!showPassword)}
+            className="absolute right-8 top-[52px]"
+          >
+            {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+          </TouchableOpacity>
+
         <Text className="text-Heading4 text-Quartz mb-2 mt-4">
           Confirm Password
         </Text>
@@ -82,6 +92,13 @@ export default function ChangePasswordScreen() {
           secureTextEntry={true}
           className="border-2 w-full rounded-full p-4 border-BrightGray mb-8"
         />
+         <TouchableOpacity
+            onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+            className="absolute right-8 top-[160px]"
+          >
+            {showConfirmPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+          </TouchableOpacity>
+
         <ButtonComponents
           onPress={handleChangePassword}
           title="Confirm"
