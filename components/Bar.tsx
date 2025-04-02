@@ -7,7 +7,6 @@ import { ThreeDotMenu } from "@/components/ThreeDotMenu";
 import { ButtonComponents } from "./Buntton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
-import LoadingIndicator from "@/components/Loading";
 import useLoading from "@/hook/useLoading";
 
 interface IActivityBar {

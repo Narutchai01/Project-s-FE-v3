@@ -14,6 +14,7 @@ import { Heart } from "lucide-react-native";
 import { LucideImage } from "lucide-react-native";
 import { MediaType, launchImageLibrary } from "react-native-image-picker";
 const defaultImage = require("@/assets/images/defaultImage.png");
+const userDefaultImage = require("@/assets/images/userDefault.jpg");
 
 export const CardSkincare: FC<CardSkincareProps> = (props) => {
   const { image, name } = props;
@@ -159,7 +160,7 @@ export const PopularThreadCard: FC<ThreadCardProps> = (props) => {
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center">
               <Image
-                source={userAvatar ? { uri: userAvatar } : defaultImage}
+                source={userAvatar ? { uri: userAvatar } : userDefaultImage}
                 className="w-5 h-5 rounded-full mr-2"
               />
               <Text 
@@ -385,7 +386,7 @@ export const CommentCard: FC<ICommentCardProps> = (props) => {
     <View className="flex flex-row justify-between ml-3 mr-3">
       <View className="flex flex-row gap-x-4">
         <Image
-          source={image ? { uri: image } : defaultImage}
+          source={image ? { uri: image } : userDefaultImage}
           style={{ width: 40, height: 40, borderRadius: 50 }}
         />
         <View className="flex justify-center gap-y-3">
@@ -523,7 +524,7 @@ export const PostByUser: FC<ThreadCardProps> = (props) => {
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center">
               <Image
-                source={userAvatar ? { uri: userAvatar } : defaultImage}
+                source={userAvatar ? { uri: userAvatar } : userDefaultImage}
                 className="w-5 h-5 rounded-full mr-2"
               />
               <Text 

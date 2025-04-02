@@ -19,11 +19,9 @@ import { IReview } from "@/interface/review";
 import { IThread } from "@/interface/threads";
 import useLoading from "@/hook/useLoading";
 import LoadingIndicator from "@/components/Loading";
-import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
 import { IUser } from "@/interface/user";
-import { useAuth } from "@/context/AuthContext";
 import { PostByUser } from "@/components/Card";
 
 export default function ProfileScreen() {
@@ -35,14 +33,16 @@ export default function ProfileScreen() {
   const [reviews, setReviews] = useState<IReview[] | null>(null);
   const [bookmarks, setBookmarks] = useState<any[]>([]);
   const [profileUser, setProfileUser] = useState<IUser | null>(null);
-  const { user } = useAuth();
+  const defaultImage = require("@/assets/images/userDefault.jpg");
 
   const fetchUser = async () => {
     startLoading();
     try {
       const token = await AsyncStorage.getItem("token");
       const res = await axiosInstance.get("/user/me", {
-        headers: { token },
+        headers: { 
+          token: token,
+         },
       });
       setProfileUser(res.data.data);
     } catch (error) {
@@ -52,24 +52,15 @@ export default function ProfileScreen() {
     }
   };
 
-  useEffect(() => {
-    fetchUser();
-  }, []);
-
-  useEffect(() => {
-    if (!profileUser?.id) return;
-
-    fetchReviews();
-    fetchThreads();
-    fetchBookmarks();
-  }, [profileUser]);
-
   const fetchThreads = async () => {
     startLoading();
     try {
+      if(profileUser?.id === undefined) return;
       const token = await AsyncStorage.getItem("token");
       const res = await axiosInstance.get(`/thread/user/${profileUser?.id}`, {
-        headers: { token },
+        headers: { 
+          token: token,
+         },
       });
 
       const data = res.data;
@@ -86,15 +77,19 @@ export default function ProfileScreen() {
   const fetchReviews = async () => {
     startLoading();
     try {
+      if(profileUser?.id === undefined) return;
       const token = await AsyncStorage.getItem("token");
       const res = await axiosInstance.get(`/reviews/user/${profileUser?.id}`, {
-        headers: { token },
+        headers: { 
+          token: token,
+         },
       });
 
       const data = res.data;
       if (data.status) {
         setReviews(data.data);
       }
+
     } catch (error) {
       console.error(error);
     } finally {
@@ -105,9 +100,12 @@ export default function ProfileScreen() {
   const fetchBookmarks = async () => {
     startLoading();
     try {
+      if(profileUser?.id === undefined) return;
       const token = await AsyncStorage.getItem("token");
       const res = await axiosInstance.get(`/bookmark/get/${profileUser?.id}`, {
-        headers: { token },
+        headers: { 
+          token: token,
+         },
       });
 
       const data = res.data;
@@ -122,12 +120,15 @@ export default function ProfileScreen() {
   };
 
   useEffect(() => {
-    if (!user?.id) return;
+    fetchUser();
+  }, []);
 
-    fetchReviews();
-    fetchThreads();
-    fetchBookmarks();
-  }, [user]);
+  useEffect(() => {
+    if (!profileUser?.id) return;
+      fetchReviews();
+      fetchThreads();
+      fetchBookmarks();
+  }, [profileUser]);
 
   const CustomHeader = () => (
     <View className="bg-Snow p-4 border-b-2 border-gray-300 relative">
@@ -141,22 +142,27 @@ export default function ProfileScreen() {
       </View>
 
       <View className="items-center mt-6 mb-4">
-        <Image className="w-24 h-24 rounded-full bg-gray-300" />
+        <Image className="w-24 h-24 rounded-full bg-gray-300" 
+        source={
+          profileUser?.image
+          ? { uri: profileUser.image }
+          : defaultImage
+                }/>
 
-        <Text className="text-Heading3 mt-2">{user?.full_name || "User"}</Text>
+        <Text className="text-Heading3 mt-2">{profileUser?.full_name || "User"}</Text>
 
         <View className="flex flex-row justify-between w-1/2 mt-4">
           <View className="items-center">
             <Text className="text-label8 text-OldSilver">followers</Text>
             <Text className="text-label8 text-OldSilver">
-              {user?.follower ?? "-"}
+              {profileUser?.follower ?? "-"}
             </Text>
           </View>
 
           <View className="items-center">
             <Text className="text-label8 text-OldSilver">following</Text>
             <Text className="text-label8 text-OldSilver">
-              {user?.following ?? "-"}
+              {profileUser?.following ?? "-"}
             </Text>
           </View>
         </View>
@@ -257,8 +263,8 @@ export default function ProfileScreen() {
                   numColumns={3}
                   renderItem={({ item }) => (
                     <PostByUser
-                      image={item.community?.image || item.thread?.image}
-                      title={item.community?.title || item.thread?.title}
+                      image={item.image}
+                      title={item.title}
                       user={item.user?.full_name}
                       userAvatar={item.user?.image}
                     />

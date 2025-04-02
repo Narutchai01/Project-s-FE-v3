@@ -3,12 +3,41 @@ import { View, SafeAreaView, Text, TextInput } from "react-native";
 import { BackButtonComponents, ButtonComponents } from "@/components/Buntton";
 import { router } from "expo-router";
 import { ConfirmAlert } from "@/components/Alert";
+import useLoading from "@/hook/useLoading";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { axiosInstance } from "@/lib/axios_instance";
 
 export default function ChangePasswordScreen() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showAlert, setShowAlert] = useState(false);
   const [alertTitle, setAlertTitle] = useState("Change Password Success");
+  const { startLoading, stopLoading, isLoading } = useLoading();
+
+  const handleNewPassword = async (password: string) => {
+    startLoading();
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (!token) throw new Error("No token found");
+
+      const formData = new FormData();
+      formData.append("password", password);
+
+      await axiosInstance.put("/user", formData, {
+        headers: {
+          token,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      setAlertTitle("Change Password Success");
+      setShowAlert(true);
+    } catch (error) {
+      console.error("Error changing password:", error);
+    } finally {
+      stopLoading();
+    }
+  };
 
   const handleChangePassword = () => {
     if (!newPassword || !confirmPassword) {
@@ -22,9 +51,7 @@ export default function ChangePasswordScreen() {
       setShowAlert(true);
       return;
     }
-
-    setAlertTitle("Change Password Success");
-    setShowAlert(true);
+    handleNewPassword(confirmPassword);
   };
 
   return (
@@ -59,13 +86,18 @@ export default function ChangePasswordScreen() {
           onPress={handleChangePassword}
           title="Confirm"
           className="flex flex-row items-center justify-center rounded-full border-2 border-BrightGray p-4 bg-Bittersweet"
-                textSize="text-white text-xl font-bold"
+          textSize="text-white text-xl font-bold"
         />
       </View>
 
       <ConfirmAlert
         visible={showAlert}
-        onClose={() => setShowAlert(false)}
+        onClose={() => {
+          setShowAlert(false);
+          if (alertTitle === "Change Password Success") {
+            router.back();
+          }
+        }}
         title={alertTitle}
         confirm="Done"
       />
