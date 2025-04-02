@@ -477,3 +477,69 @@ export const CardSkincareReccommemded: FC<CardSkincareProps> = (props) => {
     </View>
   );
 };
+
+
+export const PostByUser: FC<ThreadCardProps> = (props) => {
+  const { image, title, user, userAvatar } = props;
+  return (
+    <View className="bg-white rounded-2xl shadow w-[95px] h-[140px] mx-2 mb-2 relative overflow-hidden">
+      <View className="w-[95px] h-[100px] relative overflow-hidden">
+        <Image
+          source={image ? { uri: image } : defaultImage}
+          className="w-full h-full rounded-t-2xl object-cover"
+        />
+      </View>
+
+      <View
+        className="absolute bottom-0 left-0 w-[100px] bg-white"
+        style={{ borderTopLeftRadius: 13 }}
+      >
+        <View
+          style={{
+            position: "absolute",
+            top: -12,
+            right: 0,
+            width: 0,
+            height: 0,
+            backgroundColor: "transparent",
+            borderStyle: "solid",
+            borderLeftWidth: 12,
+            borderRightWidth: 0,
+            borderBottomWidth: 20,
+            borderLeftColor: "transparent",
+            borderRightColor: "transparent",
+            borderBottomColor: "white",
+          }}
+        />
+        <View className="p-1 ml-1 mt-1">
+          <Text
+            className="text-label12 font-medium mb-1 " 
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            style={{ width: 100 }}
+          >
+            {title?.trim() ? title : "No title"}
+          </Text>
+          <View className="flex-row items-center justify-between">
+            <View className="flex-row items-center">
+              <Image
+                source={userAvatar ? { uri: userAvatar } : defaultImage}
+                className="w-5 h-5 rounded-full mr-2"
+              />
+              <Text 
+              className="text-label13 text-gray-600"
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              style={{ width: 35 }}
+              >{user}</Text>
+            </View>
+
+            <TouchableOpacity className="w-7 h-7 bg-White rounded-full flex items-center justify-center">
+              <Heart size={12} color="gray" />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </View>
+  );
+};
