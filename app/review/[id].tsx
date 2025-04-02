@@ -28,6 +28,8 @@ export default function ReviewDetails() {
   const [commentCount, setCommentCount] = useState(0);
   const [isCommentOpen, setIsCommentOpen] = useState(false);
   const [commentContent, setCommentContent] = useState("");
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const [isFollowing, setIsFollowing] = useState(false);
 
   const fetchReview = useCallback( async () => {
     startLoading();
@@ -164,6 +166,42 @@ export default function ReviewDetails() {
     setIsCommentOpen(false);
   };
 
+  useEffect(() => {
+    const fetchUserFromToken = async () => {
+     startLoading();
+     try {
+      const token = await AsyncStorage.getItem("token");
+      const res = await axiosInstance.get("/user/me", {
+        headers: { token },
+      });
+      const data = res.data;
+      if (data.status) {
+        setCurrentUserId(data.data.id);
+        stopLoading();
+      }
+     } catch (error) {
+      console.error(error);
+     } finally {
+      stopLoading();
+     }
+    };
+  
+    fetchUserFromToken();
+  }, []);
+
+  const handleFollowStatusChange = (status: boolean) => {
+    if (review) {
+      setReview({
+        ...review,
+        user: {
+          ...review.user,
+          follow: status,
+        },
+      });
+      setIsFollowing(status);
+    }
+  };
+
   return (
     <SafeAreaProvider style={{ backgroundColor: "#fff" }}>
       <Stack.Screen
@@ -190,6 +228,10 @@ export default function ReviewDetails() {
             <UserBar
               userImage={review?.user?.image}
               username={review?.user?.full_name}
+              userId={review?.user?.id} 
+              currentUserId={currentUserId} 
+              isFollowed={isFollowing}
+              onFollowStatusChange={handleFollowStatusChange}
             />
 
             <View style={{ padding: 10 }}>

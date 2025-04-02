@@ -395,7 +395,11 @@ export const CommentCard: FC<ICommentCardProps> = (props) => {
       </View>
       <View className="flex justify-center items-center">
         <TouchableOpacity onPress={handleFavoriteComment}>
-          <Heart size={24} color={favorite ? "red" : "gray"} />
+        <Heart
+                size={24}
+                color={favorite ? "#FF6F61" : "#4A4A4A"}
+                fill={favorite ? "#FF6F61" : "none"}
+              />
         </TouchableOpacity>
         <Text>{count_favorite > 0 ? count_favorite : ""}</Text>
       </View>
