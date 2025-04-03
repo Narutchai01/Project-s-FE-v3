@@ -48,6 +48,7 @@ export default function RootLayout() {
               <Stack.Screen name="forgetPassword" />
               <Stack.Screen name="checkEmail" />
               <Stack.Screen name="recoverPassword" />
+              <Stack.Screen name="profile/[id]" />
             </Stack>
           </ReviewProvider>
         </CompareProvider>

@@ -8,6 +8,7 @@ import { ButtonComponents } from "./Buntton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
 import useLoading from "@/hook/useLoading";
+import { router, useLocalSearchParams } from "expo-router";
 
 interface IActivityBar {
   favorite: boolean | undefined;
@@ -106,9 +107,18 @@ interface UserBarProps {
 }
 
 export const UserBar: FC<UserBarProps> = (props) => {
+  const { id } = useLocalSearchParams();
   const { isLoading, startLoading, stopLoading } = useLoading();
-  const { userImage, username, currentUserId, userId, onFollowStatusChange,threadId, reviewId } =
-    props;
+  const [isOtherProfileOpen, setIsOtherProfileOpen] = useState(false);
+  const {
+    userImage,
+    username,
+    currentUserId,
+    userId,
+    onFollowStatusChange,
+    threadId,
+    reviewId,
+  } = props;
   const [isFollowing, setIsFollowing] = useState<boolean>(
     props.isFollowed || false
   );
@@ -150,38 +160,47 @@ export const UserBar: FC<UserBarProps> = (props) => {
   };
 
   return (
-    <View className="flex flex-row justify-between items-center px-3 py-2 ml-2">
-      <View className="flex flex-row items-center gap-x-2 ">
-        <Image
-          source={{ uri: userImage }}
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
+    <>
+      <View className="flex flex-row justify-between items-center px-3 py-2 ml-2">
+        <TouchableOpacity
+          className="flex flex-row items-center gap-x-2"
+          onPress={() => {
+            if (!isOwner && typeof userId === "number") {
+              router.push(`/profile/${userId}`);
+            }
           }}
-        />
-        <Text>{username}</Text>
-      </View>
+        >
+          <Image
+            source={{ uri: userImage }}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+            }}
+          />
+          <Text>{username}</Text>
+        </TouchableOpacity>
 
-      <View>
-        {isOwner ? (
-          <ThreeDotMenu threadId={threadId} reviewId={reviewId}/>
-        ) : (
-          <TouchableOpacity
-            onPress={handleFollow}
-            disabled={isFollowing || isLoading}
-          >
-            <ButtonComponents
+        <View>
+          {isOwner ? (
+            <ThreeDotMenu threadId={threadId} reviewId={reviewId} />
+          ) : (
+            <TouchableOpacity
               onPress={handleFollow}
-              title={isFollowing ? "following" : "follow"}
-              className={`px-3 py-1 rounded-full ${
-                isFollowing ? "bg-Bittersweet" : "bg-Bittersweet"
-              }`}
-              textSize="text-l font-semibold text-white"
-            />
-          </TouchableOpacity>
-        )}
+              disabled={isFollowing || isLoading}
+            >
+              <ButtonComponents
+                onPress={handleFollow}
+                title={isFollowing ? "following" : "follow"}
+                className={`px-3 py-1 rounded-full ${
+                  isFollowing ? "bg-Bittersweet" : "bg-Bittersweet"
+                }`}
+                textSize="text-l font-semibold text-white"
+              />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
-    </View>
+    </>
   );
 };

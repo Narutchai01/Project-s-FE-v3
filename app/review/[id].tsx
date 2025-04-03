@@ -35,7 +35,6 @@ export default function ReviewDetails() {
       });
 
       const data = res.data;
-      console.log("Review data:", data);
       if (data.status) {
         setReview(data.data);
         setIsFollowing(data.data.user.follow);
