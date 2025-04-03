@@ -79,10 +79,10 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
           </View>
         </View>
       </View>
-      <View>
+      <View className="mr-8 ">
         <ImagePagination data={dataPaginate} currImage={currImage} />
       </View>
-      <View className="px-10">
+      <View className="px-2">
         <TouchableOpacity onPress={handleBookmark}>
           <Bookmark
             size={24}

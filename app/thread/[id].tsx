@@ -27,6 +27,21 @@ export default function ThreadDetails() {
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
 
+    const fetchUserFollowStatus = async (userId: number) => {
+      try {
+        const token = await AsyncStorage.getItem("token");
+        const res = await axiosInstance.get(`/user/${userId}`, {
+          headers: { token },
+        });
+    
+        if (res.data.status) {
+          setIsFollowing(res.data.data.follow);
+        }
+      } catch (error) {
+        console.error("Error fetching user follow status:", error);
+      }
+    };
+
   const fecThread = useCallback(async () => {
     startLoading();
     try {
@@ -40,7 +55,7 @@ export default function ThreadDetails() {
       const data = res.data;
       if (data.status) {
         setThread(data.data);
-        setIsFollowing(data.data.user?.follow || false);
+        fetchUserFollowStatus(data.data.user.id);
         stopLoading();
       }
     } catch (error) {
@@ -58,7 +73,7 @@ export default function ThreadDetails() {
   const handleFavorite = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      const res = await axiosInstance.post(`/favorite/thread/${id}`, null, {
+      await axiosInstance.post(`/favorite/thread/${id}`, null, {
         headers: {
           token: token,
         },

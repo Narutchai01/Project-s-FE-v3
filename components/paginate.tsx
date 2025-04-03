@@ -76,9 +76,9 @@ export const ImagePagination: FC<ImagePaginationProps> = (props) => {
 
   const getDotSize = (index: number): number => {
     const distance = Math.abs(index - currImage);
-    if (distance === 0) return 34;
-    if (distance === 1) return 24;
-    if (distance === 2) return 20;
+    if (distance === 0) return 36;
+    if (distance === 1) return 30;
+    if (distance === 2) return 24;
     if (distance === 3) return 15;
     return 10;
   };
@@ -109,7 +109,7 @@ export const ImagePagination: FC<ImagePaginationProps> = (props) => {
               key={index.toString()}
               style={{
                 transform: [{ scale }],
-                marginHorizontal: -6,
+                marginHorizontal: -7,
                 minWidth: 0,
               }}
             >

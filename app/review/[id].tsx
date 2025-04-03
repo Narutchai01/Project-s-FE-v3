@@ -26,6 +26,22 @@ export default function ReviewDetails() {
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
 
+  const fetchUserFollowStatus = async (userId: number) => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const res = await axiosInstance.get(`/user/${userId}`, {
+        headers: { token },
+      });
+  
+      if (res.data.status) {
+        setIsFollowing(res.data.data.follow);
+      }
+    } catch (error) {
+      console.error("Error fetching user follow status:", error);
+    }
+  };
+  
+
   const fetchReview = useCallback(async () => {
     startLoading();
     try {
@@ -33,11 +49,11 @@ export default function ReviewDetails() {
       const res = await axiosInstance.get(`/reviews/${id}`, {
         headers: { token },
       });
-
+      
       const data = res.data;
       if (data.status) {
         setReview(data.data);
-        setIsFollowing(data.data.user.follow);
+        fetchUserFollowStatus(data.data.user.id);
         stopLoading();
       }
     } catch (error) {
