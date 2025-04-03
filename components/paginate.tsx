@@ -8,15 +8,21 @@ export const ImagePagination: FC<ImagePaginationProps> = (props) => {
 
   return (
     <View
-      style={{ flexDirection: "row", justifyContent: "center", marginTop: 10 }}
+    style={{
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+      gap: 8, 
+      marginTop: 10 }}
     >
       <FlatList
         data={data}
         horizontal
         renderItem={({ index }) => (
           <Dot
-            size={30}
+            size={24}
             color={index === currImage ? "red" : "gray"}
+            style={{ marginHorizontal: 3 }}
           />
         )}
         keyExtractor={(item, index) => index.toString()}

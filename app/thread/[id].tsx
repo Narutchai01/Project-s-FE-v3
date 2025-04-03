@@ -82,10 +82,9 @@ export default function ThreadDetails() {
 
       const data = res.data;
       if (data.status) {
-        setComment(data.data);
-        setCommentCount(data.data.length);
+        setComment(data.data ?? []); 
+        setCommentCount(data.data?.length ?? 0);
       }
-      fetchComments();
     } catch (error: any) {
       console.log(error);
     }
@@ -330,7 +329,7 @@ export default function ThreadDetails() {
 
       <ModalComment
         isCommentClose={closeComment}
-        comments={comment}
+        comments={comment || []}
         isCommentOpen={isCommentOpen}
         handleFavoriteComment={handleFavoriteComment}
         handleComment={handleComment}

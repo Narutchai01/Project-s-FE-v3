@@ -10,6 +10,9 @@ import {
   SafeAreaView,
   ActivityIndicator,
   Dimensions,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Platform,
 } from "react-native";
 import { RadioComponents } from "./Radio";
 import { BackButtonComponents, ButtonComponents } from "./Buntton";
@@ -464,48 +467,67 @@ export const ModalComment: React.FC<IModalComment> = ({
       transparent={true}
       onRequestClose={isCommentClose}
     >
-      <View className="bg-white h-full rounded-t-3xl container mx-auto px-4 py-10">
-        <View className="flex gap-y-4">
-          <TouchableOpacity onPress={isCommentClose}>
-            <View className="bg-Quartz h-1 container mx-auto w-2/12 rounded-lg"></View>
-          </TouchableOpacity>
-          <Text className="text-center text-2xl font-bold mb-4">Comments</Text>
-        </View>
+      <TouchableWithoutFeedback onPress={isCommentClose}>
+        <View className="flex-1  bg-black/30 justify-end">
+          <TouchableWithoutFeedback onPress={() => {}}>
+            <KeyboardAvoidingView
+              behavior={Platform.OS === "ios" ? "padding" : "height"}
+              style={{
+                height: "75%",
+                backgroundColor: "white",
+                borderTopLeftRadius: 24,
+                borderTopRightRadius: 24,
+              }}
+            >
+              <View className="px-4 py-6 h-full">
+                <TouchableOpacity onPress={isCommentClose}>
+                  <View className="bg-Quartz h-1 w-1/5 self-center rounded-lg mb-4"></View>
+                </TouchableOpacity>
 
-        <FlatList
-          data={comments}
-          numColumns={1}
-          contentContainerStyle={{ gap: 25 }}
-          renderItem={({ item }) => (
-            <CommentCard
-              id={item.id}
-              image={item?.user?.image}
-              username={item?.user?.full_name}
-              content={item?.content}
-              count_favorite={item.favorite_count}
-              favorite={item.favorite}
-              handleFavoriteComment={() => handleFavoriteComment(item.id)}
-            />
-          )}
-        />
+                <Text className="text-center text-2xl font-bold mb-4">
+                  Comments
+                </Text>
 
-        <View className="flex flex-row justify-center container mx-auto px-8 gap-x-2 items-center py-2">
-          <TextInput
-            className="border-Quartz border-2 w-full rounded-full py-4 px-4 mx-1"
-            placeholder="Share your thoughts..."
-            value={commentContent}
-            onChangeText={setComment}
-          />
-          <TouchableOpacity
-            onPress={() => {
-              handleComment();
-              setComment("");
-            }}
-          >
-            <CircleArrowUp size={34} color="#4A4A4A" />
-          </TouchableOpacity>
+                <FlatList
+                  data={comments ?? []}
+                  numColumns={1}
+                  contentContainerStyle={{ gap: 25 }}
+                  renderItem={({ item }) => (
+                    <CommentCard
+                      id={item.id}
+                      image={item?.user?.image}
+                      username={item?.user?.full_name}
+                      content={item?.content}
+                      count_favorite={item.favorite_count}
+                      favorite={item.favorite}
+                      handleFavoriteComment={() =>
+                        handleFavoriteComment(item.id)
+                      }
+                    />
+                  )}
+                />
+
+                <View className="flex flex-row justify-center container mx-auto px-8 gap-x-2 items-center py-2">
+                  <TextInput
+                    className="border-Quartz border-2 w-full rounded-full py-4 px-4 mx-1"
+                    placeholder="Share your thoughts..."
+                    value={commentContent}
+                    onChangeText={setComment}
+                  />
+                  <TouchableOpacity
+                    onPress={() => {
+                      handleComment();
+                      setComment("");
+                    }}
+                  >
+                    <CircleArrowUp size={34} color="#4A4A4A" />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </KeyboardAvoidingView>
+          </TouchableWithoutFeedback>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 };
