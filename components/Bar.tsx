@@ -101,11 +101,13 @@ interface UserBarProps {
   currentUserId: number | null;
   isFollowed?: boolean;
   onFollowStatusChange?: (isFollowing: boolean) => void;
+  threadId?: number;
+  reviewId?: number;
 }
 
 export const UserBar: FC<UserBarProps> = (props) => {
   const { isLoading, startLoading, stopLoading } = useLoading();
-  const { userImage, username, currentUserId, userId, onFollowStatusChange } =
+  const { userImage, username, currentUserId, userId, onFollowStatusChange,threadId, reviewId } =
     props;
   const [isFollowing, setIsFollowing] = useState<boolean>(
     props.isFollowed || false
@@ -163,7 +165,7 @@ export const UserBar: FC<UserBarProps> = (props) => {
 
       <View>
         {isOwner ? (
-          <ThreeDotMenu />
+          <ThreeDotMenu threadId={threadId} reviewId={reviewId}/>
         ) : (
           <TouchableOpacity
             onPress={handleFollow}

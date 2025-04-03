@@ -1,9 +1,4 @@
-import {
-  View,
-  Text,
-  FlatList,
-  Dimensions,
-} from "react-native";
+import { View, Text, FlatList, Dimensions } from "react-native";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router, Stack, useLocalSearchParams } from "expo-router";
@@ -31,7 +26,7 @@ export default function ReviewDetails() {
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
 
-  const fetchReview = useCallback( async () => {
+  const fetchReview = useCallback(async () => {
     startLoading();
     try {
       const token = await AsyncStorage.getItem("token");
@@ -51,7 +46,7 @@ export default function ReviewDetails() {
     } finally {
       stopLoading();
     }
-  },[id, startLoading, stopLoading])
+  }, [id, startLoading, stopLoading]);
 
   useEffect(() => {
     fetchReview();
@@ -67,9 +62,9 @@ export default function ReviewDetails() {
     try {
       const token = await AsyncStorage.getItem("token");
       const res = await axiosInstance.get(`/comment/reviews/skincare/${id}`, {
-        headers: { 
+        headers: {
           token: token,
-         },
+        },
       });
 
       const data = res.data;
@@ -86,13 +81,17 @@ export default function ReviewDetails() {
   const handleFavorite = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      const res = await axiosInstance.post(`/favorite/review/skincare/${id}`, null, {
-        headers: { 
-          token: token,
-        },
-      });
+      const res = await axiosInstance.post(
+        `/favorite/review/skincare/${id}`,
+        null,
+        {
+          headers: {
+            token: token,
+          },
+        }
+      );
 
-      console.log(res)
+      console.log(res);
       fetchReview();
     } catch (error: any) {
       console.log(error.response.data);
@@ -141,10 +140,9 @@ export default function ReviewDetails() {
     }
   };
 
-    useEffect(() => {
-      fetchComments();
-    }, [comment]);
-  
+  useEffect(() => {
+    fetchComments();
+  }, [comment]);
 
   const handleBookmark = async () => {
     try {
@@ -170,31 +168,30 @@ export default function ReviewDetails() {
 
   useEffect(() => {
     const fetchUserFromToken = async () => {
-     startLoading();
-     try {
-      const token = await AsyncStorage.getItem("token");
-      const res = await axiosInstance.get("/user/me", {
-        headers: { token },
-      });
-      const data = res.data;
-      if (data.status) {
-        setCurrentUserId(data.data.id);
+      startLoading();
+      try {
+        const token = await AsyncStorage.getItem("token");
+        const res = await axiosInstance.get("/user/me", {
+          headers: { token },
+        });
+        const data = res.data;
+        if (data.status) {
+          setCurrentUserId(data.data.id);
+          stopLoading();
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
         stopLoading();
       }
-     } catch (error) {
-      console.error(error);
-     } finally {
-      stopLoading();
-     }
     };
-  
+
     fetchUserFromToken();
   }, []);
 
   const handleFollowStatusChange = (status: boolean) => {
     fetchReview();
   };
-  
 
   return (
     <SafeAreaProvider style={{ backgroundColor: "#fff" }}>
@@ -219,14 +216,17 @@ export default function ReviewDetails() {
           <LoadingIndicator />
         ) : (
           <View>
-            <UserBar
-              userImage={review?.user?.image}
-              username={review?.user?.full_name}
-              userId={review?.user?.id} 
-              currentUserId={currentUserId} 
-              isFollowed={isFollowing}
-              onFollowStatusChange={handleFollowStatusChange}
-            />
+            {review && (
+              <UserBar
+                userImage={review?.user?.image}
+                username={review?.user?.full_name}
+                userId={review?.user?.id}
+                currentUserId={currentUserId}
+                isFollowed={isFollowing}
+                onFollowStatusChange={handleFollowStatusChange}
+                reviewId={review?.id}
+              />
+            )}
 
             <View style={{ padding: 10 }}>
               {imagesList.length > 0 && (

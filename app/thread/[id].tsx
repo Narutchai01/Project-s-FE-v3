@@ -197,7 +197,6 @@ export default function ThreadDetails() {
       setIsFollowing(status);
     }
   };
-  
 
   return (
     <SafeAreaProvider style={{ backgroundColor: "#fff" }}>
@@ -222,14 +221,18 @@ export default function ThreadDetails() {
           <LoadingIndicator />
         ) : (
           <View>
-            <UserBar
-              userImage={thread?.user?.image}
-              username={thread?.user?.full_name}
-              userId={thread?.user?.id}
+            {thread && (
+              <UserBar
+              userImage={thread.user.image}
+              username={thread.user.full_name}
+              userId={thread.user.id}
               currentUserId={currentUserId}
               isFollowed={isFollowing}
               onFollowStatusChange={handleFollowStatusChange}
+              threadId={thread.id}
             />
+            
+            )}
 
             <View style={{ padding: 10 }}>
               {thread?.images && thread?.images.length > 0 && (

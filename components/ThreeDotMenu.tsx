@@ -3,23 +3,65 @@ import { View, TouchableOpacity, Modal, Text } from "react-native";
 import { Ellipsis, PencilLine, Trash2 } from "lucide-react-native";
 import { LogoutConfirmAlert } from "./Alert";
 import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { axiosInstance } from "@/lib/axios_instance";
 
-export const ThreeDotMenu = () => {
+interface ThreeDotMenuProps {
+  threadId?: number;
+  reviewId?: number;
+}
+
+export const ThreeDotMenu: React.FC<ThreeDotMenuProps> = (props) => {
+  const { threadId, reviewId } = props;
   const [modalVisible, setModalVisible] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
-  
+
   const handleEdit = () => {
     setModalVisible(false);
   };
 
   const handleDelete = () => {
     setModalVisible(false);
-    setShowAlert(true);  
+    setShowAlert(true);
   };
-  
-  const handleDeleteConfirm = () => {
-    setShowAlert(false);
-    router.back();       
+
+  const handleDeleteThread = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      await axiosInstance.delete(`/thread/${threadId}`, {
+        headers: {
+          token,
+        },
+      });
+
+      setShowAlert(false);
+      router.back();
+    } catch (error: any) {
+      console.error(error.response.data.message);
+    } finally {
+      setModalVisible(false);
+      setShowAlert(false);
+    }
+  };
+
+  const handleDeleteReview = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      console.log("Deleting review with ID:", reviewId);
+      await axiosInstance.delete(`/reviews/${reviewId}`, {
+        headers: {
+          token,
+        },
+      });
+
+      setShowAlert(false);
+      router.back();
+    } catch (error: any) {
+      console.error(error.response.data.message);
+    } finally {
+      setModalVisible(false);
+      setShowAlert(false);
+    }
   };
 
   return (
@@ -52,7 +94,7 @@ export const ThreeDotMenu = () => {
                 borderBottomColor: "white",
                 marginRight: 4,
                 marginBottom: -4,
-                transform: [{ rotate: '20deg' }],
+                transform: [{ rotate: "20deg" }],
               }}
             />
             <View className="bg-white rounded-2xl py-2 w-40 ">
@@ -77,13 +119,13 @@ export const ThreeDotMenu = () => {
         </TouchableOpacity>
       </Modal>
 
-      <LogoutConfirmAlert 
-      visible={showAlert}
-      onClose={() => setShowAlert(false)}
-      onConfirm={handleDeleteConfirm}
-      title="Confirm Delete ?"
-      confirm="Delete"
-      cancel="Cancel"
+      <LogoutConfirmAlert
+        visible={showAlert}
+        onClose={() => setShowAlert(false)}
+        onConfirm={threadId ? handleDeleteThread : handleDeleteReview}
+        title="Confirm Delete ?"
+        confirm="Delete"
+        cancel="Cancel"
       />
     </View>
   );
