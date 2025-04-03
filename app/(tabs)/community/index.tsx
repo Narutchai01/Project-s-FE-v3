@@ -127,7 +127,7 @@ export default function CommonScreen() {
           <View className="flex items-center relative -mb-2">
             <CopyPlus size={30} />
             {!isMode && (
-              <View className="absolute bottom-[-8px] w-full border-b-2 border-black" />
+              <View className="absolute bottom-[-9px] w-full border-b-2 border-black" />
             )}
           </View>
         </TouchableOpacity>
@@ -136,7 +136,7 @@ export default function CommonScreen() {
           <View className="flex items-center relative -mb-2">
             <MessageCircleQuestion size={30} />
             {isMode && (
-              <View className="absolute bottom-[-8px] w-full border-b-2 border-black" />
+              <View className="absolute bottom-[-9px] w-full border-b-2 border-black" />
             )}
           </View>
         </TouchableOpacity>
@@ -153,7 +153,7 @@ export default function CommonScreen() {
         }}
       />
        <SafeAreaView className="flex-1 bg-Snow p-4">
-        <View className="flex justify-center items-center mt-2">
+        <View className="flex justify-center mt-2">
           {isMode ? (
             isLoading && !threads ? (
               <LoadingIndicator />
@@ -169,7 +169,7 @@ export default function CommonScreen() {
                 columnWrapperStyle={{
                   justifyContent: 'space-between',
                   columnGap: 6,
-                  paddingHorizontal: 0,
+                  paddingHorizontal: 4,
                 }}
                 onRefresh={fetchThread}
                 refreshing={isLoading}
@@ -201,7 +201,7 @@ export default function CommonScreen() {
               columnWrapperStyle={{
                 justifyContent: 'space-between',
                 columnGap: 6,
-                paddingHorizontal: 0,
+                paddingHorizontal: 4,
               }}
               
               onRefresh={fetchReview}

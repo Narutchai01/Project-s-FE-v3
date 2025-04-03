@@ -160,11 +160,10 @@ export default function ReviewDetails() {
   const handleBookmark = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      const res = await axiosInstance.post(`/bookmark/review/${id}`, null, {
+      await axiosInstance.post(`/bookmark/review/${id}`, null, {
         headers: { token },
       });
 
-      console.log(res);
       fetchReview();
     } catch (error: any) {
       console.log(error.response.data);
@@ -242,7 +241,7 @@ export default function ReviewDetails() {
             )}
 
             <View style={{ padding: 10 }}>
-              {imagesList.length > 0 && (
+              {imagesList.length > 1 && (
                 <View
                   style={{
                     position: "absolute",
@@ -311,7 +310,7 @@ export default function ReviewDetails() {
               currImage={currImage}
               bookmark={review?.bookmark}
             />
-            <View className="container mx-auto px-6">
+            <View className="container mx-auto px-6 mt-2">
               <Text style={{ fontSize: width * 0.05, fontWeight: "bold" }}>
                 {review?.title ? review?.title : "No title"}
               </Text>

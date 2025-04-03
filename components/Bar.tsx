@@ -27,7 +27,7 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
     favorite,
     favoriteCount,
     commnetCount,
-    dataPaginate = [], 
+    dataPaginate = [],
     currImage,
     bookmark,
     hadleFavorite,
@@ -36,26 +36,22 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
   } = props;
 
   return (
-    <View
-      style={{
-        alignItems: "center",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        padding: 10,
-        marginLeft: 10,
-        marginTop: -15,
-        marginBottom: -10,
-      }}
-    >
-      <View>
+    <View style={{ paddingHorizontal: 18, marginTop: 1 }}>
+      {dataPaginate.length > 1 && (
+        <View style={{ alignItems: "center", marginBottom: 1 }}>
+          <ImagePagination data={dataPaginate} currImage={currImage} />
+        </View>
+      )}
+
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
         <View style={{ flexDirection: "row", gap: 16 }}>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
             <TouchableOpacity onPress={hadleFavorite}>
               <Heart
                 size={24}
@@ -63,26 +59,17 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
                 fill={favorite ? "#FF6F61" : "none"}
               />
             </TouchableOpacity>
-            <Text style={{ fontSize: 20 }}>{favoriteCount}</Text>
+            <Text style={{ fontSize: 16 }}>{favoriteCount ?? 0}</Text>
           </View>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
+
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
             <TouchableOpacity onPress={isOpenComment}>
               <MessageCircle size={24} color="#4A4A4A" />
             </TouchableOpacity>
-            <Text style={{ fontSize: 20 }}>{commnetCount}</Text>
+            <Text style={{ fontSize: 16 }}>{commnetCount}</Text>
           </View>
         </View>
-      </View>
-      <View className="mr-8 ">
-        <ImagePagination data={dataPaginate} currImage={currImage} />
-      </View>
-      <View className="px-2">
+
         <TouchableOpacity onPress={handleBookmark}>
           <Bookmark
             size={24}

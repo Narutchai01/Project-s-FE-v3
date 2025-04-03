@@ -93,8 +93,7 @@ export const ImagePagination: FC<ImagePaginationProps> = (props) => {
         flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
-        marginTop: 10,
-        height: 24,
+        height: 20,
       }}
     >
       <View style={{ flexDirection: "row", alignItems: "center" }}>

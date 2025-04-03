@@ -206,7 +206,7 @@ export default function ProfileScreen() {
           <View className="flex items-center relative">
             <CopyPlus size={30} />
             {mode === "reviews" && (
-              <View className="absolute bottom-[-15px] w-full border-b-2 border-black" />
+              <View className="absolute bottom-[-16px] w-full border-b-2 border-black" />
             )}
           </View>
         </TouchableOpacity>
@@ -215,7 +215,7 @@ export default function ProfileScreen() {
           <View className="flex items-center relative">
             <MessageCircleQuestion size={30} />
             {mode === "threads" && (
-              <View className="absolute bottom-[-15px] w-full border-b-2 border-black" />
+              <View className="absolute bottom-[-16px] w-full border-b-2 border-black" />
             )}
           </View>
         </TouchableOpacity>
@@ -224,7 +224,7 @@ export default function ProfileScreen() {
           <View className="flex items-center relative">
             <Bookmark size={30} />
             {mode === "bookmark" && (
-              <View className="absolute bottom-[-15px] w-full border-b-2 border-black" />
+              <View className="absolute bottom-[-16px] w-full border-b-2 border-black" />
             )}
           </View>
         </TouchableOpacity>

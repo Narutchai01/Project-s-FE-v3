@@ -37,8 +37,11 @@ export const ThreeDotMenu: React.FC<ThreeDotMenuProps> = (props) => {
       setShowAlert(false);
       router.back();
     } catch (error: any) {
-      console.error(error.response.data.message);
-    } finally {
+      const message =
+        error?.response?.data?.message || "Something went wrong.";
+      console.error(message);
+    }
+     finally {
       setModalVisible(false);
       setShowAlert(false);
     }
@@ -47,7 +50,6 @@ export const ThreeDotMenu: React.FC<ThreeDotMenuProps> = (props) => {
   const handleDeleteReview = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      console.log("Deleting review with ID:", reviewId);
       await axiosInstance.delete(`/reviews/${reviewId}`, {
         headers: {
           token,
@@ -57,8 +59,11 @@ export const ThreeDotMenu: React.FC<ThreeDotMenuProps> = (props) => {
       setShowAlert(false);
       router.back();
     } catch (error: any) {
-      console.error(error.response.data.message);
-    } finally {
+      const message =
+        error?.response?.data?.message || "Something went wrong.";
+      console.error(message);
+    }
+    finally {
       setModalVisible(false);
       setShowAlert(false);
     }

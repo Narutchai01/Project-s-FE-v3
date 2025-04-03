@@ -1,4 +1,4 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import {
   Modal,
   Text,
@@ -36,6 +36,7 @@ import { CircleArrowUp } from "lucide-react-native";
 import { Search } from "@/components/Search";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
+import { ConfirmAlert } from "./Alert";
 
 interface PropsModalSensitiveSkin {
   isOpen: boolean;
@@ -73,6 +74,7 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
   const router = useRouter();
   const { isOpen, onClose, isMode } = props;
   const { isLoading, startLoading, stopLoading } = useLoading();
+  const [isAlertVisible, setIsAlertVisible] = useState(false);
   const [image, setImage] = useState<string[] | null>(null);
   const [thread, setThread] = useState({
     title: "",
@@ -118,6 +120,11 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
   };
 
   const handleCreateThread = async () => {
+    if (!thread.title || !thread.caption || !image) {
+      setIsAlertVisible(true);
+      return;
+    }
+
     startLoading();
     try {
       const token = await AsyncStorage.getItem("token");
@@ -158,6 +165,7 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
   };
 
   return (
+    <>
     <Modal visible={isOpen && isMode} animationType="slide">
       {isLoading ? (
         <LoadingIndicator />
@@ -294,6 +302,14 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
         </SafeAreaView>
       )}
     </Modal>
+
+    <ConfirmAlert
+        visible={isAlertVisible}
+        onClose={() => setIsAlertVisible(false)}
+        title="Please complete all fields before submitting."
+        confirm="OK"
+      />
+    </>
   );
 };
 
@@ -311,17 +327,21 @@ export const ModalSkincare: FC<IModalSkincare> = (props) => {
   const { skincares } = useCompare();
   const { isLoading } = useLoading();
   const [searchQuery, setSearchQuery] = useState("");
+  const [isAlertVisible, setIsAlertVisible] = useState(false);
+  const [selectSkincare, setSelectSkincare] = useState<ISkincare[]>([]);
+
 
   const filteredSkincares = skincares?.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const handleSelectItem = (item: ISkincare) => {
-    if (
-      skincare.some((selected) => selected.id === item.id) ||
-      skincare.length >= 10
-    ) {
+    const isSelected = skincare.some((selected) => selected.id === item.id);
+
+    if (isSelected) {
       setSkincare((prev) => prev.filter((prevItem) => prevItem.id !== item.id));
+    } else if (skincare.length >= 10) {
+      setIsAlertVisible(true);
     } else {
       setSkincare((prev) => [...prev, item]);
     }
@@ -332,57 +352,81 @@ export const ModalSkincare: FC<IModalSkincare> = (props) => {
   };
 
   const handleCancel = () => {
-    setSkincare([]);
+    setSkincare(selectSkincare); 
     onClose();
   };
+  
+
+  useEffect(() => {
+    if (isOpen) {
+      setSelectSkincare(skincare); 
+    }
+  }, [isOpen]);
+  
 
   return (
-    <Modal visible={isOpen} animationType="slide" onRequestClose={handleCancel}>
-      <SafeAreaView className="bg-Snow p-4 flex-1">
-        <View className="flex flex-row items-center justify-between">
-          <ButtonComponents
-            title="Cancel"
-            textSize="text-label4 font-semibold text-Bittersweet"
-            onPress={handleCancel}
-          />
+    <>
+      <Modal
+        visible={isOpen}
+        animationType="slide"
+        onRequestClose={handleCancel}
+      >
+        <SafeAreaView className="bg-Snow p-4 flex-1">
           <View className="flex flex-row items-center justify-between">
-            <Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
             <ButtonComponents
-              title="Confirm"
-              className="bg-Bittersweet px-2 rounded-full h-8 flex items-center justify-center"
-              textSize="text-label4 text-white font-semibold"
-              onPress={handleConfirm}
+              title="Cancel"
+              textSize="text-label4 font-semibold text-Bittersweet"
+              onPress={handleCancel}
             />
-          </View>
-        </View>
-
-        <View className="flex items-center mb-4 mt-4">
-          <Text className="text-Heading3 font-semibold text-center">
-            Select skincares to review ({skincare?.length}/10)
-          </Text>
-        </View>
-
-        {isLoading ? (
-          <Loading />
-        ) : filteredSkincares.length > 0 ? (
-          <FlatList
-            data={filteredSkincares}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <ReviewCard
-                data={item}
-                selectArray={skincare}
-                setItem={() => handleSelectItem(item)}
+            <View className="flex flex-row items-center justify-between">
+              <Search
+                searchQuery={searchQuery}
+                setSearchQuery={setSearchQuery}
               />
-            )}
-          />
-        ) : (
-          <View className="flex items-center justify-center h-40">
-            <Text className="text-label8">No results found</Text>
+              <ButtonComponents
+                title="Confirm"
+                className="bg-Bittersweet px-2 rounded-full h-8 flex items-center justify-center"
+                textSize="text-label4 text-white font-semibold"
+                onPress={handleConfirm}
+              />
+            </View>
           </View>
-        )}
-      </SafeAreaView>
-    </Modal>
+
+          <View className="flex items-center mb-4 mt-4">
+            <Text className="text-Heading3 font-semibold text-center">
+              Select skincares to review ({skincare?.length}/10)
+            </Text>
+          </View>
+
+          {isLoading ? (
+            <Loading />
+          ) : filteredSkincares.length > 0 ? (
+            <FlatList
+              data={filteredSkincares}
+              keyExtractor={(item) => item.id.toString()}
+              renderItem={({ item }) => (
+                <ReviewCard
+                  data={item}
+                  selectArray={skincare}
+                  setItem={() => handleSelectItem(item)}
+                />
+              )}
+            />
+          ) : (
+            <View className="flex items-center justify-center h-40">
+              <Text className="text-label8">No results found</Text>
+            </View>
+          )}
+        </SafeAreaView>
+      </Modal>
+
+      <ConfirmAlert
+        visible={isAlertVisible}
+        onClose={() => setIsAlertVisible(false)}
+        title="You can only select up to 10 items."
+        confirm="OK"
+      />
+    </>
   );
 };
 
@@ -545,6 +589,7 @@ export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (
   const { isOpen, onClose, isMode } = props;
   const { isLoading, startLoading, stopLoading } = useLoading();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAlertVisible, setIsAlertVisible] = useState(false);
   const [skincare, setSkincare] = useState<ISkincare[]>([]);
   const [image, setImage] = useState<string | null>(null);
   const [review, setReview] = useState({
@@ -577,12 +622,15 @@ export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (
 
     if (!result.canceled && result.assets && result.assets[0].uri) {
       setImage(result.assets[0].uri);
-    } else {
-      alert("You did not select any image.");
     }
   };
 
   const handlePostReview = async () => {
+    if (!review.title || !review.content || skincare.length === 0 || !image) {
+      setIsAlertVisible(true);
+      return;
+    }
+
     startLoading();
     try {
       const token = await AsyncStorage.getItem("token");
@@ -625,130 +673,139 @@ export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (
   };
 
   return (
-    <Modal visible={!isMode && isOpen} animationType="slide">
-      {isLoading ? (
-        <LoadingIndicator />
-      ) : (
-        <SafeAreaView className="flex-1 bg-Snow p-6">
-          <ScrollView>
-            <BackButtonComponents
-              title="New Review"
-              textSize="text-Heading3 text-Quartz"
-              onPress={handleCancel}
-            />
+    <>
+      <Modal visible={!isMode && isOpen} animationType="slide">
+        {isLoading ? (
+          <LoadingIndicator />
+        ) : (
+          <SafeAreaView className="flex-1 bg-Snow p-6">
+            <ScrollView>
+              <BackButtonComponents
+                title="New Review"
+                textSize="text-Heading3 text-Quartz"
+                onPress={handleCancel}
+              />
 
-            <View className="mb-4">
-              <Text className="text-Heading4">Thumbnail</Text>
-            </View>
+              <View className="mb-4">
+                <Text className="text-Heading4">Thumbnail</Text>
+              </View>
 
-            <View className="mb-6 flex items-center justify-center">
-              <TouchableOpacity
-                onPress={pickImageAsync}
-                style={{
-                  height: 300,
-                  width: 200,
-                  borderRadius: 10,
-                  backgroundColor: "#FCECEC",
-                  borderColor: "#FF6F61",
-                  borderWidth: 2,
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                {image ? (
-                  <Image
-                    source={{ uri: image }}
-                    style={{ width: 200, height: 300, borderRadius: 10 }}
+              <View className="mb-6 flex items-center justify-center">
+                <TouchableOpacity
+                  onPress={pickImageAsync}
+                  style={{
+                    height: 300,
+                    width: 200,
+                    borderRadius: 10,
+                    backgroundColor: "#FCECEC",
+                    borderColor: "#FF6F61",
+                    borderWidth: 2,
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {image ? (
+                    <Image
+                      source={{ uri: image }}
+                      style={{ width: 200, height: 300, borderRadius: 10 }}
+                    />
+                  ) : (
+                    <View className="flex items-center justify-center">
+                      <ImageIcon size={35} color="#4A4A4A" />
+                      <Text className="text-label1 mt-2">Tap a photo</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              </View>
+
+              <View className="mb-4">
+                <View className="border-b-2 border-gray-300 mb-4 w-full"></View>
+                <View className="flex flex-row items-center justify-between mb-2">
+                  <Text className="text-Heading4">Select skincare</Text>
+                  <ButtonComponents
+                    title="Select"
+                    className="bg-Bittersweet px-3 py-1.5 rounded-full flex items-center justify-center"
+                    textSize="text-label4 text-white font-semibold"
+                    onPress={handleSelectSkincare}
                   />
-                ) : (
-                  <View className="flex items-center justify-center">
-                    <ImageIcon size={35} color="#4A4A4A" />
-                    <Text className="text-label1 mt-2">Tap a photo</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            </View>
+                </View>
+                <ScrollView
+                  horizontal={true}
+                  showsHorizontalScrollIndicator={false}
+                >
+                  {skincare.length > 0 ? (
+                    skincare.map((item: ISkincare) => (
+                      <View key={item.id} className="mb-4 mr-2">
+                        <Image
+                          source={{ uri: item.image }}
+                          style={{ width: 100, height: 120, borderRadius: 10 }}
+                        />
+                        <View className="flex items-center justify-center mt-2">
+                          <Text
+                            numberOfLines={1}
+                            ellipsizeMode="tail"
+                            style={{ width: 100, textAlign: "center" }}
+                          >
+                            {item.name}
+                          </Text>
+                        </View>
+                      </View>
+                    ))
+                  ) : (
+                    <Text>No skincare selected</Text>
+                  )}
+                </ScrollView>
+              </View>
 
-            <View className="mb-4">
-              <View className="border-b-2 border-gray-300 mb-4 w-full"></View>
-              <View className="flex flex-row items-center justify-between mb-2">
-                <Text className="text-Heading4">Select skincare</Text>
-                <ButtonComponents
-                  title="Select"
-                  className="bg-Bittersweet px-3 py-2 rounded-full flex items-center justify-center"
-                  textSize="text-label4 text-white font-semibold"
-                  onPress={handleSelectSkincare}
+              <View className="mb-4">
+                <TextInput
+                  placeholder="Title"
+                  onChangeText={(title) => handleChange("title", title)}
+                  className="border-2 w-full rounded-full p-4 border-BrightGray"
                 />
               </View>
-              <ScrollView
-                horizontal={true}
-                showsHorizontalScrollIndicator={false}
-              >
-                {skincare.length > 0 ? (
-                  skincare.map((item: ISkincare) => (
-                    <View key={item.id} className="mb-4 mr-2">
-                      <Image
-                        source={{ uri: item.image }}
-                        style={{ width: 100, height: 120, borderRadius: 10 }}
-                      />
-                      <View className="flex items-center justify-center mt-2">
-                        <Text
-                          numberOfLines={1}
-                          ellipsizeMode="tail"
-                          style={{ width: 100, textAlign: "center" }}
-                        >
-                          {item.name}
-                        </Text>
-                      </View>
-                    </View>
-                  ))
-                ) : (
-                  <Text>No skincare selected</Text>
-                )}
-              </ScrollView>
-            </View>
 
-            <View className="mb-4">
-              <TextInput
-                placeholder="Title"
-                onChangeText={(title) => handleChange("title", title)}
-                className="border-2 w-full rounded-full p-4 border-BrightGray"
+              <View className="mb-6">
+                <TextInput
+                  placeholder="Add Content"
+                  multiline
+                  style={{
+                    minHeight: 100,
+                    borderRadius: 30,
+                  }}
+                  className=" border-2  w-full  p-4 border-BrightGray"
+                  onChangeText={(content) => handleChange("content", content)}
+                />
+              </View>
+
+              <View className="flex flex-row items-center justify-center mb-2">
+                <ButtonComponents
+                  title="Create Review"
+                  className="bg-Bittersweet px-6 py-3 rounded-full"
+                  textSize="text-lg font-semibold text-White"
+                  onPress={handlePostReview}
+                />
+              </View>
+
+              <ModalSkincare
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+                skincare={skincare}
+                setSkincare={setSkincare}
               />
-            </View>
+            </ScrollView>
+          </SafeAreaView>
+        )}
+      </Modal>
 
-            <View className="mb-6">
-              <TextInput
-                placeholder="Add Content"
-                multiline
-                style={{
-                  minHeight: 100,
-                  borderRadius: 30,
-                }}
-                className=" border-2  w-full  p-4 border-BrightGray"
-                onChangeText={(content) => handleChange("content", content)}
-              />
-            </View>
-
-            <View className="flex flex-row items-center justify-center mb-2">
-              <ButtonComponents
-                title="Create Review"
-                className="bg-Bittersweet px-6 py-3 rounded-full"
-                textSize="text-lg font-semibold text-White"
-                onPress={handlePostReview}
-              />
-            </View>
-
-            <ModalSkincare
-              isOpen={isModalOpen}
-              onClose={() => setIsModalOpen(false)}
-              skincare={skincare}
-              setSkincare={setSkincare}
-            />
-          </ScrollView>
-        </SafeAreaView>
-      )}
-    </Modal>
+      <ConfirmAlert
+        visible={isAlertVisible}
+        onClose={() => setIsAlertVisible(false)}
+        title="Please complete all fields before submitting."
+        confirm="OK"
+      />
+    </>
   );
 };
 

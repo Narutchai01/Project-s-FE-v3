@@ -154,13 +154,12 @@ export default function ThreadDetails() {
   const handleBookmark = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      const res = await axiosInstance.post(`/bookmark/thread/${id}`, null, {
+      await axiosInstance.post(`/bookmark/thread/${id}`, null, {
         headers: {
           token: token,
         },
       });
 
-      console.log(res);
       fecThread();
     } catch (error: any) {
       console.log(error.response.data);
@@ -248,7 +247,7 @@ export default function ThreadDetails() {
             )}
 
             <View style={{ padding: 10 }}>
-              {thread?.images && thread?.images.length > 0 && (
+              {thread?.images && thread?.images.length > 1 && (
                 <View
                   style={{
                     position: "absolute",
@@ -319,7 +318,7 @@ export default function ThreadDetails() {
               currImage={currImage}
               bookmark={thread?.bookmark}
             />
-            <View className="container mx-auto px-3">
+            <View className="container mx-auto px-6 mt-2">
               <Text
                 style={{
                   fontSize: width * 0.05,
