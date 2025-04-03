@@ -192,17 +192,9 @@ export default function ReviewDetails() {
   }, []);
 
   const handleFollowStatusChange = (status: boolean) => {
-    if (review) {
-      setReview({
-        ...review,
-        user: {
-          ...review.user,
-          follow: status,
-        },
-      });
-      setIsFollowing(status);
-    }
+    fetchReview();
   };
+  
 
   return (
     <SafeAreaProvider style={{ backgroundColor: "#fff" }}>

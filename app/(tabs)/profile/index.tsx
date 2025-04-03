@@ -34,15 +34,16 @@ export default function ProfileScreen() {
   const [bookmarks, setBookmarks] = useState<any[]>([]);
   const [profileUser, setProfileUser] = useState<IUser | null>(null);
   const defaultImage = require("@/assets/images/userDefault.jpg");
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchUser = async () => {
     startLoading();
     try {
       const token = await AsyncStorage.getItem("token");
       const res = await axiosInstance.get("/user/me", {
-        headers: { 
+        headers: {
           token: token,
-         },
+        },
       });
       setProfileUser(res.data.data);
     } catch (error) {
@@ -52,15 +53,26 @@ export default function ProfileScreen() {
     }
   };
 
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await fetchUser();
+    } catch (error) {
+      console.error("Refresh error:", error);
+    } finally {
+      setRefreshing(false);
+    }
+  };
+
   const fetchThreads = async () => {
     startLoading();
     try {
-      if(profileUser?.id === undefined) return;
+      if (profileUser?.id === undefined) return;
       const token = await AsyncStorage.getItem("token");
       const res = await axiosInstance.get(`/thread/user/${profileUser?.id}`, {
-        headers: { 
+        headers: {
           token: token,
-         },
+        },
       });
 
       const data = res.data;
@@ -77,19 +89,18 @@ export default function ProfileScreen() {
   const fetchReviews = async () => {
     startLoading();
     try {
-      if(profileUser?.id === undefined) return;
+      if (profileUser?.id === undefined) return;
       const token = await AsyncStorage.getItem("token");
       const res = await axiosInstance.get(`/reviews/user/${profileUser?.id}`, {
-        headers: { 
+        headers: {
           token: token,
-         },
+        },
       });
 
       const data = res.data;
       if (data.status) {
         setReviews(data.data);
       }
-
     } catch (error) {
       console.error(error);
     } finally {
@@ -100,12 +111,12 @@ export default function ProfileScreen() {
   const fetchBookmarks = async () => {
     startLoading();
     try {
-      if(profileUser?.id === undefined) return;
+      if (profileUser?.id === undefined) return;
       const token = await AsyncStorage.getItem("token");
       const res = await axiosInstance.get(`/bookmark/get/${profileUser?.id}`, {
-        headers: { 
+        headers: {
           token: token,
-         },
+        },
       });
 
       const data = res.data;
@@ -125,9 +136,9 @@ export default function ProfileScreen() {
 
   useEffect(() => {
     if (!profileUser?.id) return;
-      fetchReviews();
-      fetchThreads();
-      fetchBookmarks();
+    fetchReviews();
+    fetchThreads();
+    fetchBookmarks();
   }, [profileUser]);
 
   const CustomHeader = () => (
@@ -142,14 +153,16 @@ export default function ProfileScreen() {
       </View>
 
       <View className="items-center mt-6 mb-4">
-        <Image className="w-24 h-24 rounded-full bg-gray-300" 
-        source={
-          profileUser?.image
-          ? { uri: profileUser.image }
-          : defaultImage
-                }/>
+        <Image
+          className="w-24 h-24 rounded-full bg-gray-300"
+          source={
+            profileUser?.image ? { uri: profileUser.image } : defaultImage
+          }
+        />
 
-        <Text className="text-Heading3 mt-2">{profileUser?.full_name || "User"}</Text>
+        <Text className="text-Heading3 mt-2">
+          {profileUser?.full_name || "User"}
+        </Text>
 
         <View className="flex flex-row justify-between w-1/2 mt-4">
           <View className="items-center">
@@ -218,6 +231,8 @@ export default function ProfileScreen() {
                   data={reviews}
                   keyExtractor={(item) => item.id.toString()}
                   numColumns={3}
+                  refreshing={refreshing}
+                  onRefresh={handleRefresh}
                   columnWrapperStyle={{
                     marginBottom: 12,
                   }}
@@ -241,6 +256,8 @@ export default function ProfileScreen() {
                   data={threads}
                   keyExtractor={(item) => item.id.toString()}
                   numColumns={3}
+                  refreshing={refreshing}
+                  onRefresh={handleRefresh}
                   renderItem={({ item }) => (
                     <TouchableOpacity
                       onPress={() => router.push(`/thread/${item.id}`)}
@@ -261,6 +278,8 @@ export default function ProfileScreen() {
                   data={bookmarks}
                   keyExtractor={(item) => item.id.toString()}
                   numColumns={3}
+                  refreshing={refreshing}
+                  onRefresh={handleRefresh}
                   renderItem={({ item }) => (
                     <PostByUser
                       image={item.image}

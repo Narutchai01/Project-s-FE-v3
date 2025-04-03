@@ -160,134 +160,134 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
         <LoadingIndicator />
       ) : (
         <SafeAreaView className="flex-1 bg-Snow p-6">
-        <ScrollView>
+          <ScrollView>
             {/* header zone  */}
-              <BackButtonComponents
-                title={"New Thread"}
-                textSize="text-Heading3 text-Quartz"
-                onPress={handleCancel}
-              />
+            <BackButtonComponents
+              title={"New Thread"}
+              textSize="text-Heading3 text-Quartz"
+              onPress={handleCancel}
+            />
 
-          {/* header zone  */}
-          <View className="flex justify-center items-center">
-            {!image ? (
-              <TouchableOpacity
-                onPress={handleChooseImage}
-                style={{
-                  height: 300,
-                  width: 200,
-                  borderRadius: 10,
-                  backgroundColor: "#FCECEC",
-                  borderColor: "#FF6F61",
-                  borderWidth: 2,
-                  display: "flex",
-                  marginTop: 11,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <View className="flex items-center justify-center">
-                  <ImageIcon size={35} color="#4A4A4A" />
-                  <Text className="text-label1 mt-2">Tap a photo</Text>
-                </View>
-              </TouchableOpacity>
-            ) : (
-              <FlatList
-                data={image}
-                keyExtractor={(_, index: number) => index.toString()}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                ListHeaderComponent={() => {
-                  return (
-                    <TouchableOpacity
-                      onPress={handleChooseImage}
-                      style={{
-                        height: 300,
-                        width: 200,
-                        borderRadius: 10,
-                        backgroundColor: "#FCECEC",
-                        borderColor: "#FF6F61",
-                        borderWidth: 2,
-                        display: "flex",
-                        marginTop: 11,
-                        justifyContent: "center",
-                        alignItems: "center",
-                        marginRight: 10,
-                      }}
-                    >
-                      <View className="flex items-center justify-center">
-                        <ImageIcon size={35} color="#4A4A4A" />
-                        <Text className="text-label1 mt-2">Tap a photo</Text>
-                      </View>
-                    </TouchableOpacity>
-                  );
-                }}
-                renderItem={({
-                  item,
-                  index,
-                }: {
-                  item: string;
-                  index: number;
-                }) => (
-                  <View
-                    style={{
-                      position: "relative",
-                      marginRight: 10,
-                      marginTop: 10,
-                    }}
-                  >
-                    <Image
-                      source={{ uri: item }}
-                      style={{
-                        width: 200,
-                        height: 300,
-                        borderRadius: 10,
-                      }}
-                    />
-                    <TouchableOpacity
-                      onPress={() => handleRemoveImage(index)}
-                      style={{
-                        position: "absolute",
-                        top: 10,
-                        right: 10,
-                      }}
-                    >
-                      <Ionicons
-                        name="close-circle"
-                        size={30}
-                        color="#4A4A4ACC"
-                      />
-                    </TouchableOpacity>
+            {/* header zone  */}
+            <View className="flex justify-center items-center">
+              {!image ? (
+                <TouchableOpacity
+                  onPress={handleChooseImage}
+                  style={{
+                    height: 300,
+                    width: 200,
+                    borderRadius: 10,
+                    backgroundColor: "#FCECEC",
+                    borderColor: "#FF6F61",
+                    borderWidth: 2,
+                    display: "flex",
+                    marginTop: 11,
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <View className="flex items-center justify-center">
+                    <ImageIcon size={35} color="#4A4A4A" />
+                    <Text className="text-label1 mt-2">Tap a photo</Text>
                   </View>
-                )}
-              />
-            )}
+                </TouchableOpacity>
+              ) : (
+                <FlatList
+                  data={image}
+                  keyExtractor={(_, index: number) => index.toString()}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  ListHeaderComponent={() => {
+                    return (
+                      <TouchableOpacity
+                        onPress={handleChooseImage}
+                        style={{
+                          height: 300,
+                          width: 200,
+                          borderRadius: 10,
+                          backgroundColor: "#FCECEC",
+                          borderColor: "#FF6F61",
+                          borderWidth: 2,
+                          display: "flex",
+                          marginTop: 11,
+                          justifyContent: "center",
+                          alignItems: "center",
+                          marginRight: 10,
+                        }}
+                      >
+                        <View className="flex items-center justify-center">
+                          <ImageIcon size={35} color="#4A4A4A" />
+                          <Text className="text-label1 mt-2">Tap a photo</Text>
+                        </View>
+                      </TouchableOpacity>
+                    );
+                  }}
+                  renderItem={({
+                    item,
+                    index,
+                  }: {
+                    item: string;
+                    index: number;
+                  }) => (
+                    <View
+                      style={{
+                        position: "relative",
+                        marginRight: 10,
+                        marginTop: 10,
+                      }}
+                    >
+                      <Image
+                        source={{ uri: item }}
+                        style={{
+                          width: 200,
+                          height: 300,
+                          borderRadius: 10,
+                        }}
+                      />
+                      <TouchableOpacity
+                        onPress={() => handleRemoveImage(index)}
+                        style={{
+                          position: "absolute",
+                          top: 10,
+                          right: 10,
+                        }}
+                      >
+                        <Ionicons
+                          name="close-circle"
+                          size={30}
+                          color="#4A4A4ACC"
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                />
+              )}
 
-            <View className="w-full container mx-auto px-10 py-10 gap-y-4">
-              <TextInput
-                placeholder="Title"
-                className=" border-2  w-full rounded-full p-4 border-BrightGray"
-                onChangeText={(title) => handleChange("title", title)}
-              />
-              <TextInput
-                placeholder="Add Caption"
-                multiline
-                style={{
-                  minHeight: 100,
-                  borderRadius: 30,
-                }}
-                className=" border-2  w-full  p-4 border-BrightGray"
-                onChangeText={(caption) => handleChange("caption", caption)}
+              <View className="w-full container mx-auto px-10 py-10 gap-y-4">
+                <TextInput
+                  placeholder="Title"
+                  className=" border-2  w-full rounded-full p-4 border-BrightGray"
+                  onChangeText={(title) => handleChange("title", title)}
+                />
+                <TextInput
+                  placeholder="Add Caption"
+                  multiline
+                  style={{
+                    minHeight: 100,
+                    borderRadius: 30,
+                  }}
+                  className=" border-2  w-full  p-4 border-BrightGray"
+                  onChangeText={(caption) => handleChange("caption", caption)}
+                />
+              </View>
+              <ButtonComponents
+                title="Create Thread"
+                onPress={handleCreateThread}
+                className="bg-Bittersweet px-6 py-3 rounded-full"
+                textSize="text-lg font-semibold text-White"
               />
             </View>
-            <ButtonComponents
-              title="Create Thread"
-              onPress={handleCreateThread}
-              className="bg-Bittersweet px-6 py-3 rounded-full"
-              textSize="text-lg font-semibold text-White"
-            />
-          </View>
-        </ScrollView>
+          </ScrollView>
         </SafeAreaView>
       )}
     </Modal>
@@ -347,7 +347,7 @@ export const ModalSkincare: FC<IModalSkincare> = (props) => {
             <ButtonComponents
               title="Confirm"
               className="bg-Bittersweet px-2 rounded-full h-8 flex items-center justify-center"
-            textSize="text-label4 text-white font-semibold"
+              textSize="text-label4 text-white font-semibold"
               onPress={handleConfirm}
             />
           </View>
@@ -502,7 +502,7 @@ export const ModalComment: React.FC<IModalComment> = ({
               setComment("");
             }}
           >
-            <CircleArrowUp size={34} color="#4A4A4A"/>
+            <CircleArrowUp size={34} color="#4A4A4A" />
           </TouchableOpacity>
         </View>
       </View>
@@ -609,122 +609,122 @@ export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (
       ) : (
         <SafeAreaView className="flex-1 bg-Snow p-6">
           <ScrollView>
-          <BackButtonComponents
-            title="New Review"
-            textSize="text-Heading3 text-Quartz"
-            onPress={handleCancel}
-          />
+            <BackButtonComponents
+              title="New Review"
+              textSize="text-Heading3 text-Quartz"
+              onPress={handleCancel}
+            />
 
-          <View className="mb-4">
-            <Text className="text-Heading4">Thumbnail</Text>
-          </View>
+            <View className="mb-4">
+              <Text className="text-Heading4">Thumbnail</Text>
+            </View>
 
-          <View className="mb-6 flex items-center justify-center">
-            <TouchableOpacity
-              onPress={pickImageAsync}
-              style={{
-                height: 300,
-                width: 200,
-                borderRadius: 10,
-                backgroundColor: "#FCECEC",
-                borderColor: "#FF6F61",
-                borderWidth: 2,
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              {image ? (
-                <Image
-                  source={{ uri: image }}
-                  style={{ width: 200, height: 300, borderRadius: 10 }}
+            <View className="mb-6 flex items-center justify-center">
+              <TouchableOpacity
+                onPress={pickImageAsync}
+                style={{
+                  height: 300,
+                  width: 200,
+                  borderRadius: 10,
+                  backgroundColor: "#FCECEC",
+                  borderColor: "#FF6F61",
+                  borderWidth: 2,
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                {image ? (
+                  <Image
+                    source={{ uri: image }}
+                    style={{ width: 200, height: 300, borderRadius: 10 }}
+                  />
+                ) : (
+                  <View className="flex items-center justify-center">
+                    <ImageIcon size={35} color="#4A4A4A" />
+                    <Text className="text-label1 mt-2">Tap a photo</Text>
+                  </View>
+                )}
+              </TouchableOpacity>
+            </View>
+
+            <View className="mb-4">
+              <View className="border-b-2 border-gray-300 mb-4 w-full"></View>
+              <View className="flex flex-row items-center justify-between mb-2">
+                <Text className="text-Heading4">Select skincare</Text>
+                <ButtonComponents
+                  title="Select"
+                  className="bg-Bittersweet px-3 py-2 rounded-full flex items-center justify-center"
+                  textSize="text-label4 text-white font-semibold"
+                  onPress={handleSelectSkincare}
                 />
-              ) : (
-                <View className="flex items-center justify-center">
-                  <ImageIcon size={35} color="#4A4A4A" />
-                  <Text className="text-label1 mt-2">Tap a photo</Text>
-                </View>
-              )}
-            </TouchableOpacity>
-          </View>
+              </View>
+              <ScrollView
+                horizontal={true}
+                showsHorizontalScrollIndicator={false}
+              >
+                {skincare.length > 0 ? (
+                  skincare.map((item: ISkincare) => (
+                    <View key={item.id} className="mb-4 mr-2">
+                      <Image
+                        source={{ uri: item.image }}
+                        style={{ width: 100, height: 120, borderRadius: 10 }}
+                      />
+                      <View className="flex items-center justify-center mt-2">
+                        <Text
+                          numberOfLines={1}
+                          ellipsizeMode="tail"
+                          style={{ width: 100, textAlign: "center" }}
+                        >
+                          {item.name}
+                        </Text>
+                      </View>
+                    </View>
+                  ))
+                ) : (
+                  <Text>No skincare selected</Text>
+                )}
+              </ScrollView>
+            </View>
 
-          <View className="mb-4">
-            <View className="border-b-2 border-gray-300 mb-4 w-full"></View>
-            <View className="flex flex-row items-center justify-between mb-2">
-              <Text className="text-Heading4">Select skincare</Text>
-              <ButtonComponents
-                title="Select"
-                className="bg-Bittersweet px-3 py-2 rounded-full flex items-center justify-center"
-            textSize="text-label4 text-white font-semibold"
-                onPress={handleSelectSkincare}
+            <View className="mb-4">
+              <TextInput
+                placeholder="Title"
+                onChangeText={(title) => handleChange("title", title)}
+                className="border-2 w-full rounded-full p-4 border-BrightGray"
               />
             </View>
-            <ScrollView
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-            >
-              {skincare.length > 0 ? (
-                skincare.map((item: ISkincare) => (
-                  <View key={item.id} className="mb-4 mr-2">
-                    <Image
-                      source={{ uri: item.image }}
-                      style={{ width: 100, height: 120, borderRadius: 10 }}
-                    />
-                    <View className="flex items-center justify-center mt-2">
-                      <Text
-                        numberOfLines={1}
-                        ellipsizeMode="tail"
-                        style={{ width: 100, textAlign: "center" }}
-                      >
-                        {item.name}
-                      </Text>
-                    </View>
-                  </View>
-                ))
-              ) : (
-                <Text>No skincare selected</Text>
-              )}
-            </ScrollView>
-          </View>
 
-          <View className="mb-4">
-            <TextInput
-              placeholder="Title"
-              onChangeText={(title) => handleChange("title", title)}
-              className="border-2 w-full rounded-full p-4 border-BrightGray"
+            <View className="mb-6">
+              <TextInput
+                placeholder="Add Content"
+                multiline
+                style={{
+                  minHeight: 100,
+                  borderRadius: 30,
+                }}
+                className=" border-2  w-full  p-4 border-BrightGray"
+                onChangeText={(content) => handleChange("content", content)}
+              />
+            </View>
+
+            <View className="flex flex-row items-center justify-center mb-2">
+              <ButtonComponents
+                title="Create Review"
+                className="bg-Bittersweet px-6 py-3 rounded-full"
+                textSize="text-lg font-semibold text-White"
+                onPress={handlePostReview}
+              />
+            </View>
+
+            <ModalSkincare
+              isOpen={isModalOpen}
+              onClose={() => setIsModalOpen(false)}
+              skincare={skincare}
+              setSkincare={setSkincare}
             />
-          </View>
-
-          <View className="mb-6">
-            <TextInput
-              placeholder="Add Content"
-              multiline
-              style={{
-                minHeight: 100,
-                borderRadius: 30,
-              }}
-              className=" border-2  w-full  p-4 border-BrightGray"
-              onChangeText={(content) => handleChange("content", content)}
-            />
-          </View>
-
-          <View className="flex flex-row items-center justify-center mb-2">
-            <ButtonComponents
-              title="Create Review"
-              className="bg-Bittersweet px-6 py-3 rounded-full"
-              textSize="text-lg font-semibold text-White"
-              onPress={handlePostReview}
-            />
-          </View>
-
-          <ModalSkincare
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            skincare={skincare}
-            setSkincare={setSkincare}
-          />
           </ScrollView>
-      </SafeAreaView>
+        </SafeAreaView>
       )}
     </Modal>
   );
@@ -755,7 +755,10 @@ export const ModalChangePassworkSuccess: FC<ModalChangePassworkSuccessProps> = (
 
           <ButtonComponents
             onPress={() => {
-              router.push("/login");
+              onClose();
+              setTimeout(() => {
+                router.push("/login");
+              }, 100);
             }}
             title="Back to login"
             className="flex flex-row items-center justify-center rounded-full border-2 border-BrightGray p-6 bg-Bittersweet"
