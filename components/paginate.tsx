@@ -4,8 +4,8 @@ import { Dot } from "lucide-react-native";
 import { ImagePaginationProps } from "@/interface/paginate";
 
 export const ImagePagination: FC<ImagePaginationProps> = (props) => {
-  const { data, currImage } = props;
-
+  const { data = [], currImage } = props; 
+  
   const dotAnimations = data.map(() => new Animated.Value(0));
 
   useEffect(() => {

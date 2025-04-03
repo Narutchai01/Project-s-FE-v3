@@ -14,7 +14,7 @@ interface IActivityBar {
   favorite: boolean | undefined;
   favoriteCount: number | undefined;
   commnetCount: number;
-  dataPaginate: any;
+  dataPaginate?: any[];
   currImage: number;
   bookmark: boolean | undefined;
   hadleFavorite: () => void;
@@ -27,7 +27,7 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
     favorite,
     favoriteCount,
     commnetCount,
-    dataPaginate,
+    dataPaginate = [], 
     currImage,
     bookmark,
     hadleFavorite,

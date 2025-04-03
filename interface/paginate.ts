@@ -1,4 +1,4 @@
 export interface ImagePaginationProps {
-  data: any;
+  data?: any[]; 
   currImage: number;
 }
