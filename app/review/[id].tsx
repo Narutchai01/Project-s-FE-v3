@@ -79,7 +79,7 @@ export default function ReviewDetails() {
   const handleFavorite = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      const res = await axiosInstance.post(
+      await axiosInstance.post(
         `/favorite/review/skincare/${id}`,
         null,
         {
@@ -89,7 +89,6 @@ export default function ReviewDetails() {
         }
       );
 
-      console.log(res);
       fetchReview();
     } catch (error: any) {
       console.log(error.response.data);

@@ -7,6 +7,7 @@ import {
   ThreadCardProps,
   AddPhotoProps,
   ICommentCardProps,
+  CommunityCardProps
 } from "@/interface/Card";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
@@ -116,8 +117,9 @@ export const CardDiary: FC<DiaryCardProps> = (props) => {
   );
 };
 
-export const PopularThreadCard: FC<ThreadCardProps> = (props) => {
-  const { image, title, user, userAvatar } = props;
+export const PopularThreadCard: FC<CommunityCardProps> = (props) => {
+  const { image, title, user, userAvatar, isFavorited, onFavorite } = props;
+
   return (
     <View className="bg-white rounded-2xl shadow w-[120px] h-[155px] mx-2 mb-2 relative overflow-hidden">
       <View className="w-[120px] h-[120px] relative overflow-hidden">
@@ -171,8 +173,14 @@ export const PopularThreadCard: FC<ThreadCardProps> = (props) => {
               >{user}</Text>
             </View>
 
-            <TouchableOpacity className="w-7 h-7 bg-White rounded-full flex items-center justify-center">
-              <Heart size={12} color="gray" />
+            <TouchableOpacity className="w-7 h-7 bg-White rounded-full flex items-center justify-center"
+            onPress={onFavorite}
+            >
+              <Heart
+                 size={12}
+              color={isFavorited ? "#FF6F61" : "gray"}
+              fill={isFavorited ? "#FF6F61" : "none"}
+            />
             </TouchableOpacity>
           </View>
         </View>
@@ -181,8 +189,8 @@ export const PopularThreadCard: FC<ThreadCardProps> = (props) => {
   );
 };
 
-export const CommunityCard: FC<ThreadCardProps> = (props) => {
-  const { image, title, user, userAvatar } = props;
+export const CommunityCard: React.FC<CommunityCardProps> = (props) => {
+  const { image, title, user, userAvatar, isFavorited, onFavorite } = props;
 
   return (
     <View
@@ -240,8 +248,15 @@ export const CommunityCard: FC<ThreadCardProps> = (props) => {
             </Text>
           </View>
 
-          <TouchableOpacity className="w-7 h-7 bg-White rounded-full flex items-center justify-center">
-            <Heart size={12} color="gray" />
+          <TouchableOpacity
+            className="w-7 h-7 bg-white rounded-full flex items-center justify-center"
+            onPress={onFavorite}
+          >
+            <Heart
+              size={14}
+              color={isFavorited ? "#FF6F61" : "gray"}
+              fill={isFavorited ? "#FF6F61" : "none"}
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -480,10 +495,15 @@ export const CardSkincareReccommemded: FC<CardSkincareProps> = (props) => {
 };
 
 
-export const PostByUser: FC<ThreadCardProps> = (props) => {
-  const { image, title, user, userAvatar } = props;
+export const PostByUser: FC<CommunityCardProps> = (props) => {
+  const { image, title, user, userAvatar, isFavorited, onFavorite, onPress, } = props;
   return (
-    <View className="bg-white rounded-2xl shadow w-[95px] h-[140px] mx-2 mb-2 relative overflow-hidden">
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.9}
+      className="bg-white rounded-2xl shadow w-[95px] h-[140px] mx-2 mb-2 relative overflow-hidden"
+    >
+
       <View className="w-[95px] h-[100px] relative overflow-hidden">
         <Image
           source={image ? { uri: image } : defaultImage}
@@ -535,12 +555,21 @@ export const PostByUser: FC<ThreadCardProps> = (props) => {
               >{user}</Text>
             </View>
 
-            <TouchableOpacity className="w-7 h-7 bg-White rounded-full flex items-center justify-center">
-              <Heart size={12} color="gray" />
+            <TouchableOpacity className="w-7 h-7 bg-White rounded-full flex items-center justify-center"
+                onPress={(e) => {
+                  e.stopPropagation(); 
+                  onFavorite?.();
+                }}
+                >
+            <Heart
+              size={12}
+              color={isFavorited ? "#FF6F61" : "gray"}
+              fill={isFavorited ? "#FF6F61" : "none"}
+            />
             </TouchableOpacity>
           </View>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };

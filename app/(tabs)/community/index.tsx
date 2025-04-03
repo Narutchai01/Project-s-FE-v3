@@ -70,6 +70,23 @@ export default function CommonScreen() {
     fetchReview();
   }, []);
 
+  const handleFavorite = async (id: number) => {
+    const token = await AsyncStorage.getItem("token");
+    const endpoint = isMode
+      ? `/favorite/thread/${id}`
+      : `/favorite/review/skincare/${id}`;
+    try {
+      await axiosInstance.post(endpoint, null, { headers: { token } });
+  
+      if (isMode) {
+        fetchThread();
+      } else {
+        fetchReview();
+      }
+    } catch (err) {
+      console.error("Toggle favorite error:", err);
+    }
+  };
 
   const filteredThreads = threads?.filter((thread) =>
     thread.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -159,11 +176,13 @@ export default function CommonScreen() {
                 renderItem={({ item }) => (
                   <TouchableOpacity onPress={() => handleRouter(item.id)}>
                     <CommunityCard
-                      image={item.images?.[0]?.image}
-                      title={item.title}
-                      user={item.user?.full_name}
-                      userAvatar={item.user?.image}
-                    />
+                    image={item.images?.[0]?.image}
+                    title={item.title}
+                    user={item.user?.full_name}
+                    userAvatar={item.user?.image}
+                    isFavorited={item.favorite}
+                    onFavorite={() => handleFavorite(item.id)}
+                  />
                   </TouchableOpacity>
                 )}
               />
@@ -189,11 +208,13 @@ export default function CommonScreen() {
               refreshing={isLoading}
               renderItem={({ item }) => (
                 <TouchableOpacity onPress={() => handleRouter(item.id)}>
-                  <CommunityCard
+                    <CommunityCard
                     image={item.image}
                     title={item.title}
                     user={item.user?.full_name}
                     userAvatar={item.user?.image}
+                    isFavorited={item.favorite}
+                    onFavorite={() => handleFavorite(item.id)}
                   />
                 </TouchableOpacity>
               )}

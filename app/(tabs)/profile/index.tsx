@@ -130,6 +130,26 @@ export default function ProfileScreen() {
     }
   };
 
+  const handleFavorite = async (id: number, type: "review" | "thread") => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const endpoint =
+        type === "review"
+          ? `/favorite/review/skincare/${id}`
+          : `/favorite/thread/${id}`;
+
+      await axiosInstance.post(endpoint, null, { headers: { token } });
+
+      if (type === "review") {
+        fetchReviews();
+      } else {
+        fetchThreads();
+      }
+    } catch (error) {
+      console.error("Toggle favorite error:", error);
+    }
+  };
+
   useEffect(() => {
     fetchUser();
   }, []);
@@ -233,20 +253,17 @@ export default function ProfileScreen() {
                   numColumns={3}
                   refreshing={refreshing}
                   onRefresh={handleRefresh}
-                  columnWrapperStyle={{
-                    marginBottom: 12,
-                  }}
+                  columnWrapperStyle={{ marginBottom: 12 }}
                   renderItem={({ item }) => (
-                    <TouchableOpacity
+                    <PostByUser
+                      image={item.image}
+                      title={item.title}
+                      user={item.user.full_name}
+                      userAvatar={item.user.image}
+                      isFavorited={item.favorite}
+                      onFavorite={() => handleFavorite(item.id, "review")}
                       onPress={() => router.push(`/review/${item.id}`)}
-                    >
-                      <PostByUser
-                        image={item.image}
-                        title={item.title}
-                        user={item.user.full_name}
-                        userAvatar={item.user.image}
-                      />
-                    </TouchableOpacity>
+                    />
                   )}
                 />
               )}
@@ -259,20 +276,18 @@ export default function ProfileScreen() {
                   refreshing={refreshing}
                   onRefresh={handleRefresh}
                   renderItem={({ item }) => (
-                    <TouchableOpacity
+                    <PostByUser
+                      image={item.images[0]?.image}
+                      title={item.title}
+                      user={item.user.full_name}
+                      userAvatar={item.user.image}
+                      isFavorited={item.favorite}
+                      onFavorite={() => handleFavorite(item.id, "thread")}
                       onPress={() => router.push(`/thread/${item.id}`)}
-                    >
-                      <PostByUser
-                        image={item.images[0]?.image}
-                        title={item.title}
-                        user={item.user.full_name}
-                        userAvatar={item.user.image}
-                      />
-                    </TouchableOpacity>
+                    />
                   )}
                 />
               )}
-
               {mode === "bookmark" && (
                 <FlatList
                   data={bookmarks}
@@ -280,14 +295,23 @@ export default function ProfileScreen() {
                   numColumns={3}
                   refreshing={refreshing}
                   onRefresh={handleRefresh}
-                  renderItem={({ item }) => (
-                    <PostByUser
-                      image={item.image}
-                      title={item.title}
-                      user={item.user?.full_name}
-                      userAvatar={item.user?.image}
-                    />
-                  )}
+                  renderItem={({ item }) => {
+                    const isThread = item.type === 1;
+                    const contentId = item.community_id;
+                    const type = isThread ? "thread" : "review";
+
+                    return (
+                      <PostByUser
+                        image={item.image}
+                        title={item.title}
+                        user={item.user?.full_name}
+                        userAvatar={item.user?.image}
+                        isFavorited={item.favorite}
+                        onFavorite={() => handleFavorite(contentId, type)}
+                        onPress={() => router.push(`/${type}/${contentId}`)}
+                      />
+                    );
+                  }}
                 />
               )}
             </>

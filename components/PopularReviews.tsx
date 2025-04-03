@@ -35,6 +35,20 @@ export const PopularReviews: FC = () => {
     }
   },[startLoading, stopLoading])
 
+  const handleFavorite = async (id: number) => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      await axiosInstance.post(`/favorite/review/skincare/${id}`, null, {
+        headers: { token },
+      });
+  
+      fetchReviews(); 
+    } catch (error) {
+      console.error("Favorite error:", error);
+    }
+  };
+  
+
   useEffect(() => {
     fetchReviews();
   }, []);
@@ -73,6 +87,8 @@ export const PopularReviews: FC = () => {
                 title={item.title}
                 user={item.user?.full_name}
                 userAvatar={item.user?.image}
+                isFavorited={item.favorite}
+                onFavorite={() => handleFavorite(item.id)}
               />
             </TouchableOpacity>
           )}

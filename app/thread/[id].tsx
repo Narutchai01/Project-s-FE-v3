@@ -64,7 +64,6 @@ export default function ThreadDetails() {
         },
       });
 
-      console.log(res);
       fecThread();
     } catch (error: any) {
       console.log(error.response.data);

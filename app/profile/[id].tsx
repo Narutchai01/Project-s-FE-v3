@@ -119,6 +119,26 @@ export default function OtherProfileScreen() {
     }
   };
 
+  const handleFavorite = async (id: number, type: "review" | "thread") => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const endpoint =
+        type === "review"
+          ? `/favorite/review/skincare/${id}`
+          : `/favorite/thread/${id}`;
+
+      await axiosInstance.post(endpoint, null, { headers: { token } });
+
+      if (type === "review") {
+        fetchReviews();
+      } else {
+        fetchThreads();
+      }
+    } catch (error) {
+      console.error("Toggle favorite error:", error);
+    }
+  };
+
   useEffect(() => {
     fetchUser();
   }, []);
@@ -214,82 +234,74 @@ export default function OtherProfileScreen() {
             <LoadingIndicator />
           ) : (
             <>
-              {mode === "reviews" &&
-                (reviews?.length === 0 ? (
-                  <Text className="text-center mt-4 text-gray-500">
-                    No reviews available
-                  </Text>
-                ) : (
-                  <FlatList
-                    data={reviews}
-                    keyExtractor={(item) => item.id.toString()}
-                    numColumns={3}
-                    refreshing={refreshing}
-                    onRefresh={handleRefresh}
-                    columnWrapperStyle={{ marginBottom: 12 }}
-                    renderItem={({ item }) => (
-                      <TouchableOpacity
-                        onPress={() => router.push(`/review/${item.id}`)}
-                      >
-                        <PostByUser
-                          image={item.image}
-                          title={item.title}
-                          user={item.user.full_name}
-                          userAvatar={item.user.image}
-                        />
-                      </TouchableOpacity>
-                    )}
-                  />
-                ))}
-              {mode === "threads" &&
-                (threads?.length === 0 ? (
-                  <Text className="text-center mt-4 text-gray-500">
-                    No threads found
-                  </Text>
-                ) : (
-                  <FlatList
-                    data={threads}
-                    keyExtractor={(item) => item.id.toString()}
-                    numColumns={3}
-                    refreshing={refreshing}
-                    onRefresh={handleRefresh}
-                    renderItem={({ item }) => (
-                      <TouchableOpacity
-                        onPress={() => router.push(`/thread/${item.id}`)}
-                      >
-                        <PostByUser
-                          image={item.images[0]?.image}
-                          title={item.title}
-                          user={item.user.full_name}
-                          userAvatar={item.user.image}
-                        />
-                      </TouchableOpacity>
-                    )}
-                  />
-                ))}
+              {mode === "reviews" && (
+                <FlatList
+                  data={reviews}
+                  keyExtractor={(item) => item.id.toString()}
+                  numColumns={3}
+                  refreshing={refreshing}
+                  onRefresh={handleRefresh}
+                  columnWrapperStyle={{ marginBottom: 12 }}
+                  renderItem={({ item }) => (
+                    <PostByUser
+                      image={item.image}
+                      title={item.title}
+                      user={item.user.full_name}
+                      userAvatar={item.user.image}
+                      isFavorited={item.favorite}
+                      onFavorite={() => handleFavorite(item.id, "review")}
+                      onPress={() => router.push(`/review/${item.id}`)}
+                    />
+                  )}
+                />
+              )}
 
-              {mode === "bookmark" &&
-                (bookmarks?.length === 0 ? (
-                  <Text className="text-center mt-4 text-gray-500">
-                    No bookmarks yet
-                  </Text>
-                ) : (
-                  <FlatList
-                    data={bookmarks}
-                    keyExtractor={(item) => item.id.toString()}
-                    numColumns={3}
-                    refreshing={refreshing}
-                    onRefresh={handleRefresh}
-                    renderItem={({ item }) => (
+              {mode === "threads" && (
+                <FlatList
+                  data={threads}
+                  keyExtractor={(item) => item.id.toString()}
+                  numColumns={3}
+                  refreshing={refreshing}
+                  onRefresh={handleRefresh}
+                  renderItem={({ item }) => (
+                    <PostByUser
+                      image={item.images[0]?.image}
+                      title={item.title}
+                      user={item.user.full_name}
+                      userAvatar={item.user.image}
+                      isFavorited={item.favorite}
+                      onFavorite={() => handleFavorite(item.id, "thread")}
+                      onPress={() => router.push(`/thread/${item.id}`)}
+                    />
+                  )}
+                />
+              )}
+              {mode === "bookmark" && (
+                <FlatList
+                  data={bookmarks}
+                  keyExtractor={(item) => item.id.toString()}
+                  numColumns={3}
+                  refreshing={refreshing}
+                  onRefresh={handleRefresh}
+                  renderItem={({ item }) => {
+                    const isThread = item.type === 1;
+                    const contentId = item.community_id;
+                    const type = isThread ? "thread" : "review";
+
+                    return (
                       <PostByUser
                         image={item.image}
                         title={item.title}
                         user={item.user?.full_name}
                         userAvatar={item.user?.image}
+                        isFavorited={item.favorite}
+                        onFavorite={() => handleFavorite(contentId, type)}
+                        onPress={() => router.push(`/${type}/${contentId}`)}
                       />
-                    )}
-                  />
-                ))}
+                    );
+                  }}
+                />
+              )}
             </>
           )}
         </View>
