@@ -73,7 +73,7 @@ export default function ChangePasswordScreen() {
         <TextInput
           value={newPassword}
           onChangeText={setNewPassword}
-          secureTextEntry={true}
+          secureTextEntry={!showPassword}
           className="border-2 w-full rounded-full p-4 border-BrightGray mb-4"
         />
          <TouchableOpacity
@@ -89,7 +89,7 @@ export default function ChangePasswordScreen() {
         <TextInput
           value={confirmPassword}
           onChangeText={setConfirmPassword}
-          secureTextEntry={true}
+          secureTextEntry={!showConfirmPassword}
           className="border-2 w-full rounded-full p-4 border-BrightGray mb-8"
         />
          <TouchableOpacity

@@ -45,7 +45,6 @@ export default function RecoverPasswordScreen() {
         },
       });
 
-      console.log("Password reset response:", res.data);
       setErrorMessage("");
       setModalVisible(true);
       setNewPassword("");
