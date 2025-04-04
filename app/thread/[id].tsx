@@ -27,20 +27,20 @@ export default function ThreadDetails() {
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
 
-    const fetchUserFollowStatus = async (userId: number) => {
-      try {
-        const token = await AsyncStorage.getItem("token");
-        const res = await axiosInstance.get(`/user/${userId}`, {
-          headers: { token },
-        });
-    
-        if (res.data.status) {
-          setIsFollowing(res.data.data.follow);
-        }
-      } catch (error) {
-        console.error("Error fetching user follow status:", error);
+  const fetchUserFollowStatus = async (userId: number) => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const res = await axiosInstance.get(`/user/${userId}`, {
+        headers: { token },
+      });
+
+      if (res.data.status) {
+        setIsFollowing(res.data.data.follow);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching user follow status:", error);
+    }
+  };
 
   const fecThread = useCallback(async () => {
     startLoading();
@@ -54,7 +54,15 @@ export default function ThreadDetails() {
 
       const data = res.data;
       if (data.status) {
-        setThread(data.data);
+
+        const storedBookmark = await AsyncStorage.getItem(
+          `bookmark_thread_${id}`
+        );
+        const bookmarkValue = storedBookmark
+          ? JSON.parse(storedBookmark)
+          : data.data.bookmark;
+
+        setThread({ ...data.data, bookmark: bookmarkValue });
         fetchUserFollowStatus(data.data.user.id);
         stopLoading();
       }
@@ -96,7 +104,7 @@ export default function ThreadDetails() {
 
       const data = res.data;
       if (data.status) {
-        setComment(data.data ?? []); 
+        setComment(data.data ?? []);
         setCommentCount(data.data?.length ?? 0);
       }
     } catch (error: any) {
@@ -154,15 +162,21 @@ export default function ThreadDetails() {
   const handleBookmark = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
+
+      setThread((prev) =>
+        prev ? { ...prev, bookmark: !prev.bookmark } : prev
+      );
+
       await axiosInstance.post(`/bookmark/thread/${id}`, null, {
-        headers: {
-          token: token,
-        },
+        headers: { token },
       });
 
-      fecThread();
-    } catch (error: any) {
-      console.log(error.response.data);
+      await AsyncStorage.setItem(
+        `bookmark_thread_${id}`,
+        JSON.stringify(!thread?.bookmark)
+      );
+    } catch (error) {
+      console.log("Bookmark Error:", error);
     }
   };
 
@@ -235,15 +249,14 @@ export default function ThreadDetails() {
           <View>
             {thread && (
               <UserBar
-              userImage={thread.user.image}
-              username={thread.user.full_name}
-              userId={thread.user.id}
-              currentUserId={currentUserId}
-              isFollowed={isFollowing}
-              onFollowStatusChange={handleFollowStatusChange}
-              threadId={thread.id}
-            />
-            
+                userImage={thread.user.image}
+                username={thread.user.full_name}
+                userId={thread.user.id}
+                currentUserId={currentUserId}
+                isFollowed={isFollowing}
+                onFollowStatusChange={handleFollowStatusChange}
+                threadId={thread.id}
+              />
             )}
 
             <View style={{ padding: 10 }}>
