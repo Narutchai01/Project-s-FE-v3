@@ -5,10 +5,8 @@ import { PaperProvider } from "react-native-paper";
 import { expo } from "@/app.json";
 import { CompareProvider } from "@/context/CompareContext";
 import { ReviewProvider } from "@/context/ReviewContext";
-import { BackButtonComponents } from "@/components/Buntton";
 
 export default function RootLayout() {
-  const router = useRouter(); 
 
   return (
     <PaperProvider>
@@ -45,7 +43,7 @@ export default function RootLayout() {
               <Stack.Screen name="setting" />
               <Stack.Screen name="editProfile" />
               <Stack.Screen name="changePassword" />
-              <Stack.Screen name="forgetPassword" />
+              <Stack.Screen name="forgotPassword" />
               <Stack.Screen name="checkEmail" />
               <Stack.Screen name="recoverPassword" />
               <Stack.Screen name="profile/[id]" />

@@ -4,30 +4,27 @@ import React, { useState } from "react";
 import { View, Text, SafeAreaView, TextInput } from "react-native";
 import useLoading from "@/hook/useLoading";
 import { axiosInstance } from "@/lib/axios_instance";
-import { useRecoveryStore } from "@/store/recovery"; 
+import { useRecoveryStore } from "@/store/recovery";
 
 export default function CheckEmailScreen() {
   const { startLoading, stopLoading, isLoading } = useLoading();
   const [otp, setOTP] = useState("");
   const [showAlert, setShowAlert] = useState(false);
   const [alertTitle, setAlertTitle] = useState("");
-  const { user_id } = useRecoveryStore();
+  const { user_id, email } = useRecoveryStore();
+
 
   const handleValidation = async () => {
     if (!otp.trim()) {
-      setAlertTitle("Please enter your OTP");
-      setShowAlert(true);
-      return;
+      return showError("Please enter your OTP");
     }
 
     setShowAlert(false);
     startLoading();
+
     try {
-      const payload = {
-        otp: otp,
-        user_id: user_id,
-      };
-      
+      const payload = { otp, user_id };
+
       await axiosInstance.post("/recovery/validation", payload, {
         headers: {
           "Content-Type": "application/json",
@@ -36,13 +33,37 @@ export default function CheckEmailScreen() {
 
       router.push("/recoverPassword");
     } catch (error: any) {
-      console.error("Error validating OTP:", error.response?.data || error.message);
-      setAlertTitle("Invalid or expired OTP");
-      setShowAlert(true);
+      const rawMessage = error?.response?.data?.error || error.message;
+      const userFriendlyMessage = getErrorMessage(rawMessage);
+      showError(userFriendlyMessage);
     } finally {
       stopLoading();
     }
   };
+
+  const showError = (message: string) => {
+    setAlertTitle(message);
+    setShowAlert(true);
+  };
+
+  const getErrorMessage = (message: string): string => {
+    const normalized = message.toLowerCase();
+
+    if (normalized.includes("invalid")) {
+      return "The OTP you entered is invalid. Please try again.";
+    }
+
+    if (normalized.includes("expire")) {
+      return "Your OTP has expired. Please request a new one.";
+    }
+
+    if (normalized.includes("network")) {
+      return "Network error. Please check your internet connection.";
+    }
+
+    return "Something went wrong. Please try again.";
+  };
+
 
   return (
     <SafeAreaView className="flex-1 bg-Snow justify-center items-center">
@@ -58,8 +79,9 @@ export default function CheckEmailScreen() {
           </View>
 
           <Text className="text-label8 mb-10">
-            We’ve sent a code to byeWind@gmail.com
+            We’ve sent a code to <Text className="text-label8 font-medium">{email}</Text>
           </Text>
+
           <View className="w-full flex gap-10">
             <TextInput
               placeholder="otp"

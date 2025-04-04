@@ -33,6 +33,7 @@ export default function ForgotPasswordScreen() {
 
       const user_id = res?.data?.data?.user_id;
       useRecoveryStore.getState().setUserId(user_id);
+      useRecoveryStore.getState().setEmail(email);
 
       setEmail("");
       router.push("/checkEmail");
@@ -48,7 +49,7 @@ export default function ForgotPasswordScreen() {
       <View className="w-full container mx-auto px-10">
         <View className="flex flex-col ">
           <View className="mb-4">
-            <Text className="text-heading leading-snug font-bold">Forget</Text>
+            <Text className="text-heading leading-snug font-bold">Forgot</Text>
             <Text className="text-heading leading-snug font-bold">
               Password ?
             </Text>

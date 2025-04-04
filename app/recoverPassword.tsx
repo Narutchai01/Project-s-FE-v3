@@ -6,6 +6,7 @@ import {
   SafeAreaView,
   TextInput,
   TouchableOpacity,
+  Keyboard,
 } from "react-native";
 import { ButtonComponents } from "@/components/Buntton";
 import { Eye, EyeOff } from "lucide-react-native";
@@ -23,6 +24,8 @@ export default function RecoverPasswordScreen() {
   const { user_id } = useRecoveryStore();
 
   const handleChangePassword = async () => {
+    Keyboard.dismiss(); 
+    
     if (!newPassword || !confirmPassword) {
       setErrorMessage("Please fill in all fields.");
       return;
@@ -46,6 +49,7 @@ export default function RecoverPasswordScreen() {
       });
 
       setErrorMessage("");
+      Keyboard.dismiss();
       setModalVisible(true);
       setNewPassword("");
       setConfirmPassword("");
