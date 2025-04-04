@@ -1,4 +1,4 @@
-import { View, Text, FlatList, Dimensions } from "react-native";
+import { View, Text, FlatList, Dimensions, ScrollView } from "react-native";
 import React, { useCallback } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router, Stack, useLocalSearchParams } from "expo-router";
@@ -231,7 +231,7 @@ export default function ThreadDetails() {
           headerShown: true,
           header: () => (
             <View className="h-16 bg-Snow ml-1">
-              <View className=" h-full flex-row items-center justify-between px-3">
+              <View className=" h-full flex-row items-center justify-between px-4 mt-4">
                 <BackButtonComponents
                   title={"Threads"}
                   textSize="text-Heading3 text-Quartz"
@@ -246,6 +246,10 @@ export default function ThreadDetails() {
         {isLoading && thread === null ? (
           <LoadingIndicator />
         ) : (
+           <ScrollView
+                      showsVerticalScrollIndicator={false}
+                      contentContainerStyle={{ paddingBottom: 25 }}
+                    >
           <View>
             {thread && (
               <UserBar
@@ -331,7 +335,7 @@ export default function ThreadDetails() {
               currImage={currImage}
               bookmark={thread?.bookmark}
             />
-            <View className="container mx-auto px-6 mt-2">
+            <View className="container mx-auto px-4 mt-2 ">
               <Text
                 style={{
                   fontSize: width * 0.05,
@@ -350,6 +354,7 @@ export default function ThreadDetails() {
               </Text>
             </View>
           </View>
+          </ScrollView>
         )}
       </SafeAreaView>
 

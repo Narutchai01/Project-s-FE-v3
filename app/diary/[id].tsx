@@ -84,7 +84,7 @@ const ResultAnalysis = () => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
-          <View className="h-16 bg-Snow">
+          <View className="h-16 bg-Snow -ml-2">
             <View className="h-full flex-row items-center justify-between px-3">
               <BackButtonComponents
                 title={"Result Analysis"}

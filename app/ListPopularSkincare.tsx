@@ -31,7 +31,7 @@ export default function ListPopularSkincare() {
   return (
     <SafeAreaProvider>
       <SafeAreaView className="flex-1 bg-Snow p-4">
-        <View className="h-16 mb-2 bg-Snow">
+        <View className="h-16 mb-2 bg-Snow -ml-2">
           <View className="h-full flex-row items-center justify-between px-3">
             <BackButtonComponents
               title={"Popular Skincare"}

@@ -138,7 +138,7 @@ export default function EditProfileScreen() {
     <SafeAreaView className="flex-1 bg-Snow p-6">
       <ScrollView>
         {isLoading && <LoadingIndicator />}
-        <View className="h-16 bg-Snow">
+        <View className="h-16 bg-Snow ">
           <BackButtonComponents
             title={"Edit Profile"}
             textSize="text-Heading3 text-Quartz"

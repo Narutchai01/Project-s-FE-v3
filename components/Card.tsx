@@ -4,7 +4,6 @@ import {
   CardSkincareProps,
   DiaryCardProps,
   CardReviewProps,
-  ThreadCardProps,
   AddPhotoProps,
   ICommentCardProps,
   CommunityCardProps
@@ -21,8 +20,8 @@ export const CardSkincare: FC<CardSkincareProps> = (props) => {
   const { image, name } = props;
 
   return (
-    <View className="bg-white rounded-2xl shadow w-[115px] h-[130px] mx-2 mb-2 relative overflow-hidden">
-      <View className="w-[115px] h-[115px] relative overflow-hidden">
+    <View className="bg-white rounded-2xl shadow w-[110px] h-[140px] mx-2 mb-2 relative overflow-hidden">
+      <View className="w-[110px] h-[125px] relative overflow-hidden">
         <Image
           source={image ? { uri: image } : defaultImage}
           className="w-full h-full rounded-t-2xl object-cover"
@@ -242,7 +241,7 @@ export const CommunityCard: React.FC<CommunityCardProps> = (props) => {
               numberOfLines={1}
               ellipsizeMode="tail"
               className="text-label6 text-gray-600"
-              style={{ width: 75 }}
+              style={{ width: 70 }}
             >
               {user}
             </Text>
@@ -450,16 +449,16 @@ export const CardSkincareReccommemded: FC<CardSkincareProps> = (props) => {
   const { image, name } = props;
 
   return (
-    <View className="bg-white rounded-2xl shadow w-[90%] h-[105px] relative overflow-hidden">
+    <View className="bg-white rounded-2xl shadow w-[90%] h-[120px] relative overflow-hidden">
       <View
         style={{
           position: "absolute",
-          top: 65,
+          top: 78,
           right: 0,
           width: 0,
           height: 0,
           borderStyle: "solid",
-          borderLeftWidth: 12,
+          borderLeftWidth: 1,
           borderRightWidth: 0,
           borderBottomWidth: 20,
           borderLeftColor: "transparent",
@@ -468,7 +467,7 @@ export const CardSkincareReccommemded: FC<CardSkincareProps> = (props) => {
           zIndex: 10,
         }}
       />
-      <View className="w-[100px] h-[100px] relative overflow-hidden rounded-2xl">
+      <View className="w-[100px] h-[100px] relative overflow-hidden ">
         <Image
           source={image ? { uri: image } : defaultImage}
           className="w-full h-full object-cover"
@@ -551,7 +550,7 @@ export const PostByUser: FC<CommunityCardProps> = (props) => {
               className="text-label13 text-gray-600"
               numberOfLines={1}
               ellipsizeMode="tail"
-              style={{ width: 35 }}
+              style={{ width: 40 }}
               >{user}</Text>
             </View>
 

@@ -16,7 +16,7 @@ import {
 } from "react-native";
 import { RadioComponents } from "./Radio";
 import { BackButtonComponents, ButtonComponents } from "./Buntton";
-import { Image as ImageIcon } from "lucide-react-native";
+import { Image as ImageIcon, SquareArrowLeft } from "lucide-react-native";
 import { Image } from "expo-image";
 import * as DocumentPicker from "expo-document-picker";
 import { axiosInstance } from "@/lib/axios_instance";
@@ -166,144 +166,146 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
 
   return (
     <>
-    <Modal visible={isOpen && isMode} animationType="slide">
-      {isLoading ? (
-        <LoadingIndicator />
-      ) : (
-        <SafeAreaView className="flex-1 bg-Snow p-6">
-          <ScrollView>
-            {/* header zone  */}
-            <BackButtonComponents
-              title={"New Thread"}
-              textSize="text-Heading3 text-Quartz"
-              onPress={handleCancel}
-            />
+      <Modal visible={isOpen && isMode} animationType="slide">
+        {isLoading ? (
+          <LoadingIndicator />
+        ) : (
+          <SafeAreaView className="flex-1 bg-Snow p-6">
+            <ScrollView>
+              {/* header zone  */}
+              <BackButtonComponents
+                title={"New Thread"}
+                textSize="text-Heading3 text-Quartz"
+                onPress={handleCancel}
+              />
 
-            {/* header zone  */}
-            <View className="flex justify-center items-center">
-              {!image ? (
-                <TouchableOpacity
-                  onPress={handleChooseImage}
-                  style={{
-                    height: 300,
-                    width: 200,
-                    borderRadius: 10,
-                    backgroundColor: "#FCECEC",
-                    borderColor: "#FF6F61",
-                    borderWidth: 2,
-                    display: "flex",
-                    marginTop: 11,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <View className="flex items-center justify-center">
-                    <ImageIcon size={35} color="#4A4A4A" />
-                    <Text className="text-label1 mt-2">Tap a photo</Text>
-                  </View>
-                </TouchableOpacity>
-              ) : (
-                <FlatList
-                  data={image}
-                  keyExtractor={(_, index: number) => index.toString()}
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  ListHeaderComponent={() => {
-                    return (
-                      <TouchableOpacity
-                        onPress={handleChooseImage}
-                        style={{
-                          height: 300,
-                          width: 200,
-                          borderRadius: 10,
-                          backgroundColor: "#FCECEC",
-                          borderColor: "#FF6F61",
-                          borderWidth: 2,
-                          display: "flex",
-                          marginTop: 11,
-                          justifyContent: "center",
-                          alignItems: "center",
-                          marginRight: 10,
-                        }}
-                      >
-                        <View className="flex items-center justify-center">
-                          <ImageIcon size={35} color="#4A4A4A" />
-                          <Text className="text-label1 mt-2">Tap a photo</Text>
-                        </View>
-                      </TouchableOpacity>
-                    );
-                  }}
-                  renderItem={({
-                    item,
-                    index,
-                  }: {
-                    item: string;
-                    index: number;
-                  }) => (
-                    <View
-                      style={{
-                        position: "relative",
-                        marginRight: 10,
-                        marginTop: 10,
-                      }}
-                    >
-                      <Image
-                        source={{ uri: item }}
-                        style={{
-                          width: 200,
-                          height: 300,
-                          borderRadius: 10,
-                        }}
-                      />
-                      <TouchableOpacity
-                        onPress={() => handleRemoveImage(index)}
-                        style={{
-                          position: "absolute",
-                          top: 10,
-                          right: 10,
-                        }}
-                      >
-                        <Ionicons
-                          name="close-circle"
-                          size={30}
-                          color="#4A4A4ACC"
-                        />
-                      </TouchableOpacity>
+              {/* header zone  */}
+              <View className="flex justify-center items-center">
+                {!image ? (
+                  <TouchableOpacity
+                    onPress={handleChooseImage}
+                    style={{
+                      height: 300,
+                      width: 200,
+                      borderRadius: 10,
+                      backgroundColor: "#FCECEC",
+                      borderColor: "#FF6F61",
+                      borderWidth: 2,
+                      display: "flex",
+                      marginTop: 11,
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <View className="flex items-center justify-center">
+                      <ImageIcon size={35} color="#4A4A4A" />
+                      <Text className="text-label1 mt-2">Tap a photo</Text>
                     </View>
-                  )}
-                />
-              )}
+                  </TouchableOpacity>
+                ) : (
+                  <FlatList
+                    data={image}
+                    keyExtractor={(_, index: number) => index.toString()}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    ListHeaderComponent={() => {
+                      return (
+                        <TouchableOpacity
+                          onPress={handleChooseImage}
+                          style={{
+                            height: 300,
+                            width: 200,
+                            borderRadius: 10,
+                            backgroundColor: "#FCECEC",
+                            borderColor: "#FF6F61",
+                            borderWidth: 2,
+                            display: "flex",
+                            marginTop: 11,
+                            justifyContent: "center",
+                            alignItems: "center",
+                            marginRight: 10,
+                          }}
+                        >
+                          <View className="flex items-center justify-center">
+                            <ImageIcon size={35} color="#4A4A4A" />
+                            <Text className="text-label1 mt-2">
+                              Tap a photo
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      );
+                    }}
+                    renderItem={({
+                      item,
+                      index,
+                    }: {
+                      item: string;
+                      index: number;
+                    }) => (
+                      <View
+                        style={{
+                          position: "relative",
+                          marginRight: 10,
+                          marginTop: 10,
+                        }}
+                      >
+                        <Image
+                          source={{ uri: item }}
+                          style={{
+                            width: 200,
+                            height: 300,
+                            borderRadius: 10,
+                          }}
+                        />
+                        <TouchableOpacity
+                          onPress={() => handleRemoveImage(index)}
+                          style={{
+                            position: "absolute",
+                            top: 10,
+                            right: 10,
+                          }}
+                        >
+                          <Ionicons
+                            name="close-circle"
+                            size={30}
+                            color="#4A4A4ACC"
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  />
+                )}
 
-              <View className="w-full container mx-auto px-10 py-10 gap-y-4">
-                <TextInput
-                  placeholder="Title"
-                  className=" border-2  w-full rounded-full p-4 border-BrightGray"
-                  onChangeText={(title) => handleChange("title", title)}
-                />
-                <TextInput
-                  placeholder="Add Caption"
-                  multiline
-                  style={{
-                    minHeight: 100,
-                    borderRadius: 30,
-                  }}
-                  className=" border-2  w-full  p-4 border-BrightGray"
-                  onChangeText={(caption) => handleChange("caption", caption)}
+                <View className="w-full container mx-auto px-10 py-10 gap-y-4">
+                  <TextInput
+                    placeholder="Title"
+                    className=" border-2  w-full rounded-full p-4 border-BrightGray"
+                    onChangeText={(title) => handleChange("title", title)}
+                  />
+                  <TextInput
+                    placeholder="Add Caption"
+                    multiline
+                    style={{
+                      minHeight: 100,
+                      borderRadius: 30,
+                    }}
+                    className=" border-2  w-full  p-4 border-BrightGray"
+                    onChangeText={(caption) => handleChange("caption", caption)}
+                  />
+                </View>
+                <ButtonComponents
+                  title="Create Thread"
+                  onPress={handleCreateThread}
+                  className="bg-Bittersweet px-6 py-3 rounded-full"
+                  textSize="text-lg font-semibold text-White"
                 />
               </View>
-              <ButtonComponents
-                title="Create Thread"
-                onPress={handleCreateThread}
-                className="bg-Bittersweet px-6 py-3 rounded-full"
-                textSize="text-lg font-semibold text-White"
-              />
-            </View>
-          </ScrollView>
-        </SafeAreaView>
-      )}
-    </Modal>
+            </ScrollView>
+          </SafeAreaView>
+        )}
+      </Modal>
 
-    <ConfirmAlert
+      <ConfirmAlert
         visible={isAlertVisible}
         onClose={() => setIsAlertVisible(false)}
         title="Please complete all fields before submitting."
@@ -330,7 +332,6 @@ export const ModalSkincare: FC<IModalSkincare> = (props) => {
   const [isAlertVisible, setIsAlertVisible] = useState(false);
   const [selectSkincare, setSelectSkincare] = useState<ISkincare[]>([]);
 
-
   const filteredSkincares = skincares?.filter((item) =>
     item.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -352,17 +353,15 @@ export const ModalSkincare: FC<IModalSkincare> = (props) => {
   };
 
   const handleCancel = () => {
-    setSkincare(selectSkincare); 
+    setSkincare(selectSkincare);
     onClose();
   };
-  
 
   useEffect(() => {
     if (isOpen) {
-      setSelectSkincare(skincare); 
+      setSelectSkincare(skincare);
     }
   }, [isOpen]);
-  
 
   return (
     <>
@@ -375,7 +374,7 @@ export const ModalSkincare: FC<IModalSkincare> = (props) => {
           <View className="flex flex-row items-center justify-between">
             <ButtonComponents
               title="Cancel"
-              textSize="text-label4 font-semibold text-Bittersweet"
+              textSize="text-label4 font-semibold text-Bittersweet ml-3"
               onPress={handleCancel}
             />
             <View className="flex flex-row items-center justify-between">
@@ -429,13 +428,13 @@ export const ModalSkincare: FC<IModalSkincare> = (props) => {
     </>
   );
 };
-
 interface ModalSkincareDetailProps {
   isOpen: boolean;
   onClose: () => void;
 }
 export const ModalSkincareDetail: FC<ModalSkincareDetailProps> = (props) => {
   const { isOpen, onClose } = props;
+
   const { skincare } = useSkincareStore();
   const { isLoading } = useLoading();
   const { width, height } = Dimensions.get("window");
@@ -443,13 +442,22 @@ export const ModalSkincareDetail: FC<ModalSkincareDetailProps> = (props) => {
   return (
     <Modal visible={isOpen} animationType="slide" onRequestClose={onClose}>
       <SafeAreaView className="flex-1 bg-Snow p-4">
-        <View className="h-16 bg-Snow mb-4">
-          <View className="h-full flex-row items-center justify-between px-3">
-            <BackButtonComponents
-              title={skincare?.name || "Skincare Detail"}
-              textSize="text-Heading3"
+        <View className="h-16 bg-Snow mb-1">
+          <View className="h-full flex-row items-center justify-between px-1">
+            <TouchableOpacity
               onPress={onClose}
-            />
+              className="mb-4 flex-row items-center gap-x-1"
+            >
+              <SquareArrowLeft size={28} color="#4A4A4A" />
+              <Text
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                style={{ width: 275}}
+                className="text-Heading3 text-Quartz " 
+              >
+                {skincare?.name || "Skincare Detail"}
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -462,17 +470,17 @@ export const ModalSkincareDetail: FC<ModalSkincareDetailProps> = (props) => {
             <Image
               source={{ uri: skincare.image }}
               style={{
-                width: width - 20,
+                width: width - 30,
                 height: height * 0.5,
-                borderRadius: 10,
+                borderRadius: 15,
                 alignSelf: "center",
               }}
             />
 
-            <Text className="text-label4 font-semibold mt-4 text-start px-4">
+            <Text className="text-Heading4 font-semibold mt-4 text-start ">
               {skincare.name}
             </Text>
-            <Text className="text-slabel4 mt-2 text-start px-4">
+            <Text className="text-slabel4 mt-2 text-start px-1 mb-4">
               {skincare.description}
             </Text>
           </ScrollView>
@@ -485,6 +493,7 @@ export const ModalSkincareDetail: FC<ModalSkincareDetailProps> = (props) => {
     </Modal>
   );
 };
+
 interface IModalComment {
   isCommentOpen: boolean;
   isCommentClose: () => void;

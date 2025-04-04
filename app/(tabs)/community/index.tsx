@@ -14,6 +14,8 @@ import { ModalCreateReviewPost, ModalCreateThread } from "@/components/Modal";
 import { CopyPlus, Plus, MessageCircleQuestion } from "lucide-react-native";
 import axios from "axios";
 import { Search } from "@/components/Search";
+import { useLocalSearchParams } from "expo-router";
+
 
 export default function CommonScreen() {
   const [threads, setThreads] = useState<IThread[] | null>(null);
@@ -24,6 +26,8 @@ export default function CommonScreen() {
   const [isMode, setIsMode] = useState(false);
   const [isThreadModalOpen, setIsThreadModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const { mode } = useLocalSearchParams();
+
 
   const fetchThread = useCallback( async () => {
     startLoading();
@@ -100,6 +104,15 @@ export default function CommonScreen() {
   const handleRouter = (id: number) => {
     router.push(isMode ? `/thread/${id}` : `/review/${id}`);
   };
+
+  
+useEffect(() => {
+  if (mode === "thread") {
+    setIsMode(true);
+  } else if (mode === "review") {
+    setIsMode(false);
+  }
+}, [mode]);
 
   const CustomHeader = () => (
     <View className="bg-Snow p-4 border-b-2 border-gray-300 relative">

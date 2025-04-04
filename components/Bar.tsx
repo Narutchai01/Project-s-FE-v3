@@ -8,7 +8,7 @@ import { ButtonComponents } from "./Buntton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
 import useLoading from "@/hook/useLoading";
-import { router, useLocalSearchParams } from "expo-router";
+import { router } from "expo-router";
 
 interface IActivityBar {
   favorite: boolean | undefined;
@@ -50,7 +50,7 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
           alignItems: "center",
         }}
       >
-        <View style={{ flexDirection: "row", gap: 16 }}>
+        <View style={{ flexDirection: "row", gap: 16, marginLeft: -8 }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
             <TouchableOpacity onPress={hadleFavorite}>
               <Heart
@@ -70,7 +70,7 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
           </View>
         </View>
 
-        <TouchableOpacity onPress={handleBookmark}>
+        <TouchableOpacity onPress={handleBookmark} style={{ marginRight: -10 }}> 
           <Bookmark
             size={24}
             color={bookmark ? "#FFD700" : "#4A4A4A"}
@@ -94,9 +94,7 @@ interface UserBarProps {
 }
 
 export const UserBar: FC<UserBarProps> = (props) => {
-  const { id } = useLocalSearchParams();
   const { isLoading, startLoading, stopLoading } = useLoading();
-  const [isOtherProfileOpen, setIsOtherProfileOpen] = useState(false);
   const {
     userImage,
     username,
@@ -148,7 +146,7 @@ export const UserBar: FC<UserBarProps> = (props) => {
 
   return (
     <>
-      <View className="flex flex-row justify-between items-center px-3 py-2 ml-2">
+      <View className="flex flex-row justify-between items-center px-3 py-2 mt-2">
         <TouchableOpacity
           className="flex flex-row items-center gap-x-2"
           onPress={() => {
@@ -165,7 +163,10 @@ export const UserBar: FC<UserBarProps> = (props) => {
               borderRadius: 20,
             }}
           />
-          <Text>{username}</Text>
+          <Text   
+          numberOfLines={1}
+            ellipsizeMode="tail"
+            style={{ width: 195 }}>{username}</Text>
         </TouchableOpacity>
 
         <View>

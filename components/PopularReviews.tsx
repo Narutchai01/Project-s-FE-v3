@@ -62,12 +62,13 @@ export const PopularReviews: FC = () => {
       <View className="flex-row items-center justify-between mb-6">
         <Text className="text-Heading3">Popular Reviews</Text>
         <TouchableOpacity
-         className="flex-row items-center"
-         onPress={() => router.push("/(tabs)/community")}
-         >
-          <Text className="text-label2 text-gray-500">see more</Text>
-          <ChevronRight size={16} color="gray" />
-        </TouchableOpacity>
+  className="flex-row items-center"
+  onPress={() => router.push("/(tabs)/community?mode=review")}
+>
+  <Text className="text-label2 text-gray-500">see more</Text>
+  <ChevronRight size={16} color="gray" />
+</TouchableOpacity>
+
       </View>
 
       {isLoading ? (

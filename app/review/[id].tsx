@@ -1,4 +1,4 @@
-import { View, Text, FlatList, Dimensions } from "react-native";
+import { View, Text, FlatList, Dimensions, ScrollView } from "react-native";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router, Stack, useLocalSearchParams } from "expo-router";
@@ -32,7 +32,7 @@ export default function ReviewDetails() {
       const res = await axiosInstance.get(`/user/${userId}`, {
         headers: { token },
       });
-  
+
       if (res.data.status) {
         setIsFollowing(res.data.data.follow);
       }
@@ -40,7 +40,6 @@ export default function ReviewDetails() {
       console.error("Error fetching user follow status:", error);
     }
   };
-  
 
   const fetchReview = useCallback(async () => {
     startLoading();
@@ -49,7 +48,7 @@ export default function ReviewDetails() {
       const res = await axiosInstance.get(`/reviews/${id}`, {
         headers: { token },
       });
-      
+
       const data = res.data;
       if (data.status) {
         setReview(data.data);
@@ -84,7 +83,7 @@ export default function ReviewDetails() {
 
       const data = res.data;
       if (data.status) {
-        setComment(data.data ?? []); 
+        setComment(data.data ?? []);
         setCommentCount(data.data?.length ?? 0);
       }
     } catch (error: any) {
@@ -95,15 +94,11 @@ export default function ReviewDetails() {
   const handleFavorite = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-      await axiosInstance.post(
-        `/favorite/review/skincare/${id}`,
-        null,
-        {
-          headers: {
-            token: token,
-          },
-        }
-      );
+      await axiosInstance.post(`/favorite/review/skincare/${id}`, null, {
+        headers: {
+          token: token,
+        },
+      });
 
       fetchReview();
     } catch (error: any) {
@@ -211,8 +206,8 @@ export default function ReviewDetails() {
         options={{
           headerShown: true,
           header: () => (
-            <View className="h-16 bg-Snow ml-1">
-              <View className=" h-full flex-row items-center justify-between px-3">
+            <View className="h-16 bg-Snow">
+              <View className=" h-full flex-row items-center justify-between px-4 mt-4">
                 <BackButtonComponents
                   title={"Reviews"}
                   textSize="text-Heading3 text-Quartz"
@@ -227,98 +222,109 @@ export default function ReviewDetails() {
         {isLoading && review === null ? (
           <LoadingIndicator />
         ) : (
-          <View>
-            {review && (
-              <UserBar
-                userImage={review?.user?.image}
-                username={review?.user?.full_name}
-                userId={review?.user?.id}
-                currentUserId={currentUserId}
-                isFollowed={isFollowing}
-                onFollowStatusChange={handleFollowStatusChange}
-                reviewId={review?.id}
-              />
-            )}
-
-            <View style={{ padding: 10 }}>
-              {imagesList.length > 1 && (
-                <View
-                  style={{
-                    position: "absolute",
-                    top: 20,
-                    right: 20,
-                    backgroundColor: "#4A4A4ACC",
-                    paddingVertical: 5,
-                    paddingHorizontal: 10,
-                    borderRadius: 20,
-                    zIndex: 10,
-                  }}
-                >
-                  <Text
-                    style={{ color: "white", fontSize: 14, fontWeight: "bold" }}
-                  >
-                    {currImage + 1} / {imagesList.length}
-                  </Text>
-                </View>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 25 }}
+          >
+            <View>
+              {review && (
+                <UserBar
+                  userImage={review?.user?.image}
+                  username={review?.user?.full_name}
+                  userId={review?.user?.id}
+                  currentUserId={currentUserId}
+                  isFollowed={isFollowing}
+                  onFollowStatusChange={handleFollowStatusChange}
+                  reviewId={review?.id}
+                />
               )}
 
-              <FlatList
-                data={imagesList}
-                renderItem={({ item, index }) => (
-                  <Image
-                    source={{ uri: item }}
+              <View style={{ padding: 10 }}>
+                {imagesList.length > 1 && (
+                  <View
                     style={{
-                      width: width - 20,
-                      height: height * 0.5,
-                      borderRadius: 10,
+                      position: "absolute",
+                      top: 20,
+                      right: 20,
+                      backgroundColor: "#4A4A4ACC",
+                      paddingVertical: 5,
+                      paddingHorizontal: 10,
+                      borderRadius: 20,
+                      zIndex: 10,
                     }}
-                    key={index}
-                  />
+                  >
+                    <Text
+                      style={{
+                        color: "white",
+                        fontSize: 14,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {currImage + 1} / {imagesList.length}
+                    </Text>
+                  </View>
                 )}
-                keyExtractor={(item, index) => index.toString()}
-                pagingEnabled
-                bounces={false}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                onScroll={(e) => {
-                  const { contentOffset } = e.nativeEvent;
-                  const index = Math.round(contentOffset.x / (width - 20));
-                  setCurrImage(index);
-                }}
-                ListEmptyComponent={() => (
-                  <Image
-                    source={require("@/assets/images/defaultImage.png")}
-                    style={{
-                      width: width - 20,
-                      height: height * 0.5,
-                      borderRadius: 10,
-                    }}
-                    contentFit="cover"
-                  />
-                )}
-              />
-            </View>
 
-            <ActivityBar
-              isOpenComment={isOpenComment}
-              hadleFavorite={handleFavorite}
-              handleBookmark={handleBookmark}
-              favorite={review?.favorite}
-              favoriteCount={review?.favorite_count}
-              commnetCount={commentCount}
-              dataPaginate={imagesList}
-              currImage={currImage}
-              bookmark={review?.bookmark}
-            />
-            <View className="container mx-auto px-6 mt-2">
-              <Text style={{ fontSize: width * 0.05, fontWeight: "bold" }}>
-                {review?.title ? review?.title : "No title"}
-              </Text>
-              <Text style={{ fontSize: width * 0.0375, fontWeight: "medium" }}>
-                {review?.content ? review?.content : "No content"}
-              </Text>
+                <FlatList
+                  data={imagesList}
+                  renderItem={({ item, index }) => (
+                    <Image
+                      source={{ uri: item }}
+                      style={{
+                        width: width - 20,
+                        height: height * 0.5,
+                        borderRadius: 10,
+                      }}
+                      key={index}
+                    />
+                  )}
+                  keyExtractor={(item, index) => index.toString()}
+                  pagingEnabled
+                  bounces={false}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  onScroll={(e) => {
+                    const { contentOffset } = e.nativeEvent;
+                    const index = Math.round(contentOffset.x / (width - 20));
+                    setCurrImage(index);
+                  }}
+                  ListEmptyComponent={() => (
+                    <Image
+                      source={require("@/assets/images/defaultImage.png")}
+                      style={{
+                        width: width - 20,
+                        height: height * 0.5,
+                        borderRadius: 10,
+                      }}
+                      contentFit="cover"
+                    />
+                  )}
+                />
+              </View>
+
+              <ActivityBar
+                isOpenComment={isOpenComment}
+                hadleFavorite={handleFavorite}
+                handleBookmark={handleBookmark}
+                favorite={review?.favorite}
+                favoriteCount={review?.favorite_count}
+                commnetCount={commentCount}
+                dataPaginate={imagesList}
+                currImage={currImage}
+                bookmark={review?.bookmark}
+              />
+              <View className="container mx-auto px-4 mt-2 ">
+                <Text style={{ fontSize: width * 0.05, fontWeight: "bold" }}>
+                  {review?.title ? review?.title : "No title"}
+                </Text>
+                <Text
+                  style={{ fontSize: width * 0.0375, fontWeight: "medium" }}
+                >
+                  {review?.content ? review?.content : "No content"}
+                </Text>
+              </View>
             </View>
-          </View>
+          </ScrollView>
         )}
       </SafeAreaView>
 
