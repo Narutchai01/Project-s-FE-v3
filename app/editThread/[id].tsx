@@ -21,18 +21,25 @@ import { AxiosError } from "axios";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as DocumentPicker from "expo-document-picker";
 import { Ionicons } from "@expo/vector-icons";
+import { IThread } from "@/interface/threads";
 
 export default function EditThradScreen() {
-  const { id } = useLocalSearchParams(); 
+  const { id } = useLocalSearchParams();
   const router = useRouter();
   const { isLoading, startLoading, stopLoading } = useLoading();
   const [isAlertVisible, setIsAlertVisible] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [image, setImage] = useState<string[] | null>(null);
-  const [thread, setThread] = useState({
+  const [imagesToDelete, setImagesToDelete] = useState<number[]>([]);
+  const [thread, setThread] = useState<{
+    title: string;
+    caption: string;
+    originalData: IThread | null;
+  }>({
     title: "",
     caption: "",
+    originalData: null,
   });
 
   const handle404Error = (error: unknown) => {
@@ -47,14 +54,26 @@ export default function EditThradScreen() {
     setImage((prev) => {
       if (!prev) return null;
       const updatedImages = [...prev];
+
+      const removedImage = updatedImages[index];
+      if (typeof removedImage === "string" && removedImage.startsWith("http")) {
+        const imageObject = thread.originalData?.images?.find(
+          (img) => img.image === removedImage
+        );
+        if (imageObject?.id) {
+          setImagesToDelete((prev) => [...prev, imageObject.id]);
+        }
+      }
+
       updatedImages.splice(index, 1);
       return updatedImages.length > 0 ? updatedImages : null;
     });
   };
 
   const handleCancel = () => {
-    setThread({ title: "", caption: "" });
+    setThread({ title: "", caption: "", originalData: null });
     setImage(null);
+    setImagesToDelete([]);
     router.back();
   };
 
@@ -96,6 +115,7 @@ export default function EditThradScreen() {
         setThread({
           title: threadData.title,
           caption: threadData.caption,
+          originalData: threadData,
         });
 
         if (Array.isArray(threadData.images)) {
@@ -103,7 +123,6 @@ export default function EditThradScreen() {
           setImage(urls);
         }
       }
-      
     } catch (error) {
       handle404Error(error);
     } finally {
@@ -111,8 +130,8 @@ export default function EditThradScreen() {
     }
   }, []);
 
-  const handleCreateThread = async () => {
-    if (!thread.title || !thread.caption || !image) {
+  const handleUpdateThread = async () => {
+    if (!thread.title || !thread.caption) {
       setIsAlertVisible(true);
       return;
     }
@@ -123,44 +142,49 @@ export default function EditThradScreen() {
       if (!token) {
         throw new Error("No token found");
       }
+
       const formData = new FormData();
       formData.append("title", thread.title);
       formData.append("caption", thread.caption);
+
+      if (imagesToDelete.length > 0) {
+        formData.append("delete_images", JSON.stringify(imagesToDelete));
+      }
+
       if (image) {
         image.forEach((img) => {
-          const file = {
-            uri: img,
-            name: "image.jpg",
-            type: "image/jpeg",
-          };
-          formData.append("files", file as unknown as Blob);
-        });
-      }
-      await axiosInstance
-        .put(`/thread/${id}`, formData, {
-          headers: {
-            token: token,
-            // "Content-Type": "multipart/form-data",
-          },
-        })
-        .then((res) => {
-          if (res.data.status) {
-            router.push(`/thread/${res.data.data.id}`);
+          if (!img.startsWith("http")) {
+            const file = {
+              uri: img,
+              name: img.split("/").pop() || "image.jpg",
+              type: "image/jpeg",
+            };
+            formData.append("files", file as unknown as Blob);
           }
         });
+      }
+
+      const response = await axiosInstance.put(`/thread/${id}`, formData, {
+        headers: {
+          token: token,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (response.data.status) {
+        router.push(`/thread/${response.data.data.id}`);
+      }
     } catch (error) {
       handle404Error(error);
       console.log(error);
     } finally {
       stopLoading();
-      handleCancel();
     }
   };
 
   useEffect(() => {
     fetchThread();
   }, [fetchThread]);
-  
 
   return (
     <SafeAreaView className="flex-1 bg-Snow p-6">
@@ -289,7 +313,7 @@ export default function EditThradScreen() {
             </View>
             <ButtonComponents
               title="Save"
-              onPress={handleCreateThread}
+              onPress={handleUpdateThread}
               className="bg-Bittersweet px-6 py-3 rounded-full"
               textSize="text-lg font-semibold text-White"
             />

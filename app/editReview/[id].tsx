@@ -32,7 +32,9 @@ export default function EditReviewScreen() {
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [skincare, setSkincare] = useState<ISkincare[]>([]);
+  const [originalSkincare, setOriginalSkincare] = useState<ISkincare[]>([]);
   const [image, setImage] = useState<string | null>(null);
+  const [originalImageId, setOriginalImageId] = useState<number | null>(null);
   const [review, setReview] = useState({
     title: "",
     content: "",
@@ -54,18 +56,25 @@ export default function EditReviewScreen() {
         headers: { token },
       });
       const data = res.data;
-      console.log(res.data);
+
       if (data.status) {
         const reviewData = data.data;
         setReview({
           title: reviewData.title,
           content: reviewData.content,
         });
+
         if (reviewData.image) {
           setImage(reviewData.image);
         }
+
+        if (reviewData.image_id) {
+          setOriginalImageId(reviewData.image_id);
+        }
+
         if (reviewData.skincares) {
           setSkincare(reviewData.skincares);
+          setOriginalSkincare(reviewData.skincares);
         }
       }
     } catch (error) {
@@ -81,32 +90,54 @@ export default function EditReviewScreen() {
       setIsAlertVisible(true);
       return;
     }
-  
+
     startLoading();
     try {
       const token = await AsyncStorage.getItem("token");
       const formData = new FormData();
+
       formData.append("title", review.title);
       formData.append("content", review.content);
-      formData.append("skincare_id", JSON.stringify(skincare.map((item) => item.id)));
-  
-      if (image) {
+      formData.append(
+        "skincare_id",
+        JSON.stringify(skincare.map((item) => item.id))
+      );
+
+      const currentIds = Array.from(new Set(skincare.map((s) => s.id)));
+      const originalIds = Array.from(
+        new Set(originalSkincare.map((s) => s.id))
+      );
+      const deletedSkincares = originalIds.filter(
+        (id) => !currentIds.includes(id)
+      );
+      if (deletedSkincares.length > 0) {
+        formData.append("delete_skincares", JSON.stringify(deletedSkincares));
+      }
+
+      if (originalImageId && image && !image.startsWith("http")) {
+        formData.append("delete_images", JSON.stringify([originalImageId]));
+      }
+
+      if (image && !image.startsWith("http")) {
         const file = {
           uri: image,
-          name: "image.jpg",
+          name: "review_image.jpg",
           type: "image/jpeg",
         };
-        formData.append("file", file as unknown as Blob);
-        console.log("file object:", file);
+        formData.append("file", file as any);
       }
-  
+
+      for (const pair of formData.entries()) {
+        console.log(`${pair[0]}:`, pair[1]);
+      }
+
       const res = await axiosInstance.put(`/reviews/${id}`, formData, {
         headers: {
           token: token || "",
           "Content-Type": "multipart/form-data",
         },
       });
-  
+
       if (res.data.status) {
         router.push(`/review/${id}`);
       }
@@ -117,7 +148,6 @@ export default function EditReviewScreen() {
       stopLoading();
     }
   };
-  
 
   const handleCancel = () => {
     setReview({ title: "", content: "" });
@@ -214,7 +244,7 @@ export default function EditReviewScreen() {
               showsHorizontalScrollIndicator={false}
             >
               {skincare.length > 0 ? (
-                skincare.map((item: ISkincare) => (
+                skincare.map((item) => (
                   <View key={item.id} className="mb-4 mr-2">
                     <Image
                       source={{ uri: item.image }}
