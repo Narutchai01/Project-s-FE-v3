@@ -1,5 +1,11 @@
 import React, { useState } from "react";
-import { View, SafeAreaView, Text, TextInput, TouchableOpacity } from "react-native";
+import {
+  View,
+  SafeAreaView,
+  Text,
+  TextInput,
+  TouchableOpacity,
+} from "react-native";
 import { BackButtonComponents, ButtonComponents } from "@/components/Buntton";
 import { router } from "expo-router";
 import { ConfirmAlert } from "@/components/Alert";
@@ -7,6 +13,7 @@ import useLoading from "@/hook/useLoading";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
 import { Eye, EyeOff } from "lucide-react-native";
+import { AxiosError } from "axios";
 
 export default function ChangePasswordScreen() {
   const [newPassword, setNewPassword] = useState("");
@@ -16,6 +23,16 @@ export default function ChangePasswordScreen() {
   const { startLoading, stopLoading, isLoading } = useLoading();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
+  const handle404Error = (error: unknown) => {
+    const axiosError = error as AxiosError;
+    if (axiosError?.response?.status === 404 && !alertVisible) {
+      setAlertMessage("Your session has expired or account not found.");
+      setAlertVisible(true);
+    }
+  };
 
   const handleNewPassword = async (password: string) => {
     startLoading();
@@ -36,6 +53,7 @@ export default function ChangePasswordScreen() {
       setAlertTitle("Change Password Success");
       setShowAlert(true);
     } catch (error) {
+      handle404Error(error);
       console.error("Error changing password:", error);
     } finally {
       stopLoading();
@@ -76,12 +94,12 @@ export default function ChangePasswordScreen() {
           secureTextEntry={!showPassword}
           className="border-2 w-full rounded-full p-4 border-BrightGray mb-4"
         />
-         <TouchableOpacity
-            onPress={() => setShowPassword(!showPassword)}
-            className="absolute right-8 top-[52px]"
-          >
-            {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
-          </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setShowPassword(!showPassword)}
+          className="absolute right-8 top-[52px]"
+        >
+          {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+        </TouchableOpacity>
 
         <Text className="text-Heading4 text-Quartz mb-2 mt-4">
           Confirm Password
@@ -92,12 +110,12 @@ export default function ChangePasswordScreen() {
           secureTextEntry={!showConfirmPassword}
           className="border-2 w-full rounded-full p-4 border-BrightGray mb-8"
         />
-         <TouchableOpacity
-            onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-            className="absolute right-8 top-[160px]"
-          >
-            {showConfirmPassword ? <Eye size={18} /> : <EyeOff size={18} />}
-          </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+          className="absolute right-8 top-[160px]"
+        >
+          {showConfirmPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+        </TouchableOpacity>
 
         <ButtonComponents
           onPress={handleChangePassword}
@@ -117,6 +135,16 @@ export default function ChangePasswordScreen() {
         }}
         title={alertTitle}
         confirm="Done"
+      />
+
+      <ConfirmAlert
+        visible={alertVisible}
+        title={alertMessage}
+        confirm="Back to login"
+        onClose={() => {
+          setAlertVisible(false);
+          router.replace("/login");
+        }}
       />
     </SafeAreaView>
   );

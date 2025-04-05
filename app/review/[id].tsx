@@ -12,6 +12,8 @@ import { ICommentReview } from "@/interface/comment";
 import { ModalComment } from "@/components/Modal";
 import { IReview } from "@/interface/review";
 import { BackButtonComponents } from "@/components/Buntton";
+import { AxiosError } from "axios";
+import { ConfirmAlert } from "@/components/Alert";
 
 export default function ReviewDetails() {
   const { id } = useLocalSearchParams();
@@ -25,6 +27,16 @@ export default function ReviewDetails() {
   const [commentContent, setCommentContent] = useState("");
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
+  const handle404Error = (error: unknown) => {
+    const axiosError = error as AxiosError;
+    if (axiosError?.response?.status === 404 && !alertVisible) {
+      setAlertMessage("Your session has expired or account not found.");
+      setAlertVisible(true);
+    }
+  };
 
   const fetchUserFollowStatus = async (userId: number) => {
     try {
@@ -37,6 +49,7 @@ export default function ReviewDetails() {
         setIsFollowing(res.data.data.follow);
       }
     } catch (error) {
+      handle404Error(error);
       console.error("Error fetching user follow status:", error);
     }
   };
@@ -56,6 +69,7 @@ export default function ReviewDetails() {
         stopLoading();
       }
     } catch (error) {
+      handle404Error(error);
       console.error(error);
     } finally {
       stopLoading();
@@ -87,6 +101,7 @@ export default function ReviewDetails() {
         setCommentCount(data.data?.length ?? 0);
       }
     } catch (error: any) {
+      handle404Error(error);
       console.log(error);
     }
   };
@@ -102,6 +117,7 @@ export default function ReviewDetails() {
 
       fetchReview();
     } catch (error: any) {
+      handle404Error(error);
       console.log(error.response.data);
     }
   };
@@ -121,6 +137,7 @@ export default function ReviewDetails() {
         fetchComments();
       }
     } catch (error: any) {
+      handle404Error(error);
       console.log(error.response.data);
     }
   };
@@ -144,6 +161,7 @@ export default function ReviewDetails() {
       fetchComments();
       setCommentContent("");
     } catch (error) {
+      handle404Error(error);
       console.log(error);
     }
   };
@@ -161,6 +179,7 @@ export default function ReviewDetails() {
 
       fetchReview();
     } catch (error: any) {
+      handle404Error(error);
       console.log(error.response.data);
     }
   };
@@ -336,6 +355,15 @@ export default function ReviewDetails() {
         handleComment={handleComment}
         setComment={setCommentContent}
         commentContent={commentContent}
+      />
+      <ConfirmAlert
+        visible={alertVisible}
+        title={alertMessage}
+        confirm="Back to login"
+        onClose={() => {
+          setAlertVisible(false);
+          router.replace("/login");
+        }}
       />
     </SafeAreaProvider>
   );

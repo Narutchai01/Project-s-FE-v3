@@ -149,9 +149,9 @@ export const PopularThreadCard: FC<CommunityCardProps> = (props) => {
             borderBottomColor: "white",
           }}
         />
-        <View className="p-2">
+        <View className="p-2 -mb-1">
           <Text
-            className="text-label12 font-medium mb-1 " 
+            className="text-label12 font-medium mb-1" 
             numberOfLines={1}
             ellipsizeMode="tail"
             style={{ width: 100 }}
@@ -248,7 +248,7 @@ export const CommunityCard: React.FC<CommunityCardProps> = (props) => {
           </View>
 
           <TouchableOpacity
-            className="w-7 h-7 bg-white rounded-full flex items-center justify-center"
+            className="w-7 h-7 bg-white rounded-full flex items-center justify-center ml-2"
             onPress={onFavorite}
           >
             <Heart

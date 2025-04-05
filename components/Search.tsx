@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useRef, useEffect, useCallback, memo } from "react";
 import {
   View,
   TextInput,
@@ -11,58 +11,55 @@ import { Ionicons } from "@expo/vector-icons";
 
 interface SearchProps {
   searchQuery: string;
+  isSearchOpen: boolean;
+  setIsSearchOpen: (isOpen: boolean) => void;
   setSearchQuery: (query: string) => void;
 }
 
-export const Search: React.FC<SearchProps> = ({ searchQuery, setSearchQuery }) => {
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+const SearchComponent: React.FC<SearchProps> = ({
+  searchQuery,
+  isSearchOpen,
+  setSearchQuery,
+  setIsSearchOpen,
+}) => {
   const searchBarWidth = useRef(new Animated.Value(40)).current;
   const inputRef = useRef<TextInput>(null);
-  const [inputValue, setInputValue] = useState(searchQuery);
-
-  const expandSearchBar = useCallback( () => {
-    setIsSearchOpen(true);
-    Animated.timing(searchBarWidth, {
-      toValue: 180,
-      duration: 300,
-      easing: Easing.out(Easing.ease),
-      useNativeDriver: false,
-    }).start(() => {
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 50);
-    });
-  },[searchBarWidth])
-
-  useEffect(() => {
-    if (searchQuery) {
-      if (!isSearchOpen) {
-        expandSearchBar();
-      }
-      setInputValue(searchQuery);
-    }
-  }, [expandSearchBar, isSearchOpen, searchQuery]);
-
 
   const collapseSearchBar = () => {
     setSearchQuery("");
-    setInputValue("");
     Keyboard.dismiss();
-    
-    Animated.timing(searchBarWidth, {
-      toValue: 40,
-      duration: 300,
-      easing: Easing.out(Easing.ease),
-      useNativeDriver: false,
-    }).start(() => {
-      setIsSearchOpen(false);
-    });
+    setIsSearchOpen(false);
   };
 
-  const handleTextChange = (text: string) => {
-    setInputValue(text);
-    setSearchQuery(text);
-  };
+  const handleTextChange = useCallback(
+    (text: string) => {
+      setSearchQuery(text);
+    },
+    [setSearchQuery]
+  );
+
+  useEffect(() => {
+    if (isSearchOpen) {
+        Animated.timing(searchBarWidth, {
+          toValue: 180,
+          duration: 300,
+          easing: Easing.out(Easing.ease),
+          useNativeDriver: false,
+        }).start(() => {
+          setTimeout(() => {
+            inputRef.current?.focus();
+          }, 50);
+        });
+      
+    } else {
+      Animated.timing(searchBarWidth, {
+        toValue: 40,
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: false,
+      }).start();
+    }
+  }, [isSearchOpen, searchBarWidth, searchQuery.length]);
 
   return (
     <View className="mr-2">
@@ -70,7 +67,7 @@ export const Search: React.FC<SearchProps> = ({ searchQuery, setSearchQuery }) =
         {!isSearchOpen ? (
           <TouchableOpacity
             className="bg-Bittersweet w-15 h-8 rounded-full flex items-center justify-center"
-            onPress={expandSearchBar}
+            onPress={() => setIsSearchOpen(true)}
           >
             <Ionicons name="search" size={18} color="white" />
           </TouchableOpacity>
@@ -82,12 +79,12 @@ export const Search: React.FC<SearchProps> = ({ searchQuery, setSearchQuery }) =
               className="flex-1 text-white text-label1 h-6 p-0"
               placeholder="Search"
               placeholderTextColor="white"
-              value={inputValue}
+              value={searchQuery}
               onChangeText={handleTextChange}
               autoCapitalize="none"
               autoCorrect={false}
             />
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={collapseSearchBar}
               className="p-1"
               hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
@@ -100,3 +97,5 @@ export const Search: React.FC<SearchProps> = ({ searchQuery, setSearchQuery }) =
     </View>
   );
 };
+
+export const Search = memo(SearchComponent);

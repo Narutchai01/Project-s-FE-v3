@@ -9,6 +9,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
 import useLoading from "@/hook/useLoading";
 import { router } from "expo-router";
+import { AxiosError } from "axios";
+import { ConfirmAlert } from "./Alert";
 
 interface IActivityBar {
   favorite: boolean | undefined;
@@ -70,7 +72,7 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
           </View>
         </View>
 
-        <TouchableOpacity onPress={handleBookmark} style={{ marginRight: -10 }}> 
+        <TouchableOpacity onPress={handleBookmark} style={{ marginRight: -10 }}>
           <Bookmark
             size={24}
             color={bookmark ? "#FFD700" : "#4A4A4A"}
@@ -109,6 +111,17 @@ export const UserBar: FC<UserBarProps> = (props) => {
   );
   const isOwner =
     currentUserId != null && userId != null && currentUserId === userId;
+    
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
+  const handle404Error = (error: unknown) => {
+    const axiosError = error as AxiosError;
+    if (axiosError?.response?.status === 404 && !alertVisible) {
+      setAlertMessage("Your session has expired or account not found.");
+      setAlertVisible(true);
+    }
+  };
 
   useEffect(() => {
     setIsFollowing(props.isFollowed || false);
@@ -135,6 +148,7 @@ export const UserBar: FC<UserBarProps> = (props) => {
         onFollowStatusChange(newFollowStatus);
       }
     } catch (error: any) {
+      handle404Error(error);
       console.log(
         "Follow toggle error:",
         error.response?.data || error.message
@@ -163,10 +177,9 @@ export const UserBar: FC<UserBarProps> = (props) => {
               borderRadius: 20,
             }}
           />
-          <Text   
-          numberOfLines={1}
-            ellipsizeMode="tail"
-            style={{ width: 195 }}>{username}</Text>
+          <Text numberOfLines={1} ellipsizeMode="tail" style={{ width: 195 }}>
+            {username}
+          </Text>
         </TouchableOpacity>
 
         <View>
@@ -189,6 +202,16 @@ export const UserBar: FC<UserBarProps> = (props) => {
           )}
         </View>
       </View>
+
+      <ConfirmAlert
+        visible={alertVisible}
+        title={alertMessage}
+        confirm="Back to login"
+        onClose={() => {
+          setAlertVisible(false);
+          router.replace("/login");
+        }}
+      />
     </>
   );
 };

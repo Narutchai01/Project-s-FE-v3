@@ -13,6 +13,8 @@ import { ActivityBar, UserBar } from "@/components/Bar";
 import { ICommentThread } from "@/interface/comment";
 import { ModalComment } from "@/components/Modal";
 import { BackButtonComponents } from "@/components/Buntton";
+import { AxiosError } from "axios";
+import { ConfirmAlert } from "@/components/Alert";
 
 export default function ThreadDetails() {
   const { id } = useLocalSearchParams();
@@ -26,6 +28,16 @@ export default function ThreadDetails() {
   const [commentContent, setCommentContent] = useState("");
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
+  const handle404Error = (error: unknown) => {
+    const axiosError = error as AxiosError;
+    if (axiosError?.response?.status === 404 && !alertVisible) {
+      setAlertMessage("Your session has expired or account not found.");
+      setAlertVisible(true);
+    }
+  };
 
   const fetchUserFollowStatus = async (userId: number) => {
     try {
@@ -38,6 +50,7 @@ export default function ThreadDetails() {
         setIsFollowing(res.data.data.follow);
       }
     } catch (error) {
+      handle404Error(error);
       console.error("Error fetching user follow status:", error);
     }
   };
@@ -54,7 +67,6 @@ export default function ThreadDetails() {
 
       const data = res.data;
       if (data.status) {
-
         const storedBookmark = await AsyncStorage.getItem(
           `bookmark_thread_${id}`
         );
@@ -67,6 +79,7 @@ export default function ThreadDetails() {
         stopLoading();
       }
     } catch (error) {
+      handle404Error(error);
       console.log(error);
       stopLoading();
     } finally {
@@ -89,6 +102,7 @@ export default function ThreadDetails() {
 
       fecThread();
     } catch (error: any) {
+      handle404Error(error);
       console.log(error.response.data);
     }
   };
@@ -108,6 +122,7 @@ export default function ThreadDetails() {
         setCommentCount(data.data?.length ?? 0);
       }
     } catch (error: any) {
+      handle404Error(error);
       console.log(error);
     }
   };
@@ -128,6 +143,7 @@ export default function ThreadDetails() {
         fetchComments();
       }
     } catch (error: any) {
+      handle404Error(error);
       console.log(error.response.data);
     }
   };
@@ -151,6 +167,7 @@ export default function ThreadDetails() {
       fetchComments();
       setCommentContent("");
     } catch (error) {
+      handle404Error(error);
       console.log(error);
     }
   };
@@ -176,6 +193,7 @@ export default function ThreadDetails() {
         JSON.stringify(!thread?.bookmark)
       );
     } catch (error) {
+      handle404Error(error);
       console.log("Bookmark Error:", error);
     }
   };
@@ -202,6 +220,7 @@ export default function ThreadDetails() {
           stopLoading();
         }
       } catch (error) {
+        handle404Error(error);
         console.error(error);
       } finally {
         stopLoading();
@@ -246,114 +265,118 @@ export default function ThreadDetails() {
         {isLoading && thread === null ? (
           <LoadingIndicator />
         ) : (
-           <ScrollView
-                      showsVerticalScrollIndicator={false}
-                      contentContainerStyle={{ paddingBottom: 25 }}
-                    >
-          <View>
-            {thread && (
-              <UserBar
-                userImage={thread.user.image}
-                username={thread.user.full_name}
-                userId={thread.user.id}
-                currentUserId={currentUserId}
-                isFollowed={isFollowing}
-                onFollowStatusChange={handleFollowStatusChange}
-                threadId={thread.id}
-              />
-            )}
-
-            <View style={{ padding: 10 }}>
-              {thread?.images && thread?.images.length > 1 && (
-                <View
-                  style={{
-                    position: "absolute",
-                    top: 20,
-                    right: 20,
-                    backgroundColor: "#4A4A4ACC",
-                    paddingVertical: 5,
-                    paddingHorizontal: 10,
-                    borderRadius: 20,
-                    zIndex: 10,
-                  }}
-                >
-                  <Text
-                    style={{ color: "white", fontSize: 14, fontWeight: "bold" }}
-                  >
-                    {currImage + 1} / {thread?.images?.length}
-                  </Text>
-                </View>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ paddingBottom: 25 }}
+          >
+            <View>
+              {thread && (
+                <UserBar
+                  userImage={thread.user.image}
+                  username={thread.user.full_name}
+                  userId={thread.user.id}
+                  currentUserId={currentUserId}
+                  isFollowed={isFollowing}
+                  onFollowStatusChange={handleFollowStatusChange}
+                  threadId={thread.id}
+                />
               )}
 
-              <FlatList
-                data={thread?.images}
-                renderItem={({ item, index }) => (
-                  <Image
-                    source={{ uri: item.image }}
+              <View style={{ padding: 10 }}>
+                {thread?.images && thread?.images.length > 1 && (
+                  <View
                     style={{
-                      width: width - 20,
-                      height: height * 0.5,
-                      borderRadius: 10,
+                      position: "absolute",
+                      top: 20,
+                      right: 20,
+                      backgroundColor: "#4A4A4ACC",
+                      paddingVertical: 5,
+                      paddingHorizontal: 10,
+                      borderRadius: 20,
+                      zIndex: 10,
                     }}
-                    key={index}
-                  />
+                  >
+                    <Text
+                      style={{
+                        color: "white",
+                        fontSize: 14,
+                        fontWeight: "bold",
+                      }}
+                    >
+                      {currImage + 1} / {thread?.images?.length}
+                    </Text>
+                  </View>
                 )}
-                keyExtractor={(item) => item.id.toString()}
-                pagingEnabled
-                bounces={false}
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                onScroll={(e) => {
-                  const { contentOffset } = e.nativeEvent;
-                  const index = Math.round(contentOffset.x / (width - 20));
-                  if (index !== currImage) {
-                    setCurrImage(index);
-                  }
-                }}
-                ListEmptyComponent={() => (
-                  <Image
-                    source={require("@/assets/images/defaultImage.png")}
-                    style={{
-                      width: width - 20,
-                      height: height * 0.5,
-                      borderRadius: 10,
-                    }}
-                    contentFit="cover"
-                  />
-                )}
-              />
-            </View>
 
-            <ActivityBar
-              isOpenComment={isOpenComment}
-              hadleFavorite={handleFavorite}
-              handleBookmark={handleBookmark}
-              favorite={thread?.favorite}
-              favoriteCount={thread?.favorite_count}
-              commnetCount={commentCount}
-              dataPaginate={thread?.images}
-              currImage={currImage}
-              bookmark={thread?.bookmark}
-            />
-            <View className="container mx-auto px-4 mt-2 ">
-              <Text
-                style={{
-                  fontSize: width * 0.05,
-                  fontWeight: "bold",
-                }}
-              >
-                {thread?.title ? thread.title : "No title"}
-              </Text>
-              <Text
-                style={{
-                  fontSize: width * 0.0375,
-                  fontWeight: "medium",
-                }}
-              >
-                {thread?.caption ? thread.caption : "No caption"}
-              </Text>
+                <FlatList
+                  data={thread?.images}
+                  renderItem={({ item, index }) => (
+                    <Image
+                      source={{ uri: item.image }}
+                      style={{
+                        width: width - 20,
+                        height: height * 0.5,
+                        borderRadius: 10,
+                      }}
+                      key={index}
+                    />
+                  )}
+                  keyExtractor={(item) => item.id.toString()}
+                  pagingEnabled
+                  bounces={false}
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  onScroll={(e) => {
+                    const { contentOffset } = e.nativeEvent;
+                    const index = Math.round(contentOffset.x / (width - 20));
+                    if (index !== currImage) {
+                      setCurrImage(index);
+                    }
+                  }}
+                  ListEmptyComponent={() => (
+                    <Image
+                      source={require("@/assets/images/defaultImage.png")}
+                      style={{
+                        width: width - 20,
+                        height: height * 0.5,
+                        borderRadius: 10,
+                      }}
+                      contentFit="cover"
+                    />
+                  )}
+                />
+              </View>
+
+              <ActivityBar
+                isOpenComment={isOpenComment}
+                hadleFavorite={handleFavorite}
+                handleBookmark={handleBookmark}
+                favorite={thread?.favorite}
+                favoriteCount={thread?.favorite_count}
+                commnetCount={commentCount}
+                dataPaginate={thread?.images}
+                currImage={currImage}
+                bookmark={thread?.bookmark}
+              />
+              <View className="container mx-auto px-4 mt-2 ">
+                <Text
+                  style={{
+                    fontSize: width * 0.05,
+                    fontWeight: "bold",
+                  }}
+                >
+                  {thread?.title ? thread.title : "No title"}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: width * 0.0375,
+                    fontWeight: "medium",
+                  }}
+                >
+                  {thread?.caption ? thread.caption : "No caption"}
+                </Text>
+              </View>
             </View>
-          </View>
           </ScrollView>
         )}
       </SafeAreaView>
@@ -366,6 +389,16 @@ export default function ThreadDetails() {
         handleComment={handleComment}
         setComment={setCommentContent}
         commentContent={commentContent}
+      />
+
+      <ConfirmAlert
+        visible={alertVisible}
+        title={alertMessage}
+        confirm="Back to login"
+        onClose={() => {
+          setAlertVisible(false);
+          router.replace("/login");
+        }}
       />
     </SafeAreaProvider>
   );

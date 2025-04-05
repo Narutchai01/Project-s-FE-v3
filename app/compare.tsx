@@ -11,6 +11,8 @@ import { useAcneStore } from "@/store/acneStore";
 import { useFacialStore } from "@/store/facialStore";
 import { BackButtonComponents } from "@/components/Buntton";
 import { router } from "expo-router";
+import { AxiosError } from "axios";
+import { ConfirmAlert } from "@/components/Alert";
 
 export default function CompareScreen() {
   const { compare } = useCompare();
@@ -18,11 +20,21 @@ export default function CompareScreen() {
   const { facials, fetchFacials, loadFacials } = useFacialStore();
   const [compareData, setCompareData] = useState<IResult[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
   const loadAcnesStore = useCallback(loadAcnes, [loadAcnes]);
   const fetchAcnesStore = useCallback(fetchAcnes, [fetchAcnes]);
   const loadFacialsStore = useCallback(loadFacials, [loadFacials]);
   const fetchFacialsStore = useCallback(fetchFacials, [fetchFacials]);
+
+  const handle404Error = (error: unknown) => {
+    const axiosError = error as AxiosError;
+    if (axiosError?.response?.status === 404 && !alertVisible) {
+      setAlertMessage("Your session has expired or account not found.");
+      setAlertVisible(true);
+    }
+  };
 
   useEffect(() => {
     loadAcnesStore();
@@ -44,6 +56,7 @@ export default function CompareScreen() {
       );
       setCompareData(response.data.data);
     } catch (error) {
+      handle404Error(error);
       console.log(error);
     } finally {
       setLoading(false);
@@ -104,26 +117,36 @@ export default function CompareScreen() {
         </View>
       </View>
       <View className="p-4">
-      <View className="flex-row justify-center mb-6">
-        {compareData?.map((item) => (
-          <CompareDiary
-            key={item.create_at.toString()}
-            image={item.image}
-            date={item.create_at}
-          />
-        ))}
-      </View>
+        <View className="flex-row justify-center mb-6">
+          {compareData?.map((item) => (
+            <CompareDiary
+              key={item.create_at.toString()}
+              image={item.image}
+              date={item.create_at}
+            />
+          ))}
+        </View>
 
-      <LineChartComponent
-        title="Summary of Acne Types"
-        labels={dates}
-        genres={acneGenres}
-      />
-      <LineChartComponent
-        title="Summary of Skin Problems"
-        labels={dates}
-        genres={skinProblemGenres}
-      />
+        <LineChartComponent
+          title="Summary of Acne Types"
+          labels={dates}
+          genres={acneGenres}
+        />
+        <LineChartComponent
+          title="Summary of Skin Problems"
+          labels={dates}
+          genres={skinProblemGenres}
+        />
+
+        <ConfirmAlert
+          visible={alertVisible}
+          title={alertMessage}
+          confirm="Back to login"
+          onClose={() => {
+            setAlertVisible(false);
+            router.replace("/login");
+          }}
+        />
       </View>
     </ScrollView>
   );

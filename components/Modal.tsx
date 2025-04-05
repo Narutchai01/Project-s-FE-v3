@@ -37,6 +37,8 @@ import { Search } from "@/components/Search";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { ConfirmAlert } from "./Alert";
+import { useAuth } from "@/context/AuthContext";
+import { AxiosError } from "axios";
 
 interface PropsModalSensitiveSkin {
   isOpen: boolean;
@@ -75,11 +77,21 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
   const { isOpen, onClose, isMode } = props;
   const { isLoading, startLoading, stopLoading } = useLoading();
   const [isAlertVisible, setIsAlertVisible] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
   const [image, setImage] = useState<string[] | null>(null);
   const [thread, setThread] = useState({
     title: "",
     caption: "",
   });
+
+  const handle404Error = (error: unknown) => {
+    const axiosError = error as AxiosError;
+    if (axiosError?.response?.status === 404 && !alertVisible) {
+      setAlertMessage("Your session has expired or account not found.");
+      setAlertVisible(true);
+    }
+  };
 
   const handleRemoveImage = (index: number) => {
     setImage((prev) => {
@@ -157,6 +169,7 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
           }
         });
     } catch (error) {
+      handle404Error(error);
       console.log(error);
     } finally {
       stopLoading();
@@ -311,6 +324,15 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
         title="Please complete all fields before submitting."
         confirm="OK"
       />
+      <ConfirmAlert
+        visible={alertVisible}
+        title={alertMessage}
+        confirm="Back to login"
+        onClose={() => {
+          setAlertVisible(false);
+          router.replace("/login");
+        }}
+      />
     </>
   );
 };
@@ -329,6 +351,7 @@ export const ModalSkincare: FC<IModalSkincare> = (props) => {
   const { skincares } = useCompare();
   const { isLoading } = useLoading();
   const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(true);
   const [isAlertVisible, setIsAlertVisible] = useState(false);
   const [selectSkincare, setSelectSkincare] = useState<ISkincare[]>([]);
 
@@ -380,7 +403,9 @@ export const ModalSkincare: FC<IModalSkincare> = (props) => {
             <View className="flex flex-row items-center justify-between">
               <Search
                 searchQuery={searchQuery}
+                isSearchOpen={isSearchOpen}
                 setSearchQuery={setSearchQuery}
+                setIsSearchOpen={setIsSearchOpen}
               />
               <ButtonComponents
                 title="Confirm"
@@ -452,8 +477,8 @@ export const ModalSkincareDetail: FC<ModalSkincareDetailProps> = (props) => {
               <Text
                 numberOfLines={1}
                 ellipsizeMode="tail"
-                style={{ width: 275}}
-                className="text-Heading3 text-Quartz " 
+                style={{ width: 275 }}
+                className="text-Heading3 text-Quartz "
               >
                 {skincare?.name || "Skincare Detail"}
               </Text>
@@ -599,12 +624,22 @@ export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (
   const { isLoading, startLoading, stopLoading } = useLoading();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAlertVisible, setIsAlertVisible] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
   const [skincare, setSkincare] = useState<ISkincare[]>([]);
   const [image, setImage] = useState<string | null>(null);
   const [review, setReview] = useState({
     title: "",
     content: "",
   });
+
+  const handle404Error = (error: unknown) => {
+    const axiosError = error as AxiosError;
+    if (axiosError?.response?.status === 404 && !alertVisible) {
+      setAlertMessage("Your session has expired or account not found.");
+      setAlertVisible(true);
+    }
+  };
 
   const handleCancel = () => {
     setReview({ title: "", content: "" });
@@ -674,6 +709,7 @@ export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (
           }
         });
     } catch (error) {
+      handle404Error(error);
       console.error(error);
     } finally {
       stopLoading();
@@ -814,6 +850,15 @@ export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (
         title="Please complete all fields before submitting."
         confirm="OK"
       />
+      <ConfirmAlert
+        visible={alertVisible}
+        title={alertMessage}
+        confirm="Back to login"
+        onClose={() => {
+          setAlertVisible(false);
+          router.replace("/login");
+        }}
+      />
     </>
   );
 };
@@ -827,6 +872,11 @@ export const ModalChangePassworkSuccess: FC<ModalChangePassworkSuccessProps> = (
   props
 ) => {
   const { isOpen, onClose } = props;
+  
+
+  const handleBackToLogin = async () => {
+    onClose();
+  };
 
   return (
     <Modal
@@ -842,12 +892,7 @@ export const ModalChangePassworkSuccess: FC<ModalChangePassworkSuccessProps> = (
           </Text>
 
           <ButtonComponents
-            onPress={() => {
-              onClose();
-              setTimeout(() => {
-                router.push("/login");
-              }, 100);
-            }}
+            onPress={handleBackToLogin}
             title="Back to login"
             className="flex flex-row items-center justify-center rounded-full border-2 border-BrightGray p-6 bg-Bittersweet"
             textSize="text-white text-xl font-bold"

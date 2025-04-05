@@ -6,6 +6,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
 import useLoading from "@/hook/useLoading";
 import LoadingIndicator from "@/components/Loading";
+import { AxiosError } from "axios";
+import { ConfirmAlert } from "@/components/Alert";
 
 export default function FaceScan() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -13,6 +15,16 @@ export default function FaceScan() {
   const cameraRef = useRef<CameraView | null>(null);
   const router = useRouter();
   const { startLoading, stopLoading, isLoading } = useLoading();
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
+  const handle404Error = (error: unknown) => {
+    const axiosError = error as AxiosError;
+    if (axiosError?.response?.status === 404 && !alertVisible) {
+      setAlertMessage("Your session has expired or account not found.");
+      setAlertVisible(true);
+    }
+  };
 
   useEffect(() => {
     const requestPermission = async () => {
@@ -61,6 +73,7 @@ export default function FaceScan() {
       console.log("Upload response:", response.data);
       router.push(`/diary/${response.data.data.id}`);
     } catch (error) {
+      handle404Error(error);
       console.error("Failed to upload photo:", error);
     } finally {
       stopLoading();
@@ -104,7 +117,11 @@ export default function FaceScan() {
           onPress={takePicture}
           disabled={isLoading}
         >
-          <View className={`w-20 h-20 rounded-full border-4 ${isLoading ? "bg-gray-300" : "bg-white border-gray-400"}`} />
+          <View
+            className={`w-20 h-20 rounded-full border-4 ${
+              isLoading ? "bg-gray-300" : "bg-white border-gray-400"
+            }`}
+          />
         </TouchableOpacity>
 
         <View className="absolute bottom-32 w-4/5 left-1/2 transform -translate-x-1/2">
@@ -125,6 +142,16 @@ export default function FaceScan() {
           </Text>
         </View>
       </CameraView>
+
+      <ConfirmAlert
+        visible={alertVisible}
+        title={alertMessage}
+        confirm="Back to login"
+        onClose={() => {
+          setAlertVisible(false);
+          router.replace("/login");
+        }}
+      />
     </View>
   );
 }

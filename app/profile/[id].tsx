@@ -24,6 +24,8 @@ import LoadingIndicator from "@/components/Loading";
 import { Image } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { BackButtonComponents } from "@/components/Buntton";
+import { ConfirmAlert } from "@/components/Alert";
+import { AxiosError } from "axios";
 
 export default function OtherProfileScreen() {
   const { id } = useLocalSearchParams();
@@ -38,6 +40,16 @@ export default function OtherProfileScreen() {
   const [profileUser, setProfileUser] = useState<IUser | null>(null);
   const defaultImage = require("@/assets/images/userDefault.jpg");
   const [refreshing, setRefreshing] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
+  const handle404Error = (error: unknown) => {
+    const axiosError = error as AxiosError;
+    if (axiosError?.response?.status === 404 && !alertVisible) {
+      setAlertMessage("Your session has expired or account not found.");
+      setAlertVisible(true);
+    }
+  };
 
   const fetchUser = async () => {
     startLoading();
@@ -48,6 +60,7 @@ export default function OtherProfileScreen() {
       });
       setProfileUser(res.data.data);
     } catch (error) {
+      handle404Error(error);
       console.log("Error fetching user:", error);
     } finally {
       stopLoading();
@@ -77,6 +90,7 @@ export default function OtherProfileScreen() {
         setThreads(res.data.data);
       }
     } catch (error) {
+      handle404Error(error);
       console.error(error);
     } finally {
       stopLoading();
@@ -95,6 +109,7 @@ export default function OtherProfileScreen() {
         setReviews(res.data.data);
       }
     } catch (error) {
+      handle404Error(error);
       console.error(error);
     } finally {
       stopLoading();
@@ -113,6 +128,7 @@ export default function OtherProfileScreen() {
         setBookmarks(res.data.data);
       }
     } catch (error) {
+      handle404Error(error);
       console.error(error);
     } finally {
       stopLoading();
@@ -135,6 +151,7 @@ export default function OtherProfileScreen() {
         fetchThreads();
       }
     } catch (error) {
+      handle404Error(error);
       console.error("Toggle favorite error:", error);
     }
   };
@@ -305,6 +322,16 @@ export default function OtherProfileScreen() {
             </>
           )}
         </View>
+
+        <ConfirmAlert
+          visible={alertVisible}
+          title={alertMessage}
+          confirm="Back to login"
+          onClose={() => {
+            setAlertVisible(false);
+            router.replace("/login");
+          }}
+        />
       </SafeAreaView>
     </SafeAreaProvider>
   );

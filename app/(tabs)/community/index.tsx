@@ -12,24 +12,34 @@ import { IReview } from "@/interface/review";
 import { IThread } from "@/interface/threads";
 import { ModalCreateReviewPost, ModalCreateThread } from "@/components/Modal";
 import { CopyPlus, Plus, MessageCircleQuestion } from "lucide-react-native";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { Search } from "@/components/Search";
 import { useLocalSearchParams } from "expo-router";
-
+import { ConfirmAlert } from "@/components/Alert";
 
 export default function CommonScreen() {
   const [threads, setThreads] = useState<IThread[] | null>(null);
   const [reviews, setReviews] = useState<IReview[] | null>(null);
-  const [searchQuery, setSearchQuery] = useState(""); 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { startLoading, stopLoading, isLoading } = useLoading();
   const router = useRouter();
   const [isMode, setIsMode] = useState(false);
   const [isThreadModalOpen, setIsThreadModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const { mode } = useLocalSearchParams();
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
+  const handle404Error = (error: unknown) => {
+    const axiosError = error as AxiosError;
+    if (axiosError?.response?.status === 404 && !alertVisible) {
+      setAlertMessage("Your session has expired or account not found.");
+      setAlertVisible(true);
+    }
+  };
 
-  const fetchThread = useCallback( async () => {
+  const fetchThread = useCallback(async () => {
     startLoading();
     const token = await AsyncStorage.getItem("token");
     await axiosInstance
@@ -43,13 +53,14 @@ export default function CommonScreen() {
         }
       })
       .catch((err) => {
+        handle404Error(err);
         if (axios.isAxiosError(err) && err.response?.status === 401) {
           console.log("Unauthorized");
         }
       });
-  },[startLoading, stopLoading])
+  }, [startLoading, stopLoading]);
 
-  const fetchReview = useCallback( async () => {
+  const fetchReview = useCallback(async () => {
     startLoading();
     const token = await AsyncStorage.getItem("token");
     await axiosInstance
@@ -63,11 +74,12 @@ export default function CommonScreen() {
         }
       })
       .catch((err) => {
+        handle404Error(err);
         if (axios.isAxiosError(err) && err.response?.status === 401) {
           console.log("Unauthorized");
         }
       });
-  },[startLoading, stopLoading])
+  }, [startLoading, stopLoading]);
 
   useEffect(() => {
     fetchThread();
@@ -81,13 +93,14 @@ export default function CommonScreen() {
       : `/favorite/review/skincare/${id}`;
     try {
       await axiosInstance.post(endpoint, null, { headers: { token } });
-  
+
       if (isMode) {
         fetchThread();
       } else {
         fetchReview();
       }
     } catch (err) {
+      handle404Error(err);
       console.error("Toggle favorite error:", err);
     }
   };
@@ -100,21 +113,42 @@ export default function CommonScreen() {
     review.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-
   const handleRouter = (id: number) => {
     router.push(isMode ? `/thread/${id}` : `/review/${id}`);
   };
 
+  const handleSetSearchQuery = useCallback((q: string) => {
+    setSearchQuery(q);
+  }, []);
   
-useEffect(() => {
-  if (mode === "thread") {
-    setIsMode(true);
-  } else if (mode === "review") {
-    setIsMode(false);
-  }
-}, [mode]);
+  const handleSetIsSearchOpen = useCallback((open: boolean) => {
+    setIsSearchOpen(open);
+  }, []);
 
-  const CustomHeader = () => (
+
+  useEffect(() => {
+    if (mode === "thread") {
+      setIsMode(true);
+    } else if (mode === "review") {
+      setIsMode(false);
+    }
+  }, [mode]);
+
+  const CustomHeader = ({
+    isMode,
+    searchQuery,
+    isSearchOpen,
+    setIsThreadModalOpen,
+    setIsReviewModalOpen,
+  }: {
+    isMode: boolean;
+    searchQuery: string;
+    setSearchQuery: (value: string) => void;
+    isSearchOpen: boolean;
+    setIsSearchOpen: (value: boolean) => void;
+    setIsThreadModalOpen: (value: boolean) => void;
+    setIsReviewModalOpen: (value: boolean) => void;
+  }) => (
     <View className="bg-Snow p-4 border-b-2 border-gray-300 relative">
       <View className="flex flex-row items-center justify-between ml-2">
         <Text className="text-Heading3 text-Black">
@@ -122,7 +156,12 @@ useEffect(() => {
         </Text>
 
         <View className="flex flex-row items-center justify-between">
-          <Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+          <Search
+            searchQuery={searchQuery}
+            isSearchOpen={isSearchOpen}
+            setSearchQuery={handleSetSearchQuery}
+            setIsSearchOpen={handleSetIsSearchOpen}
+          />
 
           <TouchableOpacity className="bg-Bittersweet w-8 h-8 rounded-lg flex items-center justify-center mr-2">
             <Plus
@@ -162,10 +201,20 @@ useEffect(() => {
       <Stack.Screen
         options={{
           headerShown: true,
-          header: () => <CustomHeader />,
+          header: () => (
+            <CustomHeader
+              isMode={isMode}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              isSearchOpen={isSearchOpen}
+              setIsSearchOpen={setIsSearchOpen}
+              setIsThreadModalOpen={setIsThreadModalOpen}
+              setIsReviewModalOpen={setIsReviewModalOpen}
+            />
+          ),
         }}
       />
-       <SafeAreaView className="flex-1 bg-Snow p-4">
+      <SafeAreaView className="flex-1 bg-Snow p-4">
         <View className="flex justify-center mt-2">
           {isMode ? (
             isLoading && !threads ? (
@@ -177,10 +226,11 @@ useEffect(() => {
             ) : (
               <FlatList
                 data={filteredThreads}
+                keyboardShouldPersistTaps="handled"
                 keyExtractor={(item) => item.id.toString()}
                 numColumns={2}
                 columnWrapperStyle={{
-                  justifyContent: 'space-between',
+                  justifyContent: "space-between",
                   columnGap: 6,
                   paddingHorizontal: 4,
                 }}
@@ -189,13 +239,13 @@ useEffect(() => {
                 renderItem={({ item }) => (
                   <TouchableOpacity onPress={() => handleRouter(item.id)}>
                     <CommunityCard
-                    image={item.images?.[0]?.image}
-                    title={item.title}
-                    user={item.user?.full_name}
-                    userAvatar={item.user?.image}
-                    isFavorited={item.favorite}
-                    onFavorite={() => handleFavorite(item.id)}
-                  />
+                      image={item.images?.[0]?.image}
+                      title={item.title}
+                      user={item.user?.full_name}
+                      userAvatar={item.user?.image}
+                      isFavorited={item.favorite}
+                      onFavorite={() => handleFavorite(item.id)}
+                    />
                   </TouchableOpacity>
                 )}
               />
@@ -208,20 +258,19 @@ useEffect(() => {
             </Text>
           ) : (
             <FlatList
-              data={filteredReviews} 
+              data={filteredReviews}
               keyExtractor={(item) => item.id.toString()}
               numColumns={2}
               columnWrapperStyle={{
-                justifyContent: 'space-between',
+                justifyContent: "space-between",
                 columnGap: 6,
                 paddingHorizontal: 4,
               }}
-              
               onRefresh={fetchReview}
               refreshing={isLoading}
               renderItem={({ item }) => (
                 <TouchableOpacity onPress={() => handleRouter(item.id)}>
-                    <CommunityCard
+                  <CommunityCard
                     image={item.image}
                     title={item.title}
                     user={item.user?.full_name}
@@ -235,8 +284,25 @@ useEffect(() => {
           )}
         </View>
       </SafeAreaView>
-      <ModalCreateThread isOpen={isThreadModalOpen} onClose={() => setIsThreadModalOpen(false)} isMode={isMode} />
-      <ModalCreateReviewPost isOpen={isReviewModalOpen} onClose={() => setIsReviewModalOpen(false)} isMode={isMode}/>
+      <ModalCreateThread
+        isOpen={isThreadModalOpen}
+        onClose={() => setIsThreadModalOpen(false)}
+        isMode={isMode}
+      />
+      <ModalCreateReviewPost
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
+        isMode={isMode}
+      />
+      <ConfirmAlert
+        visible={alertVisible}
+        title={alertMessage}
+        confirm="Back to login"
+        onClose={() => {
+          setAlertVisible(false);
+          router.replace("/login");
+        }}
+      />
     </SafeAreaProvider>
   );
 }

@@ -21,6 +21,7 @@ import * as ImagePicker from "expo-image-picker";
 import { DatePicker } from "@/components/DatePicker";
 import dayjs from "dayjs";
 import { ConfirmAlert } from "@/components/Alert";
+import { AxiosError } from "axios";
 
 export default function EditProfileScreen() {
   const { startLoading, stopLoading, isLoading } = useLoading();
@@ -41,6 +42,16 @@ export default function EditProfileScreen() {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const defaultImage = require("@/assets/images/userDefault.jpg");
   const [showAlert, setShowAlert] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
+  const handle404Error = (error: unknown) => {
+    const axiosError = error as AxiosError;
+    if (axiosError?.response?.status === 404 && !alertVisible) {
+      setAlertMessage("Your session has expired or account not found.");
+      setAlertVisible(true);
+    }
+  };
 
   const fetchUserProfile = useCallback(async () => {
     startLoading();
@@ -70,6 +81,7 @@ export default function EditProfileScreen() {
         }
       }
     } catch (error) {
+      handle404Error(error);
       console.error("Fetch profile error:", error);
     } finally {
       stopLoading();
@@ -128,6 +140,7 @@ export default function EditProfileScreen() {
 
       setShowAlert(true);
     } catch (error: any) {
+      handle404Error(error);
       console.error("Update profile error:", error);
     } finally {
       stopLoading();
@@ -240,6 +253,16 @@ export default function EditProfileScreen() {
           }}
           title="Profile updated successfully!"
           confirm="Done"
+        />
+
+        <ConfirmAlert
+          visible={alertVisible}
+          title={alertMessage}
+          confirm="Back to login"
+          onClose={() => {
+            setAlertVisible(false);
+            router.replace("/login");
+          }}
         />
       </ScrollView>
     </SafeAreaView>

@@ -21,17 +21,28 @@ import LoadingIndicator from "@/components/Loading";
 import { ISkincare } from "@/interface/skincare";
 import { useSkincareStore } from "@/store/skincare";
 import { ModalSkincareDetail } from "@/components/Modal";
+import { ConfirmAlert } from "@/components/Alert";
+import { AxiosError } from "axios";
 
 const ResultAnalysis = () => {
   const { id } = useLocalSearchParams();
   const [result, setResult] = useState<IResult | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [isOpened, setIsOpened] = useState(false);
-
   const { skins, acnes, facials } = useCompare();
   const { startLoading, stopLoading, isLoading } = useLoading();
   const [modalVisible, setModalVisible] = useState(false);
   const { setSkincare } = useSkincareStore();
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
+  const handle404Error = (error: unknown) => {
+    const axiosError = error as AxiosError;
+    if (axiosError?.response?.status === 404 && !alertVisible) {
+      setAlertMessage("Your session has expired or account not found.");
+      setAlertVisible(true);
+    }
+  };
 
   const fetchResult = useCallback(async () => {
     startLoading();
@@ -48,6 +59,7 @@ const ResultAnalysis = () => {
         stopLoading();
       }
     } catch (error) {
+      handle404Error(error);
       console.log(error);
       stopLoading();
     } finally {
@@ -161,6 +173,16 @@ const ResultAnalysis = () => {
             isOpen={modalVisible}
             onClose={() => setModalVisible(false)}
           />
+
+          <ConfirmAlert
+            visible={alertVisible}
+            title={alertMessage}
+            confirm="Back to login"
+            onClose={() => {
+              setAlertVisible(false);
+              router.replace("/login");
+            }}
+          />
         </ScrollView>
       )}
     </SafeAreaView>
@@ -188,8 +210,8 @@ const Section: React.FC<SectionProps> = ({ title, items }) => (
           />
           <View className="flex items-center justify-center mt-2 mb-4">
             <Text
-               numberOfLines={3} 
-               style={{ width: 60, textAlign: "center" }}
+              numberOfLines={3}
+              style={{ width: 60, textAlign: "center" }}
               className="text-label6"
             >
               {item.name}

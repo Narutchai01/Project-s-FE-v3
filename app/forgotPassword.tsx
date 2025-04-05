@@ -14,9 +14,7 @@ export default function ForgotPasswordScreen() {
 
   const handleEmail = async () => {
     if (!email.trim()) {
-      setAlertTitle("Please enter your email");
-      setShowAlert(true);
-      return;
+      return showError("Please enter your email");
     }
 
     setShowAlert(false);
@@ -37,12 +35,38 @@ export default function ForgotPasswordScreen() {
 
       setEmail("");
       router.push("/checkEmail");
-    } catch (error) {
-      console.error("Error sending forgot password email:", error);
+    } catch (error: any) {
+      const rawMessage = error?.response?.data?.error || error.message;
+      const friendlyMessage = getErrorMessage(rawMessage);
+      showError(friendlyMessage);
     } finally {
       stopLoading();
     }
   };
+
+  const showError = (message: string) => {
+    setAlertTitle(message);
+    setShowAlert(true);
+  };
+
+  const getErrorMessage = (message: string): string => {
+    const normalized = message.toLowerCase();
+
+    if (normalized.includes("not found")) {
+      return "We couldn't find your account with that email.";
+    }
+
+    if (normalized.includes("invalid")) {
+      return "Please enter a valid email address.";
+    }
+
+    if (normalized.includes("network")) {
+      return "Network error. Please check your internet connection.";
+    }
+
+    return "Something went wrong. Please try again.";
+  };
+
 
   return (
     <SafeAreaView className="flex-1 bg-Snow justify-center items-center">

@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import { View, TouchableOpacity, Modal, Text } from "react-native";
 import { Ellipsis, PencilLine, Trash2 } from "lucide-react-native";
-import { LogoutConfirmAlert } from "./Alert";
+import { ConfirmAlert, LogoutConfirmAlert } from "./Alert";
 import { router } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
+import { AxiosError } from "axios";
 
 interface ThreeDotMenuProps {
   threadId?: number;
@@ -15,10 +16,29 @@ export const ThreeDotMenu: React.FC<ThreeDotMenuProps> = (props) => {
   const { threadId, reviewId } = props;
   const [modalVisible, setModalVisible] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
-  const handleEdit = () => {
-    setModalVisible(false);
+  const handle404Error = (error: unknown) => {
+    const axiosError = error as AxiosError;
+    if (axiosError?.response?.status === 404 && !alertVisible) {
+      setAlertMessage("Your session has expired or account not found.");
+      setAlertVisible(true);
+    }
   };
+
+
+const handleEdit = () => {
+  setModalVisible(false);
+
+  if (reviewId) {
+    console.log("edit review", reviewId);
+    router.push(`/editReview/${reviewId}`);
+  } else if (threadId) {
+    router.push(`/editThread/${threadId}`);
+  }
+};
+
 
   const handleDelete = () => {
     setModalVisible(false);
@@ -37,11 +57,10 @@ export const ThreeDotMenu: React.FC<ThreeDotMenuProps> = (props) => {
       setShowAlert(false);
       router.back();
     } catch (error: any) {
-      const message =
-        error?.response?.data?.message || "Something went wrong.";
+      handle404Error(error);
+      const message = error?.response?.data?.message || "Something went wrong.";
       console.error(message);
-    }
-     finally {
+    } finally {
       setModalVisible(false);
       setShowAlert(false);
     }
@@ -59,11 +78,10 @@ export const ThreeDotMenu: React.FC<ThreeDotMenuProps> = (props) => {
       setShowAlert(false);
       router.back();
     } catch (error: any) {
-      const message =
-        error?.response?.data?.message || "Something went wrong.";
+      handle404Error(error);
+      const message = error?.response?.data?.message || "Something went wrong.";
       console.error(message);
-    }
-    finally {
+    } finally {
       setModalVisible(false);
       setShowAlert(false);
     }
@@ -131,6 +149,15 @@ export const ThreeDotMenu: React.FC<ThreeDotMenuProps> = (props) => {
         title="Confirm Delete ?"
         confirm="Delete"
         cancel="Cancel"
+      />
+      <ConfirmAlert
+        visible={alertVisible}
+        title={alertMessage}
+        confirm="Back to login"
+        onClose={() => {
+          setAlertVisible(false);
+          router.replace("/login");
+        }}
       />
     </View>
   );
