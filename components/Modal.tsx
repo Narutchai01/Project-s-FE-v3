@@ -37,7 +37,6 @@ import { Search } from "@/components/Search";
 import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { ConfirmAlert } from "./Alert";
-import { useAuth } from "@/context/AuthContext";
 import { AxiosError } from "axios";
 
 interface PropsModalSensitiveSkin {
@@ -336,7 +335,6 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
     </>
   );
 };
-
 interface IModalSkincare {
   isOpen: boolean;
   onClose: () => void;
@@ -401,12 +399,6 @@ export const ModalSkincare: FC<IModalSkincare> = (props) => {
               onPress={handleCancel}
             />
             <View className="flex flex-row items-center justify-between">
-              <Search
-                searchQuery={searchQuery}
-                isSearchOpen={isSearchOpen}
-                setSearchQuery={setSearchQuery}
-                setIsSearchOpen={setIsSearchOpen}
-              />
               <ButtonComponents
                 title="Confirm"
                 className="bg-Bittersweet px-2 rounded-full h-8 flex items-center justify-center"
@@ -415,8 +407,11 @@ export const ModalSkincare: FC<IModalSkincare> = (props) => {
               />
             </View>
           </View>
+          <View className="flex items-center mt-5">
+            <Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+          </View>
 
-          <View className="flex items-center mb-4 mt-4">
+          <View className="flex items-center mb-6">
             <Text className="text-Heading3 font-semibold text-center">
               Select skincares to review ({skincare?.length}/10)
             </Text>

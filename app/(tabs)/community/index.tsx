@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { View, FlatList, Text, TouchableOpacity } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { Stack, useFocusEffect } from "expo-router";
+import { Stack } from "expo-router";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
@@ -20,8 +20,7 @@ import { ConfirmAlert } from "@/components/Alert";
 export default function CommonScreen() {
   const [threads, setThreads] = useState<IThread[] | null>(null);
   const [reviews, setReviews] = useState<IReview[] | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(""); 
   const { startLoading, stopLoading, isLoading } = useLoading();
   const router = useRouter();
   const [isMode, setIsMode] = useState(false);
@@ -117,15 +116,6 @@ export default function CommonScreen() {
     router.push(isMode ? `/thread/${id}` : `/review/${id}`);
   };
 
-  const handleSetSearchQuery = useCallback((q: string) => {
-    setSearchQuery(q);
-  }, []);
-  
-  const handleSetIsSearchOpen = useCallback((open: boolean) => {
-    setIsSearchOpen(open);
-  }, []);
-
-
   useEffect(() => {
     if (mode === "thread") {
       setIsMode(true);
@@ -134,27 +124,7 @@ export default function CommonScreen() {
     }
   }, [mode]);
 
-  useFocusEffect(
-    useCallback(() => {
-      setIsMode(false);
-    }, [])
-  );
-
-  const CustomHeader = ({
-    isMode,
-    searchQuery,
-    isSearchOpen,
-    setIsThreadModalOpen,
-    setIsReviewModalOpen,
-  }: {
-    isMode: boolean;
-    searchQuery: string;
-    setSearchQuery: (value: string) => void;
-    isSearchOpen: boolean;
-    setIsSearchOpen: (value: boolean) => void;
-    setIsThreadModalOpen: (value: boolean) => void;
-    setIsReviewModalOpen: (value: boolean) => void;
-  }) => (
+  const CustomHeader = () => (
     <View className="bg-Snow p-4 border-b-2 border-gray-300 relative">
       <View className="flex flex-row items-center justify-between ml-2">
         <Text className="text-Heading3 text-Black">
@@ -162,13 +132,6 @@ export default function CommonScreen() {
         </Text>
 
         <View className="flex flex-row items-center justify-between">
-          <Search
-            searchQuery={searchQuery}
-            isSearchOpen={isSearchOpen}
-            setSearchQuery={handleSetSearchQuery}
-            setIsSearchOpen={handleSetIsSearchOpen}
-          />
-
           <TouchableOpacity className="bg-Bittersweet w-8 h-8 rounded-lg flex items-center justify-center mr-2">
             <Plus
               size={18}
@@ -208,20 +171,16 @@ export default function CommonScreen() {
         options={{
           headerShown: true,
           header: () => (
-            <CustomHeader
-              isMode={isMode}
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              isSearchOpen={isSearchOpen}
-              setIsSearchOpen={setIsSearchOpen}
-              setIsThreadModalOpen={setIsThreadModalOpen}
-              setIsReviewModalOpen={setIsReviewModalOpen}
-            />
+            <CustomHeader />
           ),
         }}
       />
       <SafeAreaView className="flex-1 bg-Snow p-4">
         <View className="flex justify-center mt-2">
+        <Search
+      searchQuery={searchQuery}
+      setSearchQuery={setSearchQuery}
+    />
           {isMode ? (
             isLoading && !threads ? (
               <LoadingIndicator />
