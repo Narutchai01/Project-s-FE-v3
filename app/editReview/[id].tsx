@@ -1,6 +1,5 @@
-import { FC } from "react";
+import React, { useCallback, useEffect } from "react";
 import {
-  Modal,
   Text,
   View,
   TouchableOpacity,
@@ -47,18 +46,84 @@ export default function EditReviewScreen() {
     }
   };
 
+  const fetchReview = useCallback(async () => {
+    startLoading();
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const res = await axiosInstance.get(`/reviews/${id}`, {
+        headers: { token },
+      });
+      const data = res.data;
+      console.log(res.data);
+      if (data.status) {
+        const reviewData = data.data;
+        setReview({
+          title: reviewData.title,
+          content: reviewData.content,
+        });
+        if (reviewData.image) {
+          setImage(reviewData.image);
+        }
+        if (reviewData.skincares) {
+          setSkincare(reviewData.skincares);
+        }
+      }
+    } catch (error) {
+      handle404Error(error);
+      console.error(error);
+    } finally {
+      stopLoading();
+    }
+  }, [id]);
+
+  const handleUpdateReview = async () => {
+    if (!review.title || !review.content || skincare.length === 0) {
+      setIsAlertVisible(true);
+      return;
+    }
+  
+    startLoading();
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const formData = new FormData();
+      formData.append("title", review.title);
+      formData.append("content", review.content);
+      formData.append("skincare_id", JSON.stringify(skincare.map((item) => item.id)));
+  
+      if (image) {
+        const file = {
+          uri: image,
+          name: "image.jpg",
+          type: "image/jpeg",
+        };
+        formData.append("file", file as unknown as Blob);
+        console.log("file object:", file);
+      }
+  
+      const res = await axiosInstance.put(`/reviews/${id}`, formData, {
+        headers: {
+          token: token || "",
+          "Content-Type": "multipart/form-data",
+        },
+      });
+  
+      if (res.data.status) {
+        router.push(`/review/${id}`);
+      }
+    } catch (error: any) {
+      handle404Error(error);
+      console.error("Update Error:", error.response?.data || error.message);
+    } finally {
+      stopLoading();
+    }
+  };
+  
+
   const handleCancel = () => {
     setReview({ title: "", content: "" });
     setSkincare([]);
     setImage(null);
-  };
-
-  const handleChange = (key: string, value: string) => {
-    setReview({ ...review, [key]: value });
-  };
-
-  const handleSelectSkincare = () => {
-    setIsModalOpen(true);
+    router.back();
   };
 
   const pickImageAsync = async () => {
@@ -74,53 +139,19 @@ export default function EditReviewScreen() {
     }
   };
 
-  const handlePostReview = async () => {
-    if (!review.title || !review.content || skincare.length === 0 || !image) {
-      setIsAlertVisible(true);
-      return;
-    }
-
-    startLoading();
-    try {
-      const token = await AsyncStorage.getItem("token");
-      if (!token) {
-        throw new Error("No token found");
-      }
-      const formData = new FormData();
-      formData.append("title", review.title);
-      formData.append("content", review.content);
-      formData.append(
-        "skincare_id",
-        JSON.stringify(skincare.map((item) => item.id))
-      );
-      if (image) {
-        const file = {
-          uri: image,
-          name: "image.jpg",
-          type: "image/jpeg",
-        };
-        formData.append("file", file as unknown as Blob);
-      }
-      await axiosInstance
-        .post("/reviews", formData, {
-          headers: {
-            token: token,
-            "Content-Type": "multipart/form-data",
-          },
-        })
-        .then((res) => {
-          if (res.data.status) {
-            router.push(`/review/${res.data.data.id}`);
-          }
-        });
-    } catch (error) {
-      handle404Error(error);
-      console.error(error);
-    } finally {
-      stopLoading();
-      handleCancel();
-    }
+  const handleSelectSkincare = () => {
+    setIsModalOpen(true);
   };
+
+  const handleChange = (key: string, value: string) => {
+    setReview((prev) => ({ ...prev, [key]: value }));
+  };
+
+  useEffect(() => {
+    if (id) {
+      fetchReview();
+    }
+  }, [fetchReview]);
 
   return (
     <SafeAreaView className="flex-1 bg-Snow p-6">
@@ -129,7 +160,7 @@ export default function EditReviewScreen() {
       ) : (
         <ScrollView>
           <BackButtonComponents
-            title="New Review"
+            title="Edit Review"
             textSize="text-Heading3 text-Quartz"
             onPress={handleCancel}
           />
@@ -209,6 +240,7 @@ export default function EditReviewScreen() {
           <View className="mb-4">
             <TextInput
               placeholder="Title"
+              value={review.title}
               onChangeText={(title) => handleChange("title", title)}
               className="border-2 w-full rounded-full p-4 border-BrightGray"
             />
@@ -217,6 +249,7 @@ export default function EditReviewScreen() {
           <View className="mb-6">
             <TextInput
               placeholder="Add Content"
+              value={review.content}
               multiline
               style={{
                 minHeight: 100,
@@ -232,7 +265,7 @@ export default function EditReviewScreen() {
               title="Save"
               className="bg-Bittersweet px-6 py-3 rounded-full"
               textSize="text-lg font-semibold text-White"
-              onPress={handlePostReview}
+              onPress={handleUpdateReview}
             />
           </View>
 

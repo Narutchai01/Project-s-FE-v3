@@ -265,7 +265,8 @@ export const CommunityCard: React.FC<CommunityCardProps> = (props) => {
 
 export const ReviewCard: FC<CardReviewProps> = (props) => {
   const { data, selectArray = [], setItem } = props;
-  const check = selectArray.includes(data);
+  const check = selectArray?.some((item) => item.id === data.id);
+  
   return (
     <Pressable onPress={() => setItem(data)}>
       <View

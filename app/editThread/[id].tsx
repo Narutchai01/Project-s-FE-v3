@@ -1,6 +1,5 @@
-import { FC } from "react";
+import { useCallback, useEffect } from "react";
 import {
-  Modal,
   Text,
   View,
   TouchableOpacity,
@@ -19,11 +18,12 @@ import LoadingIndicator from "@/components/Loading";
 import useLoading from "@/hook/useLoading";
 import { ConfirmAlert } from "@/components/Alert";
 import { AxiosError } from "axios";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import * as DocumentPicker from "expo-document-picker";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function EditThradScreen() {
+  const { id } = useLocalSearchParams(); 
   const router = useRouter();
   const { isLoading, startLoading, stopLoading } = useLoading();
   const [isAlertVisible, setIsAlertVisible] = useState(false);
@@ -55,6 +55,7 @@ export default function EditThradScreen() {
   const handleCancel = () => {
     setThread({ title: "", caption: "" });
     setImage(null);
+    router.back();
   };
 
   const handleChange = (key: string, value: string) => {
@@ -79,6 +80,36 @@ export default function EditThradScreen() {
       }
     }
   };
+
+  const fetchThread = useCallback(async () => {
+    startLoading();
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const res = await axiosInstance.get(`/thread/${id}`, {
+        headers: { token },
+      });
+      const data = res.data;
+      console.log(res.data);
+
+      if (data.status) {
+        const threadData = data.data;
+        setThread({
+          title: threadData.title,
+          caption: threadData.caption,
+        });
+
+        if (Array.isArray(threadData.images)) {
+          const urls = threadData.images.map((img: any) => img.image);
+          setImage(urls);
+        }
+      }
+      
+    } catch (error) {
+      handle404Error(error);
+    } finally {
+      stopLoading();
+    }
+  }, []);
 
   const handleCreateThread = async () => {
     if (!thread.title || !thread.caption || !image) {
@@ -106,10 +137,10 @@ export default function EditThradScreen() {
         });
       }
       await axiosInstance
-        .post("/thread", formData, {
+        .put(`/thread/${id}`, formData, {
           headers: {
             token: token,
-            "Content-Type": "multipart/form-data",
+            // "Content-Type": "multipart/form-data",
           },
         })
         .then((res) => {
@@ -126,6 +157,11 @@ export default function EditThradScreen() {
     }
   };
 
+  useEffect(() => {
+    fetchThread();
+  }, [fetchThread]);
+  
+
   return (
     <SafeAreaView className="flex-1 bg-Snow p-6">
       {isLoading ? (
@@ -133,7 +169,7 @@ export default function EditThradScreen() {
       ) : (
         <ScrollView>
           <BackButtonComponents
-            title={"New Thread"}
+            title={"Edit Thread"}
             textSize="text-Heading3 text-Quartz"
             onPress={handleCancel}
           />
@@ -235,11 +271,13 @@ export default function EditThradScreen() {
             <View className="w-full container mx-auto px-10 py-10 gap-y-4">
               <TextInput
                 placeholder="Title"
+                value={thread.title}
                 className=" border-2  w-full rounded-full p-4 border-BrightGray"
                 onChangeText={(title) => handleChange("title", title)}
               />
               <TextInput
                 placeholder="Add Caption"
+                value={thread.caption}
                 multiline
                 style={{
                   minHeight: 100,

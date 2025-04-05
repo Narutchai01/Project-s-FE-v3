@@ -32,7 +32,6 @@ const handleEdit = () => {
   setModalVisible(false);
 
   if (reviewId) {
-    console.log("edit review", reviewId);
     router.push(`/editReview/${reviewId}`);
   } else if (threadId) {
     router.push(`/editThread/${threadId}`);
