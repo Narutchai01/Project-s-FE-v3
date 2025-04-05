@@ -67,21 +67,13 @@ export default function ThreadDetails() {
 
       const data = res.data;
       if (data.status) {
-        const storedBookmark = await AsyncStorage.getItem(
-          `bookmark_thread_${id}`
-        );
-        const bookmarkValue = storedBookmark
-          ? JSON.parse(storedBookmark)
-          : data.data.bookmark;
-
-        setThread({ ...data.data, bookmark: bookmarkValue });
+        setThread(data.data);
         fetchUserFollowStatus(data.data.user.id);
         stopLoading();
       }
     } catch (error) {
       handle404Error(error);
       console.log(error);
-      stopLoading();
     } finally {
       stopLoading();
     }
@@ -179,19 +171,11 @@ export default function ThreadDetails() {
   const handleBookmark = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-
-      setThread((prev) =>
-        prev ? { ...prev, bookmark: !prev.bookmark } : prev
-      );
-
       await axiosInstance.post(`/bookmark/thread/${id}`, null, {
         headers: { token },
       });
 
-      await AsyncStorage.setItem(
-        `bookmark_thread_${id}`,
-        JSON.stringify(!thread?.bookmark)
-      );
+      fecThread();
     } catch (error) {
       handle404Error(error);
       console.log("Bookmark Error:", error);
