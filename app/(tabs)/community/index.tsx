@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, memo } from "react";
 import { View, FlatList, Text, TouchableOpacity } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Stack } from "expo-router";
@@ -16,11 +16,13 @@ import axios, { AxiosError } from "axios";
 import { Search } from "@/components/Search";
 import { useLocalSearchParams } from "expo-router";
 import { ConfirmAlert } from "@/components/Alert";
+import { CustomHeader } from "@/components/CustomHeader";
 
 export default function CommonScreen() {
   const [threads, setThreads] = useState<IThread[] | null>(null);
   const [reviews, setReviews] = useState<IReview[] | null>(null);
-  const [searchQuery, setSearchQuery] = useState(""); 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { startLoading, stopLoading, isLoading } = useLoading();
   const router = useRouter();
   const [isMode, setIsMode] = useState(false);
@@ -29,6 +31,26 @@ export default function CommonScreen() {
   const { mode } = useLocalSearchParams();
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+
+  const handleSetIsMode = useCallback((mode: boolean) => {
+    setIsMode(mode);
+  }, []);
+
+  const handleSetIsThreadModalOpen = useCallback((val: boolean) => {
+    setIsThreadModalOpen(val);
+  }, []);
+
+  const handleSetIsReviewModalOpen = useCallback((val: boolean) => {
+    setIsReviewModalOpen(val);
+  }, []);
+
+  const handleSetSearchQuery = useCallback((q: string) => {
+    setSearchQuery(q);
+  }, []);
+
+  const handleSetIsSearchOpen = useCallback((open: boolean) => {
+    setIsSearchOpen(open);
+  }, []);
 
   const handle404Error = (error: unknown) => {
     const axiosError = error as AxiosError;
@@ -124,63 +146,27 @@ export default function CommonScreen() {
     }
   }, [mode]);
 
-  const CustomHeader = () => (
-    <View className="bg-Snow p-4 border-b-2 border-gray-300 relative">
-      <View className="flex flex-row items-center justify-between ml-2">
-        <Text className="text-Heading3 text-Black">
-          {isMode ? "Threads" : "Reviews"}
-        </Text>
-
-        <View className="flex flex-row items-center justify-between">
-          <TouchableOpacity className="bg-Bittersweet w-8 h-8 rounded-lg flex items-center justify-center mr-2">
-            <Plus
-              size={18}
-              color="white"
-              onPress={() =>
-                isMode ? setIsThreadModalOpen(true) : setIsReviewModalOpen(true)
-              }
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View className="flex flex-row items-center justify-around mt-4">
-        <TouchableOpacity onPress={() => setIsMode(false)}>
-          <View className="flex items-center relative -mb-2">
-            <CopyPlus size={30} />
-            {!isMode && (
-              <View className="absolute bottom-[-9px] w-full border-b-2 border-black" />
-            )}
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => setIsMode(true)}>
-          <View className="flex items-center relative -mb-2">
-            <MessageCircleQuestion size={30} />
-            {isMode && (
-              <View className="absolute bottom-[-9px] w-full border-b-2 border-black" />
-            )}
-          </View>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-
   return (
     <SafeAreaProvider>
       <Stack.Screen
         options={{
           headerShown: true,
           header: () => (
-            <CustomHeader />
+            <CustomHeader
+              isMode={isMode}
+              searchQuery={searchQuery}
+              isSearchOpen={isSearchOpen}
+              setSearchQuery={handleSetSearchQuery}
+              setIsSearchOpen={handleSetIsSearchOpen}
+              setIsThreadModalOpen={handleSetIsThreadModalOpen}
+              setIsReviewModalOpen={handleSetIsReviewModalOpen}
+              setIsMode={handleSetIsMode}
+            />
           ),
         }}
       />
       <SafeAreaView className="flex-1 bg-Snow p-4">
         <View className="flex justify-center mt-2">
-        <Search
-      searchQuery={searchQuery}
-      setSearchQuery={setSearchQuery}
-    />
           {isMode ? (
             isLoading && !threads ? (
               <LoadingIndicator />
