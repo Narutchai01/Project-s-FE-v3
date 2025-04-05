@@ -876,6 +876,7 @@ export const ModalChangePassworkSuccess: FC<ModalChangePassworkSuccessProps> = (
 
   const handleBackToLogin = async () => {
     onClose();
+    router.push("/login");
   };
 
   return (

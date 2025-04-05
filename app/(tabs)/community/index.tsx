@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { View, FlatList, Text, TouchableOpacity } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
-import { Stack } from "expo-router";
+import { Stack, useFocusEffect } from "expo-router";
 import { useRouter } from "expo-router";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
@@ -133,6 +133,12 @@ export default function CommonScreen() {
       setIsMode(false);
     }
   }, [mode]);
+
+  useFocusEffect(
+    useCallback(() => {
+      setIsMode(false);
+    }, [])
+  );
 
   const CustomHeader = ({
     isMode,

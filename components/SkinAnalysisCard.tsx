@@ -98,72 +98,98 @@ export const SkinAnalysisCard: FC = () => {
                 />
               </View>
 
-              <View className="flex flex-col justify-evenly ml-8">
-                <Text className="text-label2 font-bold mb-1 mt-1">
+              <View className="flex flex-col justify-evenly ml-5 ">
+              <Text className="text-label4 mb-1">
                   Skin Type:
                 </Text>
-                <View className="flex flex-row gap-2">
-                  {skins
-                    .filter((item) => item.id === resultLatest?.skin_id)
-                    .map((item, index) => {
-                      const imageUri = item.image?.trim();
-                      return imageUri ? (
-                        <Avatar.Image
-                          size={24}
-                          key={index}
-                          source={{ uri: imageUri }}
-                        />
-                      ) : (
-                        <Avatar.Icon size={24} key={index} icon="image-off" />
-                      );
-                    })}
+                <View className="flex flex-row gap-2 ">
+                  {skins.filter((item) => item.id === resultLatest?.skin_id)
+                    .length > 0 ? (
+                    skins
+                      .filter((item) => item.id === resultLatest?.skin_id)
+                      .map((item, index) => {
+                        const imageUri = item.image?.trim();
+                        return imageUri ? (
+                          <Avatar.Image
+                            size={24}
+                            key={index}
+                            source={{ uri: imageUri }}
+                          />
+                        ) : (
+                          <Avatar.Icon size={24} key={index} icon="image-off" />
+                        );
+                      })
+                  ) : (
+                    <Text className="text-gray-400 text-label2">
+                      No data available
+                    </Text>
+                  )}
                 </View>
 
-                <Text className="text-label2 font-bold mb-1">Acne Type:</Text>
-                <View className="flex flex-row gap-2">
-                  {acnes
-                    .filter((item) =>
-                      resultLatest?.acne_type.some(
-                        (acne) => acne.id === item.id
+                <Text className="text-label4 mb-1 mt-2">Acne Type:</Text>
+                <View className="flex flex-row gap-2 ">
+                  {acnes.filter((item) =>
+                    resultLatest?.acne_type.some((acne) => acne.id === item.id)
+                  ).length > 0 ? (
+                    acnes
+                      .filter((item) =>
+                        resultLatest?.acne_type.some(
+                          (acne) => acne.id === item.id
+                        )
                       )
-                    )
-                    .map((item, index) => {
-                      const imageUri = item.image?.trim();
-                      return imageUri ? (
-                        <Avatar.Image
-                          size={24}
-                          key={index}
-                          source={{ uri: imageUri }}
-                        />
-                      ) : (
-                        <Avatar.Icon size={24} key={index} icon="image-off" />
-                      );
-                    })}
+                      .map((item, index) => {
+                        const imageUri = item.image?.trim();
+                        return imageUri ? (
+                          <Avatar.Image
+                            size={24}
+                            key={index}
+                            source={{ uri: imageUri }}
+                          />
+                        ) : (
+                          <Avatar.Icon size={24} key={index} icon="image-off" />
+                        );
+                      })
+                  ) : (
+                    <Text className="text-gray-400 text-label2">
+                      No data available
+                    </Text>
+                  )}
                 </View>
 
-                <Text className="text-label2 font-bold mb-1">
+                <Text className="text-label4 mb-1 mt-2">
                   Skin Problems:
                 </Text>
                 <View className="flex flex-row gap-2">
-                  {facials
-                    .filter((item) =>
-                      resultLatest?.facial_type.some(
-                        (facial) => facial.id === item.id
-                      )
+                  {facials.filter((item) =>
+                    resultLatest?.facial_type.some(
+                      (facial) => facial.id === item.id
                     )
-                    .map((item, index) => {
-                      const imageUri = item.image?.trim();
-                      return imageUri ? (
-                        <Avatar.Image
-                          size={24}
-                          key={index}
-                          source={{ uri: imageUri }}
-                        />
-                      ) : (
-                        <Avatar.Icon size={24} key={index} icon="image-off" />
-                      );
-                    })}
+                  ).length > 0 ? (
+                    facials
+                      .filter((item) =>
+                        resultLatest?.facial_type.some(
+                          (facial) => facial.id === item.id
+                        )
+                      )
+                      .map((item, index) => {
+                        const imageUri = item.image?.trim();
+                        return imageUri ? (
+                          <Avatar.Image
+                            size={24}
+                            key={index}
+                            source={{ uri: imageUri }}
+                          />
+                        ) : (
+                          <Avatar.Icon size={24} key={index} icon="image-off" />
+                        );
+                      })
+                  ) : (
+                    <Text className="text-gray-400 text-label2">
+                      No data available
+                    </Text>
+                  )}
                 </View>
+
               </View>
             </View>
           </View>

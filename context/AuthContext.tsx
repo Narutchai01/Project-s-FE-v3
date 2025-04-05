@@ -98,14 +98,12 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       .then(async (res) => {
         const status = res.status;
 
-        console.log("loginData", res.data);
-
         if (status !== 200) {
           return;
         }
         const token: string = res.data.data.token;
         await AsyncStorage.setItem("token", token);
-        console.log("login suc");
+        router.push("/(tabs)/home");
       })
       .catch((err) => {
         console.log(err);
