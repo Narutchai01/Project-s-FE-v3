@@ -16,7 +16,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import LoadingIndicator from "@/components/Loading";
 import useLoading from "@/hook/useLoading";
 import { ISkincare } from "@/interface/skincare";
-import * as ImagePicker from "expo-image-picker";
+import * as DocumentPicker from "expo-document-picker";
 import { ConfirmAlert } from "@/components/Alert";
 import { AxiosError } from "axios";
 import { useRouter } from "expo-router";
@@ -157,14 +157,13 @@ export default function EditReviewScreen() {
   };
 
   const pickImageAsync = async () => {
-    const result: ImagePicker.ImagePickerResult =
-      await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        quality: 1,
-      });
-
-    if (!result.canceled && result.assets && result.assets[0].uri) {
+    const result = await DocumentPicker.getDocumentAsync({
+      type: "image/*",
+      copyToCacheDirectory: true,
+      multiple: false,
+    });
+  
+    if (!result.canceled && result.assets[0].uri) {
       setImage(result.assets[0].uri);
     }
   };

@@ -34,7 +34,6 @@ import { ICommentReview, ICommentThread } from "@/interface/comment";
 import { CommentCard } from "./Card";
 import { CircleArrowUp } from "lucide-react-native";
 import { Search } from "@/components/Search";
-import * as ImagePicker from "expo-image-picker";
 import { Ionicons } from "@expo/vector-icons";
 import { ConfirmAlert } from "./Alert";
 import { AxiosError } from "axios";
@@ -656,17 +655,17 @@ export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (
   };
 
   const pickImageAsync = async () => {
-    const result: ImagePicker.ImagePickerResult =
-    await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 1,
+    const result = await DocumentPicker.getDocumentAsync({
+      type: "image/*",
+      copyToCacheDirectory: true,
+      multiple: false,
     });
-
-    if (!result.canceled && result.assets && result.assets[0].uri) {
+  
+    if (!result.canceled && result.assets[0].uri) {
       setImage(result.assets[0].uri);
     }
   };
+  
 
   const handlePostReview = async () => {
     if (!review.title || !review.content || skincare.length === 0 || !image) {
