@@ -121,9 +121,23 @@ const ResultAnalysis = () => {
 
             <View className="w-full">
               <View className="w-full flex justify-center">
-                <MemoizedSection title="Skin type" items={skins || []} />
-                <MemoizedSection title="Acne Type" items={acnes || []} />
-                <MemoizedSection title="Skin Problems" items={facials || []} />
+                <MemoizedSection
+                  title="Skin type"
+                  items={skins || []}
+                  highlightId={result?.skin_id}
+                />
+
+                <MemoizedSection
+                  title="Acne Type"
+                  items={acnes || []}
+                  highlightIds={result?.acne_type?.map((item) => item.id)}
+                />
+
+                <MemoizedSection
+                  title="Skin Problems"
+                  items={facials || []}
+                  highlightIds={result?.facial_type?.map((item) => item.id)}
+                />
               </View>
             </View>
 
@@ -193,34 +207,68 @@ const ResultAnalysis = () => {
 
 interface SectionProps {
   title: string;
-  items: { name: string; image: string }[];
+  items: { id: number; name: string; image: string }[];
+  highlightId?: number;
+  highlightIds?: number[];
 }
 
-const Section: React.FC<SectionProps> = ({ title, items }) => (
+const Section: React.FC<SectionProps> = ({
+  title,
+  items,
+  highlightId,
+  highlightIds,
+}) => (
   <View className="w-full">
-    <Text className="text-Heading4 mb-3 mt-4 ml-4">{title}</Text>
+    <Text className="text-Heading4 mb-3 mt-4 ml-2">{title}</Text>
     <View
-      className={`flex flex-row w-full gap-x-4 ml-4 ml-4 ${
+      className={`flex flex-row w-full gap-x-4 ml-2 ${
         items.length > 4 ? "flex-wrap" : ""
       }`}
     >
-      {items?.map((item, index) => (
-        <View key={index}>
-          <Image
-            source={{ uri: item.image }}
-            style={{ width: 65, height: 65, borderRadius: 50 }}
-          />
-          <View className="flex items-center justify-center mt-2 mb-4">
-            <Text
-              numberOfLines={3}
-              style={{ width: 60, textAlign: "center" }}
-              className="text-label6"
+      {items.map((item, index) => {
+        const isHighlighted =
+          item.id === highlightId || highlightIds?.includes(item.id);
+        const hasData = !!item.image && !!item.name;
+
+        return (
+          <View key={index} style={{ alignItems: "center" }}>
+            <View
+              style={{
+                width: 70,
+                height: 70,
+                borderRadius: 40,
+                borderWidth: 2.5,
+                borderColor: isHighlighted ? "black" : "gray",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              {item.name}
-            </Text>
+              <Image
+                source={{ uri: item.image }}
+                style={{
+                  width: 65,
+                  height: 65,
+                  borderRadius: 40,
+                  tintColor: hasData ? undefined : "gray",
+                }}
+              />
+            </View>
+            <View className="flex items-center justify-center mt-2 mb-4">
+              <Text
+                numberOfLines={3}
+                style={{
+                  width: 60,
+                  textAlign: "center",
+                  color: hasData ? "#000" : "#999",
+                }}
+                className="text-label7"
+              >
+                {item.name}
+              </Text>
+            </View>
           </View>
-        </View>
-      ))}
+        );
+      })}
     </View>
   </View>
 );

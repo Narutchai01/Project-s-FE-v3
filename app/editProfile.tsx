@@ -17,7 +17,7 @@ import { axiosInstance } from "@/lib/axios_instance";
 import useLoading from "@/hook/useLoading";
 import LoadingIndicator from "@/components/Loading";
 import { IUser } from "@/interface/user";
-import * as ImagePicker from "expo-image-picker";
+import * as DocumentPicker from "expo-document-picker";
 import { DatePicker } from "@/components/DatePicker";
 import dayjs from "dayjs";
 import { ConfirmAlert } from "@/components/Alert";
@@ -93,13 +93,13 @@ export default function EditProfileScreen() {
   }, []);
 
   const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 1,
+    const result = await DocumentPicker.getDocumentAsync({
+      type: "image/*",
+      copyToCacheDirectory: true,
+      multiple: false,
     });
-
-    if (!result.canceled) {
+  
+    if (!result.canceled && result.assets[0].uri) {
       setImage([result.assets[0].uri]);
     }
   };
@@ -117,10 +117,6 @@ export default function EditProfileScreen() {
         "birthday",
         dayjs(user.birthday).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]")
       );
-
-      for (let [key, value] of formData) {
-        console.log(`${key}:`, value);
-      }
 
       if (image && typeof image[0] === "string") {
         const file = {

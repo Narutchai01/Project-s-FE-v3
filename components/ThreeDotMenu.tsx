@@ -27,17 +27,15 @@ export const ThreeDotMenu: React.FC<ThreeDotMenuProps> = (props) => {
     }
   };
 
+  const handleEdit = () => {
+    setModalVisible(false);
 
-const handleEdit = () => {
-  setModalVisible(false);
-
-  if (reviewId) {
-    router.push(`/editReview/${reviewId}`);
-  } else if (threadId) {
-    router.push(`/editThread/${threadId}`);
-  }
-};
-
+    if (reviewId) {
+      router.push(`/editReview/${reviewId}`);
+    } else if (threadId) {
+      router.push(`/editThread/${threadId}`);
+    }
+  };
 
   const handleDelete = () => {
     setModalVisible(false);
@@ -47,9 +45,14 @@ const handleEdit = () => {
   const handleDeleteThread = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
+
+      //       console.log("🧨 Delete threadId:", threadId, typeof threadId);
+      // console.log("🧨 API Path:", `/thread/${threadId}`);
+      // console.log("🧨 Headers:", { token: `${token}` });
+
       await axiosInstance.delete(`/thread/${threadId}`, {
         headers: {
-          token,
+          token: token,
         },
       });
 
@@ -68,9 +71,13 @@ const handleEdit = () => {
   const handleDeleteReview = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
+
+      console.log("Try delete review id:", reviewId);
+      console.log("Token:", token);
+
       await axiosInstance.delete(`/reviews/${reviewId}`, {
         headers: {
-          token,
+          token: token,
         },
       });
 
