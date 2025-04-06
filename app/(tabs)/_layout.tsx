@@ -5,6 +5,7 @@ import {
   BookAIcon,
   CameraIcon,
   MessageCircleMore,
+  User,
 } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { BackButtonComponents } from "@/components/Buntton";
@@ -34,14 +35,6 @@ export default function _layout() {
         }}
       />
       <Tabs.Screen
-        name="diary"
-        options={{
-          tabBarIcon: ({ color, size }) => (
-            <BookAIcon size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
         name="camera"
         options={{
           headerTitle: "",
@@ -60,6 +53,22 @@ export default function _layout() {
           ),
           // hide the tab bar
           tabBarStyle: { display: "none" },
+        }}
+      />
+       <Tabs.Screen
+        name="diary"
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <BookAIcon size={size} color={color} />
+          ),
+        }}
+      />
+       <Tabs.Screen
+        name="profile"
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <User size={size} color={color} />
+          ),
         }}
       />
     </Tabs>

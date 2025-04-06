@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC } from "react";
 import {
   Modal,
   Text,
@@ -19,7 +19,7 @@ import * as DocumentPicker from "expo-document-picker";
 import { axiosInstance } from "@/lib/axios_instance";
 import { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { useRouter } from "expo-router";
+import { router, useRouter } from "expo-router";
 import LoadingIndicator from "@/components/Loading";
 import useLoading from "@/hook/useLoading";
 import { ReviewCard } from "./Card";
@@ -48,7 +48,7 @@ export const ModalSensitiveSkin: FC<PropsModalSensitiveSkin> = (props) => {
         <Text className=" text-Heading3">
           Do you have sensitive facial skin?
         </Text>
-        <RadioComponents setValue={setSensitiveSkin} />
+        <RadioComponents setValue={setSensitiveSkin} value={null} />
         <ButtonComponents
           title="Save"
           onPress={onPres}
@@ -59,7 +59,6 @@ export const ModalSensitiveSkin: FC<PropsModalSensitiveSkin> = (props) => {
     </Modal>
   );
 };
-
 
 interface IModalCreateThreadProps {
   isOpen: boolean;
@@ -160,26 +159,23 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
       {isLoading ? (
         <LoadingIndicator />
       ) : (
+        <SafeAreaView className="flex-1 bg-Snow p-6">
         <ScrollView>
-          <View className="h-16 bg-White">
             {/* header zone  */}
-            <View className=" h-full flex-row items-center justify-between px-3">
               <BackButtonComponents
                 title={"New Thread"}
                 textSize="text-Heading3 text-Quartz"
                 onPress={handleCancel}
               />
-            </View>
-          </View>
-          {/* header zone  */}
 
+          {/* header zone  */}
           <View className="flex justify-center items-center">
             {!image ? (
               <TouchableOpacity
                 onPress={handleChooseImage}
                 style={{
-                  height: 350,
-                  width: 250,
+                  height: 300,
+                  width: 200,
                   borderRadius: 10,
                   backgroundColor: "#FCECEC",
                   borderColor: "#FF6F61",
@@ -191,8 +187,8 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
                 }}
               >
                 <View className="flex items-center justify-center">
-                  <ImageIcon size={50} color="#4A4A4A" />
-                  <Text className="text-label8 mt-2">Tap a photo</Text>
+                  <ImageIcon size={35} color="#4A4A4A" />
+                  <Text className="text-label1 mt-2">Tap a photo</Text>
                 </View>
               </TouchableOpacity>
             ) : (
@@ -206,8 +202,8 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
                     <TouchableOpacity
                       onPress={handleChooseImage}
                       style={{
-                        height: 350,
-                        width: 250,
+                        height: 300,
+                        width: 200,
                         borderRadius: 10,
                         backgroundColor: "#FCECEC",
                         borderColor: "#FF6F61",
@@ -220,8 +216,8 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
                       }}
                     >
                       <View className="flex items-center justify-center">
-                        <ImageIcon size={50} color="#4A4A4A" />
-                        <Text className="text-label8 mt-2">Tap a photo</Text>
+                        <ImageIcon size={35} color="#4A4A4A" />
+                        <Text className="text-label1 mt-2">Tap a photo</Text>
                       </View>
                     </TouchableOpacity>
                   );
@@ -243,8 +239,8 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
                     <Image
                       source={{ uri: item }}
                       style={{
-                        width: 250,
-                        height: 350,
+                        width: 200,
+                        height: 300,
                         borderRadius: 10,
                       }}
                     />
@@ -270,7 +266,7 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
             <View className="w-full container mx-auto px-10 py-10 gap-y-4">
               <TextInput
                 placeholder="Title"
-                className=" border-2  w-full rounded-full p-6 border-BrightGray"
+                className=" border-2  w-full rounded-full p-4 border-BrightGray"
                 onChangeText={(title) => handleChange("title", title)}
               />
               <TextInput
@@ -280,18 +276,19 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
                   minHeight: 100,
                   borderRadius: 30,
                 }}
-                className=" border-2  w-full  p-6 border-BrightGray"
+                className=" border-2  w-full  p-4 border-BrightGray"
                 onChangeText={(caption) => handleChange("caption", caption)}
               />
             </View>
             <ButtonComponents
               title="Create Thread"
               onPress={handleCreateThread}
-              className="bg-Bittersweet px-10 py-4 rounded-full"
+              className="bg-Bittersweet px-6 py-3 rounded-full"
               textSize="text-lg font-semibold text-White"
             />
           </View>
         </ScrollView>
+        </SafeAreaView>
       )}
     </Modal>
   );
@@ -300,7 +297,9 @@ export const ModalCreateThread: FC<IModalCreateThreadProps> = (props) => {
 interface IModalSkincare {
   isOpen: boolean;
   onClose: () => void;
-  setSkincare: (skincare: ISkincare[] | ((prev: ISkincare[]) => ISkincare[])) => void;
+  setSkincare: (
+    skincare: ISkincare[] | ((prev: ISkincare[]) => ISkincare[])
+  ) => void;
   skincare: ISkincare[];
 }
 
@@ -315,13 +314,16 @@ export const ModalSkincare: FC<IModalSkincare> = (props) => {
   );
 
   const handleSelectItem = (item: ISkincare) => {
-    if (skincare.some((selected) => selected.id === item.id) || skincare.length >= 10) {
+    if (
+      skincare.some((selected) => selected.id === item.id) ||
+      skincare.length >= 10
+    ) {
       setSkincare((prev) => prev.filter((prevItem) => prevItem.id !== item.id));
     } else {
       setSkincare((prev) => [...prev, item]);
     }
   };
-  
+
   const handleConfirm = () => {
     onClose();
   };
@@ -337,15 +339,15 @@ export const ModalSkincare: FC<IModalSkincare> = (props) => {
         <View className="flex flex-row items-center justify-between">
           <ButtonComponents
             title="Cancel"
-            textSize="text-label1 font-semibold"
+            textSize="text-label4 font-semibold text-Bittersweet"
             onPress={handleCancel}
           />
           <View className="flex flex-row items-center justify-between">
             <Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
             <ButtonComponents
               title="Confirm"
-              className="bg-Bittersweet px-2 py-2 rounded-full"
-              textSize="text-label1 font-semibold text-White"
+              className="bg-Bittersweet px-2 rounded-full h-8 flex items-center justify-center"
+            textSize="text-label4 text-white font-semibold"
               onPress={handleConfirm}
             />
           </View>
@@ -379,7 +381,7 @@ export const ModalSkincare: FC<IModalSkincare> = (props) => {
       </SafeAreaView>
     </Modal>
   );
-}
+};
 
 interface ModalSkincareDetailProps {
   isOpen: boolean;
@@ -465,9 +467,9 @@ export const ModalComment: React.FC<IModalComment> = ({
       <View className="bg-white h-full rounded-t-3xl container mx-auto px-4 py-10">
         <View className="flex gap-y-4">
           <TouchableOpacity onPress={isCommentClose}>
-            <View className="bg-black h-1 container mx-auto w-2/12 rounded-lg"></View>
+            <View className="bg-Quartz h-1 container mx-auto w-2/12 rounded-lg"></View>
           </TouchableOpacity>
-          <Text className="text-center text-3xl font-bold mb-8">Comments</Text>
+          <Text className="text-center text-2xl font-bold mb-4">Comments</Text>
         </View>
 
         <FlatList
@@ -487,9 +489,9 @@ export const ModalComment: React.FC<IModalComment> = ({
           )}
         />
 
-        <View className="flex flex-row justify-center container mx-auto px-5 gap-x-2 items-center py-2">
+        <View className="flex flex-row justify-center container mx-auto px-8 gap-x-2 items-center py-2">
           <TextInput
-            className="border-Quartz border-2 w-full rounded-full py-4 px-4 mx-2"
+            className="border-Quartz border-2 w-full rounded-full py-4 px-4 mx-1"
             placeholder="Share your thoughts..."
             value={commentContent}
             onChangeText={setComment}
@@ -500,7 +502,7 @@ export const ModalComment: React.FC<IModalComment> = ({
               setComment("");
             }}
           >
-            <CircleArrowUp size={36} />
+            <CircleArrowUp size={34} color="#4A4A4A"/>
           </TouchableOpacity>
         </View>
       </View>
@@ -514,7 +516,9 @@ interface IModalCreateReviewPostProps {
   isMode: boolean;
 }
 
-export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (props) => {
+export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (
+  props
+) => {
   const router = useRouter();
   const { isOpen, onClose, isMode } = props;
   const { isLoading, startLoading, stopLoading } = useLoading();
@@ -603,7 +607,8 @@ export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (props) =>
       {isLoading ? (
         <LoadingIndicator />
       ) : (
-        <ScrollView className="p-4">
+        <SafeAreaView className="flex-1 bg-Snow p-6">
+          <ScrollView>
           <BackButtonComponents
             title="New Review"
             textSize="text-Heading3 text-Quartz"
@@ -614,12 +619,12 @@ export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (props) =>
             <Text className="text-Heading4">Thumbnail</Text>
           </View>
 
-          <View className="mb-4 flex items-center justify-center">
+          <View className="mb-6 flex items-center justify-center">
             <TouchableOpacity
               onPress={pickImageAsync}
               style={{
-                height: 350,
-                width: 250,
+                height: 300,
+                width: 200,
                 borderRadius: 10,
                 backgroundColor: "#FCECEC",
                 borderColor: "#FF6F61",
@@ -632,25 +637,25 @@ export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (props) =>
               {image ? (
                 <Image
                   source={{ uri: image }}
-                  style={{ width: 250, height: 350, borderRadius: 10 }}
+                  style={{ width: 200, height: 300, borderRadius: 10 }}
                 />
               ) : (
                 <View className="flex items-center justify-center">
-                  <ImageIcon size={50} color="#4A4A4A" />
-                  <Text className="text-label8 mt-2">Tap a photo</Text>
+                  <ImageIcon size={35} color="#4A4A4A" />
+                  <Text className="text-label1 mt-2">Tap a photo</Text>
                 </View>
               )}
             </TouchableOpacity>
           </View>
 
           <View className="mb-4">
-            <View className="border-b-2 border-gray-300 mb-4"></View>
+            <View className="border-b-2 border-gray-300 mb-4 w-full"></View>
             <View className="flex flex-row items-center justify-between mb-2">
               <Text className="text-Heading4">Select skincare</Text>
               <ButtonComponents
                 title="Select"
-                className="bg-Bittersweet px-2 py-2 rounded-full w-[80px] flex items-center justify-center"
-                textSize="text-md font-semibold text-white"
+                className="bg-Bittersweet px-3 py-2 rounded-full flex items-center justify-center"
+            textSize="text-label4 text-white font-semibold"
                 onPress={handleSelectSkincare}
               />
             </View>
@@ -686,11 +691,11 @@ export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (props) =>
             <TextInput
               placeholder="Title"
               onChangeText={(title) => handleChange("title", title)}
-              className="border-2 w-full rounded-full p-6 border-BrightGray"
+              className="border-2 w-full rounded-full p-4 border-BrightGray"
             />
           </View>
 
-          <View className="mb-4">
+          <View className="mb-6">
             <TextInput
               placeholder="Add Content"
               multiline
@@ -698,16 +703,16 @@ export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (props) =>
                 minHeight: 100,
                 borderRadius: 30,
               }}
-              className=" border-2  w-full  p-6 border-BrightGray"
+              className=" border-2  w-full  p-4 border-BrightGray"
               onChangeText={(content) => handleChange("content", content)}
             />
           </View>
 
           <View className="flex flex-row items-center justify-center mb-2">
             <ButtonComponents
-              title="Post"
-              className="bg-Bittersweet px-2 py-2 rounded-full w-[80px] flex items-center justify-center"
-              textSize="text-md font-semibold text-white"
+              title="Create Review"
+              className="bg-Bittersweet px-6 py-3 rounded-full"
+              textSize="text-lg font-semibold text-White"
               onPress={handlePostReview}
             />
           </View>
@@ -718,8 +723,46 @@ export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (props) =>
             skincare={skincare}
             setSkincare={setSkincare}
           />
-        </ScrollView>
+          </ScrollView>
+      </SafeAreaView>
       )}
+    </Modal>
+  );
+};
+
+interface ModalChangePassworkSuccessProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const ModalChangePassworkSuccess: FC<ModalChangePassworkSuccessProps> = (
+  props
+) => {
+  const { isOpen, onClose } = props;
+
+  return (
+    <Modal
+      visible={isOpen}
+      animationType="slide"
+      onRequestClose={onClose}
+      transparent
+    >
+      <SafeAreaView className="flex-1 bg-Snow justify-center items-center">
+        <View className="flex flex-col w-full container mx-auto px-10">
+          <Text className="text-Heading3 mb-8 text-center">
+            Password changed !
+          </Text>
+
+          <ButtonComponents
+            onPress={() => {
+              router.push("/login");
+            }}
+            title="Back to login"
+            className="flex flex-row items-center justify-center rounded-full border-2 border-BrightGray p-6 bg-Bittersweet"
+            textSize="text-white text-xl font-bold"
+          />
+        </View>
+      </SafeAreaView>
     </Modal>
   );
 };

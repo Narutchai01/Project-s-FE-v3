@@ -24,4 +24,5 @@ export interface User {
     birthday:       null;
     sensitive_skin: boolean;
     image:          string;
+    follow?:        boolean;
 }

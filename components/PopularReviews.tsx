@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useCallback, useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, FlatList } from "react-native";
 import { ChevronRight } from "lucide-react-native";
 import { PopularThreadCard } from "@/components/Card";
@@ -14,7 +14,7 @@ export const PopularReviews: FC = () => {
   const { startLoading, stopLoading, isLoading } = useLoading();
   const [reviews, setReviews] = useState<IReview[] | null>(null);
 
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback( async () => {
     startLoading();
     try {
       const token = await AsyncStorage.getItem("token");
@@ -33,7 +33,7 @@ export const PopularReviews: FC = () => {
     } finally {
       stopLoading();
     }
-  }
+  },[startLoading, stopLoading])
 
   useEffect(() => {
     fetchReviews();
@@ -58,6 +58,8 @@ export const PopularReviews: FC = () => {
 
       {isLoading ? (
         <LoadingIndicator />
+      ) : !reviews ? (
+        <Text className="text-gray-500 text-center mt-4">No reviews found.</Text>
       ) : (
         <FlatList
           horizontal

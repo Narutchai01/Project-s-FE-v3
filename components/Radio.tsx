@@ -1,20 +1,25 @@
 import { Text, View, TouchableOpacity } from "react-native";
-import React from "react";
+import React, { useEffect, useMemo } from "react";
 import { useState } from "react";
 import "../global.css";
 
 interface RadioProps {
+  value: boolean | null;
   setValue: (value: boolean) => void;
 }
 
-export function RadioComponents({ setValue }: RadioProps) {
+export function RadioComponents({ value, setValue }: RadioProps) {
   const [selected, setSelected] = useState<number | null>(null);
 
-  const RadioValue = [
+  const RadioValue = useMemo(()=> [
     { id: 1, label: "Sensitive", value: true },
     { id: 2, label: "Not Sensitive", value: false },
-  ];
+  ],[])
 
+  useEffect(() => {
+    const found = RadioValue.find((item) => item.value === value);
+    if (found) setSelected(found.id);
+  }, [RadioValue, value]);
   const OnPress = (value: boolean, id: number) => {
     setSelected(id);
     setValue(value);
@@ -27,10 +32,10 @@ export function RadioComponents({ setValue }: RadioProps) {
           key={item.id}
           onPress={() => OnPress(item.value, item.id)}
           style={{
-            gap: 10,
+            gap: 8,
             flexDirection: "row",
             alignItems: "center",
-            marginRight: 10,
+            marginRight: 24,
           }}
         >
           <View

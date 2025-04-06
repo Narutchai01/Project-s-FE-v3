@@ -2,6 +2,7 @@ import {
   createContext,
   FC,
   ReactNode,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -44,17 +45,25 @@ export const CompareProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const { facials, loadFacials, fetchFacials } = useFacialStore();
   const { skincares, loadSkincares, fetchSkincares } = useSkincareStore();
 
-  useEffect(() => {
-    fetchskins();
-    fetchAcnes();
-    fetchFacials();
-    fetchSkincares();
+  const loadSkins = useCallback(loadskinsFromStore, [loadskinsFromStore]);
+  const fetchSkins = useCallback(fetchskins, [fetchskins]);
+  const fetchAcnesStore = useCallback(fetchAcnes, [fetchAcnes]);
+  const loadAcnesStore = useCallback(loadAcnes, [loadAcnes]);
+  const fetchFacialsStore = useCallback(fetchFacials, [fetchFacials]);
+  const fetchSkincaresStore = useCallback(fetchSkincares, [fetchSkincares]);
 
-    loadskinsFromStore();
-    loadAcnes();
+  useEffect(() => {
+    fetchSkins();
+    fetchAcnesStore();
+    fetchFacialsStore();
+    fetchSkincaresStore();
+    loadSkins();
+    loadAcnesStore();
     loadFacials();
     loadSkincares();
-  }, []);
+  }, [
+   
+  ]);
 
   const valuesContext = {
     compare,

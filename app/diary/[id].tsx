@@ -11,7 +11,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { IResult } from "@/interface/result";
 import { axiosInstance } from "@/lib/axios_instance";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { CardSkincare } from "@/components/Card";
+import { CardSkincareReccommemded } from "@/components/Card";
 import { ChevronUp, ChevronDown } from "lucide-react-native";
 import { Image } from "expo-image";
 import { useCompare } from "@/context/CompareContext";
@@ -33,7 +33,7 @@ const ResultAnalysis = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const { setSkincare } = useSkincareStore();
 
-  const fetchResult = async () => {
+  const fetchResult = useCallback(async () => {
     startLoading();
     try {
       const token = await AsyncStorage.getItem("token");
@@ -53,7 +53,7 @@ const ResultAnalysis = () => {
     } finally {
       stopLoading();
     }
-  };
+  }, [id, startLoading, stopLoading]);
 
   useEffect(() => {
     fetchResult();
@@ -62,7 +62,7 @@ const ResultAnalysis = () => {
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     fetchResult().then(() => setRefreshing(false));
-  }, [id]);
+  }, [fetchResult]);
 
   const image = result?.image;
 
@@ -79,7 +79,7 @@ const ResultAnalysis = () => {
         <LoadingIndicator />
       ) : (
         <ScrollView
-          style={{ backgroundColor: "#ffffff", height: "100%" }}
+          style={{ backgroundColor: "#FCFAFD", height: "100%" }}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
@@ -94,7 +94,7 @@ const ResultAnalysis = () => {
             </View>
           </View>
 
-          <View className="flex justify-center items-center p-4">
+          <View className="flex justify-center items-center">
             {image && (
               <View
                 className="justify-center"
@@ -102,7 +102,7 @@ const ResultAnalysis = () => {
               >
                 <Image
                   source={{ uri: image }}
-                  style={{ width: 183.11, height: 236.77, borderRadius: 8 }}
+                  style={{ width: 183, height: 236, borderRadius: 8 }}
                 />
               </View>
             )}
@@ -117,7 +117,7 @@ const ResultAnalysis = () => {
 
             <View>
               <View className="w-full flex flex-row justify-between items-center">
-                <Text className="text-Heading3 font-bold mb-4 mt-2">
+                <Text className="text-Heading3 font-bold mb-4 mt-2 ml-4">
                   Recommended Skincare
                 </Text>
                 <TouchableOpacity
@@ -139,9 +139,14 @@ const ResultAnalysis = () => {
                     <TouchableOpacity
                       key={item.id || index}
                       onPress={() => handleSkincare(item)}
-                      className="mb-4"
+                      style={{
+                        width: "32%",
+                        alignItems: "center",
+                        marginBottom: 10,
+                        marginLeft: 4,
+                      }}
                     >
-                      <CardSkincare
+                      <CardSkincareReccommemded
                         key={index}
                         name={item.name}
                         image={item.image}
@@ -169,20 +174,27 @@ interface SectionProps {
 
 const Section: React.FC<SectionProps> = ({ title, items }) => (
   <View className="w-full">
-    <Text className="text-Heading4 mb-2 mt-2">{title}</Text>
+    <Text className="text-Heading4 mb-3 mt-4 ml-4">{title}</Text>
     <View
-      className={`flex flex-row w-full gap-x-5 ${
-        items.length > 5 ? "flex-wrap" : ""
+      className={`flex flex-row w-full gap-x-4 ml-4 ml-4 ${
+        items.length > 4 ? "flex-wrap" : ""
       }`}
     >
       {items?.map((item, index) => (
         <View key={index}>
           <Image
             source={{ uri: item.image }}
-            style={{ width: 75, height: 75, borderRadius: 50 }}
+            style={{ width: 65, height: 65, borderRadius: 50 }}
           />
           <View className="flex items-center justify-center mt-2 mb-4">
-            <Text className="text-label6">{item.name}</Text>
+            <Text 
+             numberOfLines={1}
+                        ellipsizeMode="tail"
+                        style={{ width: 60, textAlign: "center"}}
+            className="text-label6"
+            >
+              {item.name}
+              </Text>
           </View>
         </View>
       ))}

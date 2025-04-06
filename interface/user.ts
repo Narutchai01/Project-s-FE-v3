@@ -1,7 +1,7 @@
 import {Dayjs} from "dayjs";
 
 export type IUser = {
-    fullname: string;
+    full_name: string;
     birthday: Dayjs | null;
     email: string;
     password: string;

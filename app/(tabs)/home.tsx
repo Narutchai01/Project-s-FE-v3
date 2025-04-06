@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Image, ScrollView } from "react-native";
+import { View, Text, Image, ScrollView, SafeAreaView } from "react-native";
 import { SkinAnalysisCard } from "@/components/SkinAnalysisCard";
 import { PopularReviews } from "@/components/PopularReviews";
 import { PopularSkincare } from "@/components/PopularSkincare";
@@ -15,26 +15,28 @@ export default function SkincareScreen() {
   const { skincares } = useCompare();
 
   return (
-    <ScrollView className="px-4 pt-8 bg-Snow flex-1">
-      <View className="flex-row items-center mb-6">
-        <Image
-          source={require("../../assets/images/ucare-logo.png")}
-          className="w-[55px] h-[65px] rounded-lg mr-4"
-        />
-        <View>
-          <Text className="text-Heading3">
-            {day} {weekday}
-          </Text>
-          <Text className="text-Heading3">
-            {month} {year}
-          </Text>
+    <SafeAreaView className="flex-1 bg-Snow p-6">
+      <ScrollView>
+        <View className="flex-row items-center mb-6">
+          <Image
+            source={require("../../assets/images/ucare-logo.png")}
+            className="w-[18%] h-[65px] rounded-lg mr-4"
+          />
+          <View>
+            <Text className="text-Heading3">
+              {day} {weekday}
+            </Text>
+            <Text className="text-Heading3">
+              {month} {year}
+            </Text>
+          </View>
         </View>
-      </View>
 
-      <SkinAnalysisCard />
+        <SkinAnalysisCard />
 
-      <PopularReviews />
-      <PopularSkincare skincares={skincares} />
-    </ScrollView>
+        <PopularReviews />
+        <PopularSkincare skincares={skincares} />
+      </ScrollView>
+    </SafeAreaView>
   );
 }

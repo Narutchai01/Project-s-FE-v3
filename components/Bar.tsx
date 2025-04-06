@@ -1,12 +1,14 @@
 import { Heart, MessageCircle, Bookmark } from "lucide-react-native";
-import { Text, Touchable, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { ImagePagination } from "./paginate";
-import { FC } from "react";
+import { FC, useEffect, useState } from "react";
 import { Image } from "expo-image";
+import { ThreeDotMenu } from "@/components/ThreeDotMenu";
 import { ButtonComponents } from "./Buntton";
-import { Dimensions } from "react-native";
-
-const { width, height } = Dimensions.get("window");
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { axiosInstance } from "@/lib/axios_instance";
+import LoadingIndicator from "@/components/Loading";
+import useLoading from "@/hook/useLoading";
 
 interface IActivityBar {
   favorite: boolean | undefined;
@@ -40,6 +42,9 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
         flexDirection: "row",
         justifyContent: "space-between",
         padding: 10,
+        marginLeft: 10,
+        marginTop: -15,
+        marginBottom: -10,
       }}
     >
       <View>
@@ -52,7 +57,11 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
             }}
           >
             <TouchableOpacity onPress={hadleFavorite}>
-              <Heart size={24} color={favorite ? "red" : "gray"} />
+              <Heart
+                size={24}
+                color={favorite ? "#FF6F61" : "#4A4A4A"}
+                fill={favorite ? "#FF6F61" : "none"}
+              />
             </TouchableOpacity>
             <Text style={{ fontSize: 20 }}>{favoriteCount}</Text>
           </View>
@@ -64,7 +73,7 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
             }}
           >
             <TouchableOpacity onPress={isOpenComment}>
-              <MessageCircle size={24} />
+              <MessageCircle size={24} color="#4A4A4A" />
             </TouchableOpacity>
             <Text style={{ fontSize: 20 }}>{commnetCount}</Text>
           </View>
@@ -75,18 +84,72 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
       </View>
       <View className="px-10">
         <TouchableOpacity onPress={handleBookmark}>
-          <Bookmark size={24} color={bookmark ? "red" : "gray"} />
+          <Bookmark
+            size={24}
+            color={bookmark ? "#FFD700" : "#4A4A4A"}
+            fill={bookmark ? "#FFD700" : "none"}
+          />
         </TouchableOpacity>
       </View>
     </View>
   );
 };
 
-export const UserBar: FC<any> = (props) => {
-  const { userImage, username } = props;
+interface UserBarProps {
+  userImage?: string;
+  username?: string;
+  userId?: number;
+  currentUserId: number | null;
+  isFollowed?: boolean;
+  onFollowStatusChange?: (isFollowing: boolean) => void;
+}
+
+export const UserBar: FC<UserBarProps> = (props) => {
+  const { isLoading, startLoading, stopLoading } = useLoading();
+  const { userImage, username, currentUserId, userId, onFollowStatusChange } =
+    props;
+  const [isFollowing, setIsFollowing] = useState<boolean>(
+    props.isFollowed || false
+  );
+  const isOwner =
+    currentUserId != null && userId != null && currentUserId === userId;
+
+  useEffect(() => {
+    setIsFollowing(props.isFollowed || false);
+  }, [props.isFollowed]);
+
+  const handleFollow = async () => {
+    if (!userId) {
+      console.log("userId missing");
+      return;
+    }
+
+    try {
+      startLoading();
+
+      const token = await AsyncStorage.getItem("token");
+      const res = await axiosInstance.post(`/user/follower/${userId}`, null, {
+        headers: { token },
+      });
+
+      const newFollowStatus = res.data?.followed ?? !isFollowing;
+
+      setIsFollowing(newFollowStatus);
+      if (onFollowStatusChange) {
+        onFollowStatusChange(newFollowStatus);
+      }
+    } catch (error: any) {
+      console.log(
+        "Follow toggle error:",
+        error.response?.data || error.message
+      );
+    } finally {
+      stopLoading();
+    }
+  };
 
   return (
-    <View className="flex flex-row justify-between items-center px-3 py-2">
+    <View className="flex flex-row justify-between items-center px-3 py-2 ml-2">
       <View className="flex flex-row items-center gap-x-2 ">
         <Image
           source={{ uri: userImage }}
@@ -98,12 +161,25 @@ export const UserBar: FC<any> = (props) => {
         />
         <Text>{username}</Text>
       </View>
+
       <View>
-        <ButtonComponents
-          title="follow"
-          className="bg-Bittersweet px-10 py-2 rounded-full"
-          textSize="text-xl font-semibold text-white"
-        />
+        {isOwner ? (
+          <ThreeDotMenu />
+        ) : (
+          <TouchableOpacity
+            onPress={handleFollow}
+            disabled={isFollowing || isLoading}
+          >
+            <ButtonComponents
+              onPress={handleFollow}
+              title={isFollowing ? "following" : "follow"}
+              className={`px-3 py-1 rounded-full ${
+                isFollowing ? "bg-Bittersweet" : "bg-Bittersweet"
+              }`}
+              textSize="text-l font-semibold text-white"
+            />
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

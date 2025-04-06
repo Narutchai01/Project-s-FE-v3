@@ -26,15 +26,9 @@ export default function RootLayout() {
               <Stack.Screen
                 name="compare"
                 options={{
-                  headerTitle: "",
-                  headerShown: true,
-                  headerLeft: () => (
-                    <BackButtonComponents
-                      title="Compare"
-                      textSize="text-Heading3 text-Quartz"
-                      onPress={() => router.back()} 
-                    />
-                  ),
+                  headerTitle: "Compare",
+                  headerShadowVisible: false,
+                  headerShown: false,
                 }}
               />
               <Stack.Screen
@@ -48,6 +42,12 @@ export default function RootLayout() {
               <Stack.Screen name="thread/[id]" />
               <Stack.Screen name="review/[id]" />
               <Stack.Screen name="ListPopularSkincare" />
+              <Stack.Screen name="setting" />
+              <Stack.Screen name="editProfile" />
+              <Stack.Screen name="changePassword" />
+              <Stack.Screen name="forgetPassword" />
+              <Stack.Screen name="checkEmail" />
+              <Stack.Screen name="recoverPassword" />
             </Stack>
           </ReviewProvider>
         </CompareProvider>

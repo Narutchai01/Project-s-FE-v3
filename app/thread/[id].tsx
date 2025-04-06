@@ -1,5 +1,5 @@
 import { View, Text, FlatList, Dimensions } from "react-native";
-import React from "react";
+import React, { useCallback } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { useState, useEffect } from "react";
@@ -24,8 +24,10 @@ export default function ThreadDetails() {
   const [commentCount, setCommentCount] = useState(0);
   const [isCommentOpen, setIsCommentOpen] = useState(false);
   const [commentContent, setCommentContent] = useState("");
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const [isFollowing, setIsFollowing] = useState<boolean>(false);
 
-  const fecThread = async () => {
+  const fecThread = useCallback(async () => {
     startLoading();
     try {
       const token = await AsyncStorage.getItem("token");
@@ -38,6 +40,7 @@ export default function ThreadDetails() {
       const data = res.data;
       if (data.status) {
         setThread(data.data);
+        setIsFollowing(data.data.user?.follow || false);
         stopLoading();
       }
     } catch (error) {
@@ -46,7 +49,7 @@ export default function ThreadDetails() {
     } finally {
       stopLoading();
     }
-  };
+  }, [id, startLoading, stopLoading]);
 
   useEffect(() => {
     fecThread();
@@ -159,7 +162,42 @@ export default function ThreadDetails() {
     setIsCommentOpen(false);
   };
 
-  // console.log("Image", currImage);
+  useEffect(() => {
+    const fetchUserFromToken = async () => {
+      startLoading();
+      try {
+        const token = await AsyncStorage.getItem("token");
+        const res = await axiosInstance.get("/user/me", {
+          headers: { token },
+        });
+        const data = res.data;
+        if (data.status) {
+          setCurrentUserId(data.data.id);
+          stopLoading();
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        stopLoading();
+      }
+    };
+
+    fetchUserFromToken();
+  }, []);
+
+  const handleFollowStatusChange = (status: boolean) => {
+    if (thread) {
+      setThread({
+        ...thread,
+        user: {
+          ...thread.user,
+          follow: status,
+        },
+      });
+      setIsFollowing(status);
+    }
+  };
+  
 
   return (
     <SafeAreaProvider style={{ backgroundColor: "#fff" }}>
@@ -167,7 +205,7 @@ export default function ThreadDetails() {
         options={{
           headerShown: true,
           header: () => (
-            <View className="h-16 bg-White">
+            <View className="h-16 bg-Snow ml-1">
               <View className=" h-full flex-row items-center justify-between px-3">
                 <BackButtonComponents
                   title={"Threads"}
@@ -179,7 +217,7 @@ export default function ThreadDetails() {
           ),
         }}
       />
-      <SafeAreaView className="flex-1">
+      <SafeAreaView className="flex-1 bg-Snow">
         {isLoading && thread === null ? (
           <LoadingIndicator />
         ) : (
@@ -187,6 +225,10 @@ export default function ThreadDetails() {
             <UserBar
               userImage={thread?.user?.image}
               username={thread?.user?.full_name}
+              userId={thread?.user?.id}
+              currentUserId={currentUserId}
+              isFollowed={isFollowing}
+              onFollowStatusChange={handleFollowStatusChange}
             />
 
             <View style={{ padding: 10 }}>
@@ -200,7 +242,7 @@ export default function ThreadDetails() {
                     paddingVertical: 5,
                     paddingHorizontal: 10,
                     borderRadius: 20,
-                    zIndex: 10, 
+                    zIndex: 10,
                   }}
                 >
                   <Text
