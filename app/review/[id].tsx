@@ -21,6 +21,8 @@ import { IReview } from "@/interface/review";
 import { BackButtonComponents } from "@/components/Buntton";
 import { AxiosError } from "axios";
 import { ConfirmAlert } from "@/components/Alert";
+import { Animated, Pressable } from "react-native";
+import { Heart } from "lucide-react-native";
 
 export default function ReviewDetails() {
   const { id } = useLocalSearchParams();
@@ -37,6 +39,10 @@ export default function ReviewDetails() {
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [refreshing, setRefreshing] = useState(false);
+  const [lastTap, setLastTap] = useState<number | null>(null);
+  const [showHeart, setShowHeart] = useState(false);
+  const heartScale = useState(new Animated.Value(0))[0];
+  const [tapPosition, setTapPosition] = useState({ x: 0, y: 0 });
 
   const handle404Error = (error: unknown) => {
     const axiosError = error as AxiosError;
@@ -44,6 +50,47 @@ export default function ReviewDetails() {
       setAlertMessage("Your session has expired or account not found.");
       setAlertVisible(true);
     }
+  };
+
+  const handleDoubleTap = (event: any) => {
+    const now = Date.now();
+    const DOUBLE_PRESS_DELAY = 500;
+
+    const { locationX, locationY } = event.nativeEvent;
+    setTapPosition({ x: locationX, y: locationY });
+
+    if (lastTap && now - lastTap < DOUBLE_PRESS_DELAY) {
+      triggerHeartAnimation();
+      handleFavorite();
+    } else {
+      setLastTap(now);
+    }
+  };
+
+  const triggerHeartAnimation = () => {
+    setShowHeart(true);
+    heartScale.setValue(0);
+
+    Animated.sequence([
+      Animated.timing(heartScale, {
+        toValue: 1.5,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(heartScale, {
+        toValue: 1.5,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(heartScale, {
+        toValue: 0,
+        duration: 300,
+        delay: 300,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setShowHeart(false);
+    });
   };
 
   const fetchUserFollowStatus = async (userId: number) => {
@@ -304,15 +351,38 @@ export default function ReviewDetails() {
                 <FlatList
                   data={imagesList}
                   renderItem={({ item, index }) => (
-                    <Image
-                      source={{ uri: item }}
-                      style={{
-                        width: width - 20,
-                        height: height * 0.5,
-                        borderRadius: 10,
-                      }}
-                      key={index}
-                    />
+                    <Pressable onPress={(e) => handleDoubleTap(e)}>
+                      <View>
+                        <Image
+                          source={{ uri: item }}
+                          style={{
+                            width: width - 20,
+                            height: height * 0.5,
+                            borderRadius: 10,
+                          }}
+                          key={index}
+                        />
+
+                        {showHeart && (
+                          <Animated.View
+                            style={{
+                              position: "absolute",
+                              top: tapPosition.y,
+                              left: tapPosition.x,
+                              transform: [
+                                { translateX: -25 },
+                                { translateY: -25 },
+                                { scale: heartScale },
+                              ],
+                              opacity: heartScale,
+                              zIndex: 5,
+                            }}
+                          >
+                            <Heart size={45} color="#FF6F61" fill="#FF6F61" />
+                          </Animated.View>
+                        )}
+                      </View>
+                    </Pressable>
                   )}
                   keyExtractor={(item, index) => index.toString()}
                   pagingEnabled
