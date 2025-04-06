@@ -127,10 +127,6 @@ export default function EditReviewScreen() {
         formData.append("file", file as any);
       }
 
-      for (const pair of formData.entries()) {
-        console.log(`${pair[0]}:`, pair[1]);
-      }
-
       const res = await axiosInstance.put(`/reviews/${id}`, formData, {
         headers: {
           token: token || "",
@@ -139,7 +135,10 @@ export default function EditReviewScreen() {
       });
 
       if (res.data.status) {
-        router.replace(`/review/${id}`);
+        router.replace("/(tabs)/community?mode=review");
+        setTimeout(() => {
+          router.push(`/review/${res.data.data.id}`);
+        }, 50);
       }
       
     } catch (error: any) {

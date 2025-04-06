@@ -1,4 +1,11 @@
-import { View, Text, FlatList, Dimensions, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  Dimensions,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router, Stack, useLocalSearchParams } from "expo-router";
@@ -29,6 +36,7 @@ export default function ReviewDetails() {
   const [isFollowing, setIsFollowing] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
 
   const handle404Error = (error: unknown) => {
     const axiosError = error as AxiosError;
@@ -206,6 +214,7 @@ export default function ReviewDetails() {
           stopLoading();
         }
       } catch (error) {
+        handle404Error(error);
         console.error(error);
       } finally {
         stopLoading();
@@ -218,6 +227,11 @@ export default function ReviewDetails() {
   const handleFollowStatusChange = (status: boolean) => {
     fetchReview();
   };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchReview().then(() => setRefreshing(false));
+  }, [fetchReview]);
 
   return (
     <SafeAreaProvider style={{ backgroundColor: "#fff" }}>
@@ -244,6 +258,9 @@ export default function ReviewDetails() {
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 25 }}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
           >
             <View>
               {review && (

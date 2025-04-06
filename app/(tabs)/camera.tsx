@@ -30,7 +30,7 @@ export default function FaceScan() {
     const requestPermission = async () => {
       startLoading();
       const { status } = await Camera.requestCameraPermissionsAsync();
-      console.log("Camera permission status:", status);
+      // console.log("Camera permission status:", status);
       setHasPermission(status === "granted");
       stopLoading();
     };
@@ -51,7 +51,7 @@ export default function FaceScan() {
         return;
       }
 
-      console.log("Captured Photo:", photo.uri);
+      // console.log("Captured Photo:", photo.uri);
 
       const formData = new FormData();
       const photoFile = {
@@ -70,7 +70,7 @@ export default function FaceScan() {
         },
       });
 
-      console.log("Upload response:", response.data);
+      // console.log("Upload response:", response.data);
       router.push(`/diary/${response.data.data.id}`);
     } catch (error) {
       handle404Error(error);

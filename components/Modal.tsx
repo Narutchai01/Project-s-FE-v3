@@ -1,4 +1,4 @@
-import { FC, useCallback, useEffect } from "react";
+import { FC, useEffect } from "react";
 import {
   Modal,
   Text,
@@ -22,7 +22,7 @@ import * as DocumentPicker from "expo-document-picker";
 import { axiosInstance } from "@/lib/axios_instance";
 import { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router, useFocusEffect, useRouter } from "expo-router";
+import { router, useRouter } from "expo-router";
 import LoadingIndicator from "@/components/Loading";
 import useLoading from "@/hook/useLoading";
 import { ReviewCard } from "./Card";
@@ -657,11 +657,11 @@ export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (
 
   const pickImageAsync = async () => {
     const result: ImagePicker.ImagePickerResult =
-      await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        quality: 1,
-      });
+    await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+    });
 
     if (!result.canceled && result.assets && result.assets[0].uri) {
       setImage(result.assets[0].uri);

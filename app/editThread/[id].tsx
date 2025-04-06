@@ -108,8 +108,6 @@ export default function EditThradScreen() {
         headers: { token },
       });
       const data = res.data;
-      console.log(res.data);
-
       if (data.status) {
         const threadData = data.data;
         setThread({
@@ -164,16 +162,20 @@ export default function EditThradScreen() {
         });
       }
 
-      const response = await axiosInstance.put(`/thread/${id}`, formData, {
+      const res = await axiosInstance.put(`/thread/${id}`, formData, {
         headers: {
           token: token,
           "Content-Type": "multipart/form-data",
         },
       });
 
-      if (response.data.status) {
-        router.push(`/thread/${response.data.data.id}`);
+      if (res.data.status) {
+        router.replace("/(tabs)/community?mode=thread");
+        setTimeout(() => {
+          router.push(`/thread/${res.data.data.id}`);
+        }, 50);
       }
+      
     } catch (error) {
       handle404Error(error);
       console.log(error);

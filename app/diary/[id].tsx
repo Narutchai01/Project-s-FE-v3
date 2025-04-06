@@ -136,7 +136,9 @@ const ResultAnalysis = () => {
                   onPress={() => setIsOpened(!isOpened)}
                   className="flex flex-row items-center gap-x-2"
                 >
-                  <Text className="text-label2 text-gray-500">See all</Text>
+                  <Text className="text-label2 text-gray-500">
+                    {isOpened ? "See less" : "See more"}
+                  </Text>
                   {isOpened ? (
                     <ChevronUp size={16} color="gray" />
                   ) : (
@@ -154,7 +156,7 @@ const ResultAnalysis = () => {
                       style={{
                         width: "32%",
                         alignItems: "center",
-                        marginBottom: 10,
+                        marginBottom: 15,
                         marginLeft: 4,
                       }}
                     >

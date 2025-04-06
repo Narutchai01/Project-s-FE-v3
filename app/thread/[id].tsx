@@ -1,4 +1,11 @@
-import { View, Text, FlatList, Dimensions, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  FlatList,
+  Dimensions,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
 import React, { useCallback } from "react";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { router, Stack, useLocalSearchParams } from "expo-router";
@@ -30,6 +37,7 @@ export default function ThreadDetails() {
   const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const [refreshing, setRefreshing] = useState(false);
 
   const handle404Error = (error: unknown) => {
     const axiosError = error as AxiosError;
@@ -55,7 +63,7 @@ export default function ThreadDetails() {
     }
   };
 
-  const fecThread = useCallback(async () => {
+  const fetchThread = useCallback(async () => {
     startLoading();
     try {
       const token = await AsyncStorage.getItem("token");
@@ -80,7 +88,7 @@ export default function ThreadDetails() {
   }, [id, startLoading, stopLoading]);
 
   useEffect(() => {
-    fecThread();
+    fetchThread();
   }, []);
 
   const handleFavorite = async () => {
@@ -92,7 +100,7 @@ export default function ThreadDetails() {
         },
       });
 
-      fecThread();
+      fetchThread();
     } catch (error: any) {
       handle404Error(error);
       console.log(error.response.data);
@@ -175,7 +183,7 @@ export default function ThreadDetails() {
         headers: { token },
       });
 
-      fecThread();
+      fetchThread();
     } catch (error) {
       handle404Error(error);
       console.log("Bookmark Error:", error);
@@ -215,17 +223,13 @@ export default function ThreadDetails() {
   }, []);
 
   const handleFollowStatusChange = (status: boolean) => {
-    if (thread) {
-      setThread({
-        ...thread,
-        user: {
-          ...thread.user,
-          follow: status,
-        },
-      });
-      setIsFollowing(status);
-    }
+    fetchThread();
   };
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchThread().then(() => setRefreshing(false));
+  }, [fetchThread]);
 
   return (
     <SafeAreaProvider style={{ backgroundColor: "#fff" }}>
@@ -252,6 +256,9 @@ export default function ThreadDetails() {
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{ paddingBottom: 25 }}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
           >
             <View>
               {thread && (
