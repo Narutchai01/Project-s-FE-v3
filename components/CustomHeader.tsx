@@ -24,6 +24,9 @@ const CustomHeaderComponent: React.FC<CustomHeaderProps> = ({
   setIsReviewModalOpen,
   setIsMode,
 }) => {
+  const activeColor = "#FF6F61";
+  const inactiveColor = "#848484";
+
   return (
     <View className="bg-Snow p-4 border-b-2 border-gray-300 relative">
       <View className="flex flex-row items-center justify-between ml-2">
@@ -50,20 +53,23 @@ const CustomHeaderComponent: React.FC<CustomHeaderProps> = ({
       </View>
 
       <View className="flex flex-row items-center justify-around mt-4">
-        <TouchableOpacity onPress={() => setIsMode(false)}>
+      <TouchableOpacity onPress={() => setIsMode(false)}>
           <View className="flex items-center relative -mb-2">
-            <CopyPlus size={30} />
+            <CopyPlus size={30} color={!isMode ? activeColor : inactiveColor} />
             {!isMode && (
-              <View className="absolute bottom-[-9px] w-full border-b-2 border-black" />
+              <View className="absolute bottom-[-9px] w-full border-b-2 border-Bittersweet" />
             )}
           </View>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => setIsMode(true)}>
-          <View className="flex items-center relative -mb-2">
-            <MessageCircleQuestion size={30} />
+        <View className="flex items-center relative -mb-2">
+            <MessageCircleQuestion
+              size={30}
+              color={isMode ? activeColor : inactiveColor}
+            />
             {isMode && (
-              <View className="absolute bottom-[-9px] w-full border-b-2 border-black" />
+              <View className="absolute bottom-[-9px] w-full border-b-2 border-Bittersweet" />
             )}
           </View>
         </TouchableOpacity>

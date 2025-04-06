@@ -18,12 +18,11 @@ import {
   CopyPlus,
   MessageCircleQuestion,
   Bookmark,
-  AlignJustify,
 } from "lucide-react-native";
 import LoadingIndicator from "@/components/Loading";
 import { Image } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { BackButtonComponents } from "@/components/Buntton";
+import { BackButtonComponents, ButtonComponents } from "@/components/Buntton";
 import { ConfirmAlert } from "@/components/Alert";
 import { AxiosError } from "axios";
 
@@ -42,6 +41,39 @@ export default function OtherProfileScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const [isFollowing, setIsFollowing] = useState<boolean>(false);
+  const activeColor = "#FF6F61";
+  const inactiveColor = "#848484";
+
+  const checkFollowStatus = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const res = await axiosInstance.get(`/user/${userId}`, {
+        headers: { token },
+      });
+
+      if (res.data.status) {
+        setIsFollowing(res.data.data.follow);
+      }
+    } catch (error) {
+      console.log("Follow status check error:", error);
+    }
+  };
+
+  const handleFollow = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const res = await axiosInstance.post(`/user/follower/${userId}`, null, {
+        headers: { token },
+      });
+
+      const newFollowStatus = res.data?.followed ?? !isFollowing;
+      setIsFollowing(newFollowStatus);
+    } catch (error) {
+      console.log("Follow toggle error:", error);
+    }
+  };
 
   const handle404Error = (error: unknown) => {
     const axiosError = error as AxiosError;
@@ -157,6 +189,31 @@ export default function OtherProfileScreen() {
   };
 
   useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const token = await AsyncStorage.getItem("token");
+        const res = await axiosInstance.get("/user/me", {
+          headers: { token },
+        });
+
+        if (res.data.status) {
+          setCurrentUserId(res.data.data.id);
+        }
+      } catch (err) {
+        console.log("Error fetching current user:", err);
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
+
+  useEffect(() => {
+    if (profileUser?.id && currentUserId !== null) {
+      checkFollowStatus();
+    }
+  }, [profileUser, currentUserId]);
+
+  useEffect(() => {
     fetchUser();
   }, []);
 
@@ -185,11 +242,23 @@ export default function OtherProfileScreen() {
           }
         />
 
-        <Text className="text-Heading3 mt-2">
+        <Text className="text-Heading3 mt-2 mb-2">
           {profileUser?.full_name || "User"}
         </Text>
+        <View>
+          <TouchableOpacity>
+            <ButtonComponents
+              onPress={handleFollow}
+              title={isFollowing ? "following" : "follow"}
+              className={`px-3 py-1 rounded-full ${
+                isFollowing ? "bg-Bittersweet" : "bg-Bittersweet"
+              }`}
+              textSize="text-l font-semibold text-white"
+            />
+          </TouchableOpacity>
+        </View>
 
-        <View className="flex flex-row justify-between w-1/2 mt-4">
+        <View className="flex flex-row justify-between w-1/2 mt-2">
           <View className="items-center">
             <Text className="text-label8 text-OldSilver">followers</Text>
             <Text className="text-label8 text-OldSilver">
@@ -209,27 +278,27 @@ export default function OtherProfileScreen() {
       <View className="flex flex-row items-center justify-around mt-4">
         <TouchableOpacity onPress={() => setMode("reviews")}>
           <View className="flex items-center relative">
-            <CopyPlus size={30} />
+            <CopyPlus size={30}  color={mode === "reviews" ? activeColor : inactiveColor} />
             {mode === "reviews" && (
-              <View className="absolute bottom-[-15px] w-full border-b-2 border-black" />
+              <View className="absolute bottom-[-15px] w-full border-b-2 border-Bittersweet" />
             )}
           </View>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => setMode("threads")}>
           <View className="flex items-center relative">
-            <MessageCircleQuestion size={30} />
+            <MessageCircleQuestion size={30}  color={mode === "threads" ? activeColor : inactiveColor} />
             {mode === "threads" && (
-              <View className="absolute bottom-[-15px] w-full border-b-2 border-black" />
+              <View className="absolute bottom-[-15px] w-full border-b-2 border-Bittersweet" />
             )}
           </View>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => setMode("bookmark")}>
           <View className="flex items-center relative">
-            <Bookmark size={30} />
+            <Bookmark size={30}  color={mode === "bookmark" ? activeColor : inactiveColor} />
             {mode === "bookmark" && (
-              <View className="absolute bottom-[-15px] w-full border-b-2 border-black" />
+              <View className="absolute bottom-[-15px] w-full border-b-2 border-Bittersweet" />
             )}
           </View>
         </TouchableOpacity>
@@ -251,74 +320,96 @@ export default function OtherProfileScreen() {
             <LoadingIndicator />
           ) : (
             <>
-              {mode === "reviews" && (
-                <FlatList
-                  data={reviews}
-                  keyExtractor={(item) => item.id.toString()}
-                  numColumns={3}
-                  refreshing={refreshing}
-                  onRefresh={handleRefresh}
-                  columnWrapperStyle={{ marginBottom: 12 }}
-                  renderItem={({ item }) => (
-                    <PostByUser
-                      image={item.image}
-                      title={item.title}
-                      user={item.user.full_name}
-                      userAvatar={item.user.image}
-                      isFavorited={item.favorite}
-                      onFavorite={() => handleFavorite(item.id, "review")}
-                      onPress={() => router.push(`/review/${item.id}`)}
-                    />
-                  )}
-                />
-              )}
-
-              {mode === "threads" && (
-                <FlatList
-                  data={threads}
-                  keyExtractor={(item) => item.id.toString()}
-                  numColumns={3}
-                  refreshing={refreshing}
-                  onRefresh={handleRefresh}
-                  renderItem={({ item }) => (
-                    <PostByUser
-                      image={item.images[0]?.image}
-                      title={item.title}
-                      user={item.user.full_name}
-                      userAvatar={item.user.image}
-                      isFavorited={item.favorite}
-                      onFavorite={() => handleFavorite(item.id, "thread")}
-                      onPress={() => router.push(`/thread/${item.id}`)}
-                    />
-                  )}
-                />
-              )}
-              {mode === "bookmark" && (
-                <FlatList
-                  data={bookmarks}
-                  keyExtractor={(item) => item.id.toString()}
-                  numColumns={3}
-                  refreshing={refreshing}
-                  onRefresh={handleRefresh}
-                  renderItem={({ item }) => {
-                    const isThread = item.type === 1;
-                    const contentId = item.community_id;
-                    const type = isThread ? "thread" : "review";
-
-                    return (
+              {mode === "reviews" &&
+                (reviews && reviews.length > 0 ? (
+                  <FlatList
+                    data={reviews}
+                    keyExtractor={(item) => item.id.toString()}
+                    numColumns={3}
+                    refreshing={refreshing}
+                    onRefresh={handleRefresh}
+                    columnWrapperStyle={{ marginBottom: 12 }}
+                    renderItem={({ item }) => (
                       <PostByUser
                         image={item.image}
                         title={item.title}
-                        user={item.user?.full_name}
-                        userAvatar={item.user?.image}
+                        user={item.user.full_name}
+                        userAvatar={item.user.image}
                         isFavorited={item.favorite}
-                        onFavorite={() => handleFavorite(contentId, type)}
-                        onPress={() => router.push(`/${type}/${contentId}`)}
+                        onFavorite={() => handleFavorite(item.id, "review")}
+                        onPress={() => router.push(`/review/${item.id}`)}
                       />
-                    );
-                  }}
-                />
-              )}
+                    )}
+                  />
+                ) : (
+                  <View className="items-center mt-10">
+                    <Text className="text-label7 text-OldSilver">
+                      No reviews available.
+                    </Text>
+                  </View>
+                ))}
+
+              {mode === "threads" &&
+                (threads && threads.length > 0 ? (
+                  <FlatList
+                    data={threads}
+                    keyExtractor={(item) => item.id.toString()}
+                    numColumns={3}
+                    refreshing={refreshing}
+                    onRefresh={handleRefresh}
+                    renderItem={({ item }) => (
+                      <PostByUser
+                        image={item.images[0]?.image}
+                        title={item.title}
+                        user={item.user.full_name}
+                        userAvatar={item.user.image}
+                        isFavorited={item.favorite}
+                        onFavorite={() => handleFavorite(item.id, "thread")}
+                        onPress={() => router.push(`/thread/${item.id}`)}
+                      />
+                    )}
+                  />
+                ) : (
+                  <View className="items-center mt-10">
+                    <Text className="text-label7 text-OldSilver">
+                      No threads available.
+                    </Text>
+                  </View>
+                ))}
+
+              {mode === "bookmark" &&
+                (bookmarks && bookmarks.length > 0 ? (
+                  <FlatList
+                    data={bookmarks}
+                    keyExtractor={(item) => item.id.toString()}
+                    numColumns={3}
+                    refreshing={refreshing}
+                    onRefresh={handleRefresh}
+                    renderItem={({ item }) => {
+                      const isThread = item.type === 1;
+                      const contentId = item.community_id;
+                      const type = isThread ? "thread" : "review";
+
+                      return (
+                        <PostByUser
+                          image={item.image}
+                          title={item.title}
+                          user={item.user?.full_name}
+                          userAvatar={item.user?.image}
+                          isFavorited={item.favorite}
+                          onFavorite={() => handleFavorite(contentId, type)}
+                          onPress={() => router.push(`/${type}/${contentId}`)}
+                        />
+                      );
+                    }}
+                  />
+                ) : (
+                  <View className="items-center mt-10">
+                    <Text className="text-label7 text-OldSilver">
+                      No bookmarks available.
+                    </Text>
+                  </View>
+                ))}
             </>
           )}
         </View>

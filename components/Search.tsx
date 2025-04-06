@@ -86,7 +86,7 @@ const SearchComponent: React.FC<SearchProps> = ({
             />
             <TouchableOpacity
               onPress={collapseSearchBar}
-              className="p-1"
+              className="p-1 -mr-2"
               hitSlop={{ top: 10, right: 10, bottom: 10, left: 10 }}
             >
               <Ionicons name="close-circle" size={20} color="white" />

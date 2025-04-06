@@ -139,8 +139,9 @@ export default function EditReviewScreen() {
       });
 
       if (res.data.status) {
-        router.push(`/review/${id}`);
+        router.replace(`/review/${id}`);
       }
+      
     } catch (error: any) {
       handle404Error(error);
       console.error("Update Error:", error.response?.data || error.message);

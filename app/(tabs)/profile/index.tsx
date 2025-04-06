@@ -39,6 +39,8 @@ export default function ProfileScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const activeColor = "#FF6F61";
+  const inactiveColor = "#848484";
 
   const handle404Error = (error: unknown) => {
     const axiosError = error as AxiosError;
@@ -221,27 +223,27 @@ export default function ProfileScreen() {
       <View className="flex flex-row items-center justify-around mt-4">
         <TouchableOpacity onPress={() => setMode("reviews")}>
           <View className="flex items-center relative">
-            <CopyPlus size={30} />
+            <CopyPlus size={30}  color={mode === "reviews" ? activeColor : inactiveColor} />
             {mode === "reviews" && (
-              <View className="absolute bottom-[-16px] w-full border-b-2 border-black" />
+              <View className="absolute bottom-[-16px] w-full border-b-2 border-Bittersweet" />
             )}
           </View>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => setMode("threads")}>
           <View className="flex items-center relative">
-            <MessageCircleQuestion size={30} />
+            <MessageCircleQuestion size={30}   color={mode === "threads" ? activeColor : inactiveColor} />
             {mode === "threads" && (
-              <View className="absolute bottom-[-16px] w-full border-b-2 border-black" />
+              <View className="absolute bottom-[-16px] w-full border-b-2 border-Bittersweet" />
             )}
           </View>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => setMode("bookmark")}>
           <View className="flex items-center relative">
-            <Bookmark size={30} />
+            <Bookmark size={30}   color={mode === "bookmark" ? activeColor : inactiveColor} />
             {mode === "bookmark" && (
-              <View className="absolute bottom-[-16px] w-full border-b-2 border-black" />
+              <View className="absolute bottom-[-16px] w-full border-b-2 border-Bittersweet" />
             )}
           </View>
         </TouchableOpacity>

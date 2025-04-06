@@ -1,4 +1,4 @@
-import { FC, useEffect } from "react";
+import { FC, useCallback, useEffect } from "react";
 import {
   Modal,
   Text,
@@ -22,7 +22,7 @@ import * as DocumentPicker from "expo-document-picker";
 import { axiosInstance } from "@/lib/axios_instance";
 import { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router, useRouter } from "expo-router";
+import { router, useFocusEffect, useRouter } from "expo-router";
 import LoadingIndicator from "@/components/Loading";
 import useLoading from "@/hook/useLoading";
 import { ReviewCard } from "./Card";
@@ -349,7 +349,7 @@ export const ModalSkincare: FC<IModalSkincare> = (props) => {
   const { skincares } = useCompare();
   const { isLoading } = useLoading();
   const [searchQuery, setSearchQuery] = useState("");
-  const [isSearchOpen, setIsSearchOpen] = useState(true);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isAlertVisible, setIsAlertVisible] = useState(false);
   const [selectSkincare, setSelectSkincare] = useState<ISkincare[]>([]);
 
@@ -370,11 +370,15 @@ export const ModalSkincare: FC<IModalSkincare> = (props) => {
   };
 
   const handleConfirm = () => {
+    setSearchQuery("");
+    setIsSearchOpen(false);
     onClose();
   };
 
   const handleCancel = () => {
     setSkincare(selectSkincare);
+    setSearchQuery("");
+    setIsSearchOpen(false);
     onClose();
   };
 
@@ -399,6 +403,10 @@ export const ModalSkincare: FC<IModalSkincare> = (props) => {
               onPress={handleCancel}
             />
             <View className="flex flex-row items-center justify-between">
+            <Search   searchQuery={searchQuery}
+            isSearchOpen={isSearchOpen}
+            setSearchQuery={setSearchQuery}
+            setIsSearchOpen={setIsSearchOpen} />
               <ButtonComponents
                 title="Confirm"
                 className="bg-Bittersweet px-2 rounded-full h-8 flex items-center justify-center"
@@ -407,11 +415,7 @@ export const ModalSkincare: FC<IModalSkincare> = (props) => {
               />
             </View>
           </View>
-          <View className="flex items-center mt-5">
-            <Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-          </View>
-
-          <View className="flex items-center mb-6">
+          <View className="flex items-center mb-6 mt-6">
             <Text className="text-Heading3 font-semibold text-center">
               Select skincares to review ({skincare?.length}/10)
             </Text>

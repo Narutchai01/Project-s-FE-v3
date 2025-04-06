@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, memo } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { View, FlatList, Text, TouchableOpacity } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { Stack } from "expo-router";
@@ -11,12 +11,12 @@ import LoadingIndicator from "@/components/Loading";
 import { IReview } from "@/interface/review";
 import { IThread } from "@/interface/threads";
 import { ModalCreateReviewPost, ModalCreateThread } from "@/components/Modal";
-import { CopyPlus, Plus, MessageCircleQuestion } from "lucide-react-native";
 import axios, { AxiosError } from "axios";
-import { Search } from "@/components/Search";
 import { useLocalSearchParams } from "expo-router";
 import { ConfirmAlert } from "@/components/Alert";
 import { CustomHeader } from "@/components/CustomHeader";
+import { useFocusEffect } from "@react-navigation/native";
+
 
 export default function CommonScreen() {
   const [threads, setThreads] = useState<IThread[] | null>(null);
@@ -145,6 +145,13 @@ export default function CommonScreen() {
       setIsMode(false);
     }
   }, [mode]);
+
+  useFocusEffect(
+    useCallback(() => {
+      setIsSearchOpen(false);
+      setSearchQuery("");
+    }, [])
+  );
 
   return (
     <SafeAreaProvider>
