@@ -45,13 +45,20 @@ export default function ThreadDetails() {
   const heartScale = useState(new Animated.Value(0))[0];
   const [tapPosition, setTapPosition] = useState({ x: 0, y: 0 });
 
-  const handle404Error = (error: unknown) => {
+  const handleError = (error: unknown) => {
     const axiosError = error as AxiosError;
-    if (axiosError?.response?.status === 404 && !alertVisible) {
-      setAlertMessage("Your session has expired or account not found.");
-      setAlertVisible(true);
+  
+    if (!alertVisible) {
+      if (axiosError?.response?.status === 404) {
+        setAlertMessage("Your session has expired or account not found.");
+        setAlertVisible(true);
+      } else if (axiosError?.response?.status === 401) {
+        setAlertMessage("Unauthorized. Please log in again.");
+        setAlertVisible(true);
+      }
     }
   };
+  
 
   const handleDoubleTap = (event: any) => {
     const now = Date.now();
@@ -105,7 +112,7 @@ export default function ThreadDetails() {
         setIsFollowing(res.data.data.follow);
       }
     } catch (error) {
-      handle404Error(error);
+      handleError(error);
       console.error("Error fetching user follow status:", error);
     }
   };
@@ -127,7 +134,7 @@ export default function ThreadDetails() {
         stopLoading();
       }
     } catch (error) {
-      handle404Error(error);
+      handleError(error);
       console.log(error);
     } finally {
       stopLoading();
@@ -149,7 +156,7 @@ export default function ThreadDetails() {
 
       fetchThread();
     } catch (error: any) {
-      handle404Error(error);
+      handleError(error);
       console.log(error.response.data);
     }
   };
@@ -169,7 +176,7 @@ export default function ThreadDetails() {
         setCommentCount(data.data?.length ?? 0);
       }
     } catch (error: any) {
-      handle404Error(error);
+      handleError(error);
       console.log(error);
     }
   };
@@ -190,7 +197,7 @@ export default function ThreadDetails() {
         fetchComments();
       }
     } catch (error: any) {
-      handle404Error(error);
+      handleError(error);
       console.log(error.response.data);
     }
   };
@@ -214,7 +221,7 @@ export default function ThreadDetails() {
       fetchComments();
       setCommentContent("");
     } catch (error) {
-      handle404Error(error);
+      handleError(error);
       console.log(error);
     }
   };
@@ -232,7 +239,7 @@ export default function ThreadDetails() {
 
       fetchThread();
     } catch (error) {
-      handle404Error(error);
+      handleError(error);
       console.log("Bookmark Error:", error);
     }
   };
@@ -259,7 +266,7 @@ export default function ThreadDetails() {
           stopLoading();
         }
       } catch (error) {
-        handle404Error(error);
+        handleError(error);
         console.error(error);
       } finally {
         stopLoading();

@@ -18,14 +18,19 @@ export const PopularReviews: FC = () => {
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
 
-  const handle404Error = (error: unknown) => {
+  const handleError = (error: unknown) => {
     const axiosError = error as AxiosError;
-    if (axiosError?.response?.status === 404 && !alertVisible) {
-      setAlertMessage("Your session has expired or account not found.");
-      setAlertVisible(true);
+  
+    if (!alertVisible) {
+      if (axiosError?.response?.status === 404) {
+        setAlertMessage("Your session has expired or account not found.");
+        setAlertVisible(true);
+      } else if (axiosError?.response?.status === 401) {
+        setAlertMessage("Unauthorized. Please log in again.");
+        setAlertVisible(true);
+      }
     }
   };
-
   const fetchReviews = useCallback(async () => {
     startLoading();
     try {
@@ -40,7 +45,7 @@ export const PopularReviews: FC = () => {
         stopLoading();
       }
     } catch (error) {
-      handle404Error(error);
+      handleError(error);
       console.log(error);
       stopLoading();
     } finally {
@@ -57,7 +62,7 @@ export const PopularReviews: FC = () => {
 
       fetchReviews();
     } catch (error) {
-      handle404Error(error);
+      handleError(error);
       console.error("Favorite error:", error);
     }
   };

@@ -57,6 +57,7 @@ export default function OtherProfileScreen() {
         setIsFollowing(res.data.data.follow);
       }
     } catch (error) {
+      handleError(error);
       console.log("Follow status check error:", error);
     }
   };
@@ -71,15 +72,22 @@ export default function OtherProfileScreen() {
       const newFollowStatus = res.data?.followed ?? !isFollowing;
       setIsFollowing(newFollowStatus);
     } catch (error) {
+      handleError(error);
       console.log("Follow toggle error:", error);
     }
   };
 
-  const handle404Error = (error: unknown) => {
+  const handleError = (error: unknown) => {
     const axiosError = error as AxiosError;
-    if (axiosError?.response?.status === 404 && !alertVisible) {
-      setAlertMessage("Your session has expired or account not found.");
-      setAlertVisible(true);
+  
+    if (!alertVisible) {
+      if (axiosError?.response?.status === 404) {
+        setAlertMessage("Your session has expired or account not found.");
+        setAlertVisible(true);
+      } else if (axiosError?.response?.status === 401) {
+        setAlertMessage("Unauthorized. Please log in again.");
+        setAlertVisible(true);
+      }
     }
   };
 
@@ -92,7 +100,7 @@ export default function OtherProfileScreen() {
       });
       setProfileUser(res.data.data);
     } catch (error) {
-      handle404Error(error);
+      handleError(error);
       console.log("Error fetching user:", error);
     } finally {
       stopLoading();
@@ -122,7 +130,7 @@ export default function OtherProfileScreen() {
         setThreads(res.data.data);
       }
     } catch (error) {
-      handle404Error(error);
+      handleError(error);
       console.error(error);
     } finally {
       stopLoading();
@@ -141,7 +149,7 @@ export default function OtherProfileScreen() {
         setReviews(res.data.data);
       }
     } catch (error) {
-      handle404Error(error);
+      handleError(error);
       console.error(error);
     } finally {
       stopLoading();
@@ -160,7 +168,7 @@ export default function OtherProfileScreen() {
         setBookmarks(res.data.data);
       }
     } catch (error) {
-      handle404Error(error);
+      handleError(error);
       console.error(error);
     } finally {
       stopLoading();
@@ -183,7 +191,7 @@ export default function OtherProfileScreen() {
         fetchThreads();
       }
     } catch (error) {
-      handle404Error(error);
+      handleError(error);
       console.error("Toggle favorite error:", error);
     }
   };
@@ -199,8 +207,9 @@ export default function OtherProfileScreen() {
         if (res.data.status) {
           setCurrentUserId(res.data.data.id);
         }
-      } catch (err) {
-        console.log("Error fetching current user:", err);
+      } catch (error) {
+        handleError(error);
+        console.log("Error fetching current user:", error);
       }
     };
 

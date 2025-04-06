@@ -52,13 +52,20 @@ export default function CommonScreen() {
     setIsSearchOpen(open);
   }, []);
 
-  const handle404Error = (error: unknown) => {
+  const handleError = (error: unknown) => {
     const axiosError = error as AxiosError;
-    if (axiosError?.response?.status === 404 && !alertVisible) {
-      setAlertMessage("Your session has expired or account not found.");
-      setAlertVisible(true);
+  
+    if (!alertVisible) {
+      if (axiosError?.response?.status === 404) {
+        setAlertMessage("Your session has expired or account not found.");
+        setAlertVisible(true);
+      } else if (axiosError?.response?.status === 401) {
+        setAlertMessage("Unauthorized. Please log in again.");
+        setAlertVisible(true);
+      }
     }
   };
+  
 
   const fetchThread = useCallback(async () => {
     startLoading();
@@ -74,7 +81,7 @@ export default function CommonScreen() {
         }
       })
       .catch((err) => {
-        handle404Error(err);
+        handleError(err);
         if (axios.isAxiosError(err) && err.response?.status === 401) {
           console.log("Unauthorized");
         }
@@ -95,7 +102,7 @@ export default function CommonScreen() {
         }
       })
       .catch((err) => {
-        handle404Error(err);
+        handleError(err);
         if (axios.isAxiosError(err) && err.response?.status === 401) {
           console.log("Unauthorized");
         }
@@ -121,7 +128,7 @@ export default function CommonScreen() {
         fetchReview();
       }
     } catch (err) {
-      handle404Error(err);
+      handleError(err);
       console.error("Toggle favorite error:", err);
     }
   };

@@ -42,11 +42,18 @@ export default function ProfileScreen() {
   const activeColor = "#FF6F61";
   const inactiveColor = "#848484";
 
-  const handle404Error = (error: unknown) => {
+
+  const handleError = (error: unknown) => {
     const axiosError = error as AxiosError;
-    if (axiosError?.response?.status === 404 && !alertVisible) {
-      setAlertMessage("Your session has expired or account not found.");
-      setAlertVisible(true);
+  
+    if (!alertVisible) {
+      if (axiosError?.response?.status === 404) {
+        setAlertMessage("Your session has expired or account not found.");
+        setAlertVisible(true);
+      } else if (axiosError?.response?.status === 401) {
+        setAlertMessage("Unauthorized. Please log in again.");
+        setAlertVisible(true);
+      }
     }
   };
 
@@ -61,7 +68,7 @@ export default function ProfileScreen() {
       });
       setProfileUser(res.data.data);
     } catch (error) {
-      handle404Error(error);
+      handleError(error);
       console.log("Error fetching user:", error);
     } finally {
       stopLoading();
@@ -95,7 +102,7 @@ export default function ProfileScreen() {
         setThreads(res.data.data);
       }
     } catch (error) {
-      handle404Error(error);
+      handleError(error);
       console.error(error);
     } finally {
       stopLoading();
@@ -118,7 +125,7 @@ export default function ProfileScreen() {
         setReviews(data.data);
       }
     } catch (error) {
-      handle404Error(error);
+      handleError(error);
       console.error(error);
     } finally {
       stopLoading();
@@ -141,7 +148,7 @@ export default function ProfileScreen() {
         setBookmarks(data.data);
       }
     } catch (error) {
-      handle404Error(error);
+      handleError(error);
       console.error(error);
     } finally {
       stopLoading();
@@ -164,7 +171,7 @@ export default function ProfileScreen() {
         fetchThreads();
       }
     } catch (error) {
-      handle404Error(error);
+      handleError(error);
       console.error("Toggle favorite error:", error);
     }
   };

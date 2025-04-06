@@ -45,11 +45,17 @@ export default function EditProfileScreen() {
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
 
-  const handle404Error = (error: unknown) => {
+const handleError = (error: unknown) => {
     const axiosError = error as AxiosError;
-    if (axiosError?.response?.status === 404 && !alertVisible) {
-      setAlertMessage("Your session has expired or account not found.");
-      setAlertVisible(true);
+  
+    if (!alertVisible) {
+      if (axiosError?.response?.status === 404) {
+        setAlertMessage("Your session has expired or account not found.");
+        setAlertVisible(true);
+      } else if (axiosError?.response?.status === 401) {
+        setAlertMessage("Unauthorized. Please log in again.");
+        setAlertVisible(true);
+      }
     }
   };
 
@@ -81,7 +87,7 @@ export default function EditProfileScreen() {
         }
       }
     } catch (error) {
-      handle404Error(error);
+      handleError(error);
       console.error("Fetch profile error:", error);
     } finally {
       stopLoading();
@@ -136,7 +142,7 @@ export default function EditProfileScreen() {
 
       setShowAlert(true);
     } catch (error: any) {
-      handle404Error(error);
+      handleError(error);
       console.error("Update profile error:", error);
     } finally {
       stopLoading();

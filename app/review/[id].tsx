@@ -44,11 +44,17 @@ export default function ReviewDetails() {
   const heartScale = useState(new Animated.Value(0))[0];
   const [tapPosition, setTapPosition] = useState({ x: 0, y: 0 });
 
-  const handle404Error = (error: unknown) => {
+  const handleError = (error: unknown) => {
     const axiosError = error as AxiosError;
-    if (axiosError?.response?.status === 404 && !alertVisible) {
-      setAlertMessage("Your session has expired or account not found.");
-      setAlertVisible(true);
+  
+    if (!alertVisible) {
+      if (axiosError?.response?.status === 404) {
+        setAlertMessage("Your session has expired or account not found.");
+        setAlertVisible(true);
+      } else if (axiosError?.response?.status === 401) {
+        setAlertMessage("Unauthorized. Please log in again.");
+        setAlertVisible(true);
+      }
     }
   };
 
@@ -104,7 +110,7 @@ export default function ReviewDetails() {
         setIsFollowing(res.data.data.follow);
       }
     } catch (error) {
-      handle404Error(error);
+      handleError(error);
       console.error("Error fetching user follow status:", error);
     }
   };
@@ -124,7 +130,7 @@ export default function ReviewDetails() {
         stopLoading();
       }
     } catch (error) {
-      handle404Error(error);
+      handleError(error);
       console.error(error);
     } finally {
       stopLoading();
@@ -156,7 +162,7 @@ export default function ReviewDetails() {
         setCommentCount(data.data?.length ?? 0);
       }
     } catch (error: any) {
-      handle404Error(error);
+      handleError(error);
       console.log(error);
     }
   };
@@ -172,7 +178,7 @@ export default function ReviewDetails() {
 
       fetchReview();
     } catch (error: any) {
-      handle404Error(error);
+      handleError(error);
       console.log(error.response.data);
     }
   };
@@ -192,7 +198,7 @@ export default function ReviewDetails() {
         fetchComments();
       }
     } catch (error: any) {
-      handle404Error(error);
+      handleError(error);
       console.log(error.response.data);
     }
   };
@@ -216,7 +222,7 @@ export default function ReviewDetails() {
       fetchComments();
       setCommentContent("");
     } catch (error) {
-      handle404Error(error);
+      handleError(error);
       console.log(error);
     }
   };
@@ -234,7 +240,7 @@ export default function ReviewDetails() {
 
       fetchReview();
     } catch (error: any) {
-      handle404Error(error);
+      handleError(error);
       console.log(error.response.data);
     }
   };
@@ -261,7 +267,7 @@ export default function ReviewDetails() {
           stopLoading();
         }
       } catch (error) {
-        handle404Error(error);
+        handleError(error);
         console.error(error);
       } finally {
         stopLoading();

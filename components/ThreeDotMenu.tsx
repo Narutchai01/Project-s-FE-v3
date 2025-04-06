@@ -19,11 +19,17 @@ export const ThreeDotMenu: React.FC<ThreeDotMenuProps> = (props) => {
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
 
-  const handle404Error = (error: unknown) => {
+  const handleError = (error: unknown) => {
     const axiosError = error as AxiosError;
-    if (axiosError?.response?.status === 404 && !alertVisible) {
-      setAlertMessage("Your session has expired or account not found.");
-      setAlertVisible(true);
+  
+    if (!alertVisible) {
+      if (axiosError?.response?.status === 404) {
+        setAlertMessage("Your session has expired or account not found.");
+        setAlertVisible(true);
+      } else if (axiosError?.response?.status === 401) {
+        setAlertMessage("Unauthorized. Please log in again.");
+        setAlertVisible(true);
+      }
     }
   };
 
@@ -46,10 +52,6 @@ export const ThreeDotMenu: React.FC<ThreeDotMenuProps> = (props) => {
     try {
       const token = await AsyncStorage.getItem("token");
 
-      //       console.log("🧨 Delete threadId:", threadId, typeof threadId);
-      // console.log("🧨 API Path:", `/thread/${threadId}`);
-      // console.log("🧨 Headers:", { token: `${token}` });
-
       await axiosInstance.delete(`/thread/${threadId}`, {
         headers: {
           token: token,
@@ -59,7 +61,7 @@ export const ThreeDotMenu: React.FC<ThreeDotMenuProps> = (props) => {
       setShowAlert(false);
       router.back();
     } catch (error: any) {
-      handle404Error(error);
+      handleError(error);
       const message = error?.response?.data?.message || "Something went wrong.";
       console.error(message);
     } finally {
@@ -84,7 +86,7 @@ export const ThreeDotMenu: React.FC<ThreeDotMenuProps> = (props) => {
       setShowAlert(false);
       router.back();
     } catch (error: any) {
-      handle404Error(error);
+      handleError(error);
       const message = error?.response?.data?.message || "Something went wrong.";
       console.error(message);
     } finally {

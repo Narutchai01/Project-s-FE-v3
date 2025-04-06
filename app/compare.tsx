@@ -28,13 +28,20 @@ export default function CompareScreen() {
   const loadFacialsStore = useCallback(loadFacials, [loadFacials]);
   const fetchFacialsStore = useCallback(fetchFacials, [fetchFacials]);
 
-  const handle404Error = (error: unknown) => {
+  const handleError = (error: unknown) => {
     const axiosError = error as AxiosError;
-    if (axiosError?.response?.status === 404 && !alertVisible) {
-      setAlertMessage("Your session has expired or account not found.");
-      setAlertVisible(true);
+  
+    if (!alertVisible) {
+      if (axiosError?.response?.status === 404) {
+        setAlertMessage("Your session has expired or account not found.");
+        setAlertVisible(true);
+      } else if (axiosError?.response?.status === 401) {
+        setAlertMessage("Unauthorized. Please log in again.");
+        setAlertVisible(true);
+      }
     }
   };
+  
 
   useEffect(() => {
     loadAcnesStore();
@@ -56,7 +63,7 @@ export default function CompareScreen() {
       );
       setCompareData(response.data.data);
     } catch (error) {
-      handle404Error(error);
+      handleError(error);
       console.log(error);
     } finally {
       setLoading(false);

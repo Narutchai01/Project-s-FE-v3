@@ -26,13 +26,19 @@ export default function ChangePasswordScreen() {
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
 
-  const handle404Error = (error: unknown) => {
-    const axiosError = error as AxiosError;
-    if (axiosError?.response?.status === 404 && !alertVisible) {
-      setAlertMessage("Your session has expired or account not found.");
-      setAlertVisible(true);
-    }
-  };
+  const handleError = (error: unknown) => {
+      const axiosError = error as AxiosError;
+    
+      if (!alertVisible) {
+        if (axiosError?.response?.status === 404) {
+          setAlertMessage("Your session has expired or account not found.");
+          setAlertVisible(true);
+        } else if (axiosError?.response?.status === 401) {
+          setAlertMessage("Unauthorized. Please log in again.");
+          setAlertVisible(true);
+        }
+      }
+    };
 
   const handleNewPassword = async (password: string) => {
     startLoading();
@@ -53,7 +59,7 @@ export default function ChangePasswordScreen() {
       setAlertTitle("Change Password Success");
       setShowAlert(true);
     } catch (error) {
-      handle404Error(error);
+      handleError(error);
       console.error("Error changing password:", error);
     } finally {
       stopLoading();
