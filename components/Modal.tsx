@@ -861,12 +861,12 @@ export const ModalCreateReviewPost: FC<IModalCreateReviewPostProps> = (
   );
 };
 
-interface ModalChangePassworkSuccessProps {
+interface ModalChangePasswordSuccessProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export const ModalChangePassworkSuccess: FC<ModalChangePassworkSuccessProps> = (
+export const ModalChangePasswordSuccess: FC<ModalChangePasswordSuccessProps> = (
   props
 ) => {
   const { isOpen, onClose } = props;

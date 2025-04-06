@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { ButtonComponents } from "@/components/Buntton";
 import { Eye, EyeOff } from "lucide-react-native";
-import { ModalChangePassworkSuccess } from "@/components/Modal";
+import { ModalChangePasswordSuccess } from "@/components/Modal";
 import { axiosInstance } from "@/lib/axios_instance";
 import { useRecoveryStore } from "@/store/recovery";
 
@@ -146,7 +146,7 @@ export default function RecoverPasswordScreen() {
         </View>
       </View>
 
-      <ModalChangePassworkSuccess
+      <ModalChangePasswordSuccess
         isOpen={modalVisible}
         onClose={() => setModalVisible(false)}
       />
