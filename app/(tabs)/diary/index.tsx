@@ -97,30 +97,36 @@ export default function DiaryScreen() {
 
   const handleError = (error: unknown) => {
     const axiosError = error as AxiosError;
-  
+
     if (!alertVisible) {
-      if (axiosError?.response?.status === 404) {
-        setAlertMessage("Your session has expired or account not found.");
-        setAlertVisible(true);
-      } else if (axiosError?.response?.status === 401) {
+      if (axiosError?.response?.status === 401) {
         setAlertMessage("Unauthorized. Please log in again.");
         setAlertVisible(true);
       }
     }
   };
-  
 
   const fetchResults = useCallback(async () => {
     startLoading();
     try {
       const token = await AsyncStorage.getItem("token");
-      if (token) {
-        const res = await axiosInstance.get("/results", { headers: { token } });
+      const res = await axiosInstance.get("/results", { headers: { token } });
+
+      if (res.data?.status && res.data?.data) {
         setResults(res.data.data);
         setFilteredResults(res.data.data);
+      } else {
+        setResults([]);
+        setFilteredResults([]);
       }
     } catch (error) {
-      handleError(error);
+      const axiosError = error as AxiosError;
+      if (axiosError?.response?.status === 404) {
+        setResults([]);
+        setFilteredResults([]);
+      } else {
+        handleError(error);
+      }
       console.log("Error fetching results:", error);
     } finally {
       stopLoading();
@@ -215,6 +221,15 @@ export default function DiaryScreen() {
                 selectArray={compare}
               />
             )}
+            ListEmptyComponent={
+              !isLoading ? (
+                <View className="flex items-center justify-center mt-10">
+                  <Text className="text-gray-500 text-base text-center">
+                    You don't have any diary entries yet.
+                  </Text>
+                </View>
+              ) : null
+            }
           />
 
           <CalendarPicker

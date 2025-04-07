@@ -46,6 +46,17 @@ export default function OtherProfileScreen() {
   const activeColor = "#FF6F61";
   const inactiveColor = "#848484";
 
+      const handleError = (error: unknown) => {
+        const axiosError = error as AxiosError;
+      
+        if (!alertVisible) {
+          if (axiosError?.response?.status === 401) {
+            setAlertMessage("Unauthorized. Please log in again.");
+            setAlertVisible(true);
+          }
+        }
+      };
+
   const checkFollowStatus = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
@@ -74,20 +85,6 @@ export default function OtherProfileScreen() {
     } catch (error) {
       handleError(error);
       console.log("Follow toggle error:", error);
-    }
-  };
-
-  const handleError = (error: unknown) => {
-    const axiosError = error as AxiosError;
-  
-    if (!alertVisible) {
-      if (axiosError?.response?.status === 404) {
-        setAlertMessage("Your session has expired or account not found.");
-        setAlertVisible(true);
-      } else if (axiosError?.response?.status === 401) {
-        setAlertMessage("Unauthorized. Please log in again.");
-        setAlertVisible(true);
-      }
     }
   };
 

@@ -52,19 +52,16 @@ export default function CommonScreen() {
     setIsSearchOpen(open);
   }, []);
 
-  const handleError = (error: unknown) => {
-    const axiosError = error as AxiosError;
-  
-    if (!alertVisible) {
-      if (axiosError?.response?.status === 404) {
-        setAlertMessage("Your session has expired or account not found.");
-        setAlertVisible(true);
-      } else if (axiosError?.response?.status === 401) {
-        setAlertMessage("Unauthorized. Please log in again.");
-        setAlertVisible(true);
+    const handleError = (error: unknown) => {
+      const axiosError = error as AxiosError;
+    
+      if (!alertVisible) {
+        if (axiosError?.response?.status === 401) {
+          setAlertMessage("Unauthorized. Please log in again.");
+          setAlertVisible(true);
+        }
       }
-    }
-  };
+    };
   
 
   const fetchThread = useCallback(async () => {
