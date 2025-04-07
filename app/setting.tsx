@@ -4,13 +4,15 @@ import { BackButtonComponents } from "@/components/Buntton";
 import { router } from "expo-router";
 import { PencilLine, Lock, LogOut } from "lucide-react-native";
 import { LogoutConfirmAlert } from "@/components/Alert";
+import { useAuth } from "@/context/AuthContext";
 
 export default function SettingScreen() {
   const [showAlert, setShowAlert] = useState(false);
+  const { handleLogout } = useAuth(); 
 
-  const handleLogout = () => {
+  const handleConfirmLogout = async () => {
     setShowAlert(false);
-    router.push("/login");
+    await handleLogout(); 
   };
 
   return (
@@ -49,7 +51,7 @@ export default function SettingScreen() {
       <LogoutConfirmAlert
         visible={showAlert}
         onClose={() => setShowAlert(false)}
-        onConfirm={handleLogout}
+        onConfirm={handleConfirmLogout}
         title="Are you sure you want to logout?"
         confirm="Logout"
         cancel="Cancel"

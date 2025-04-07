@@ -23,6 +23,7 @@ type AuthContextType = {
   setSignupData: (data: ISignUp) => void;
   handleSignup: () => void;
   googleSignIn: () => void;
+  handleLogout: () => void; 
   user: IPubicUser;
   getToken: () => string | null;
   isOpen: boolean,
@@ -46,25 +47,37 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [sensitiveSkin , setSensitiveSkin] = useState<boolean>(false)
   const [isOpen,setIsOpen] = useState<boolean>(false)
   const [loginData, setLoginData] = useState<ILogin>({
+    id: 0,
+    full_name: "",
     email: "",
     password: "",
+    follower: 0,
+    following: 0,
   });
 
   const [signupData, setSignupData] = useState<ISignUp>({
-    fullname: "",
+    id: 0,
+    full_name: "",
     birthday: null,
     email: "",
     password: "",
     sensitive_skin: false,
+    follower: 0,
+    following: 0,
   });
+  
 
   const [user, setUser] = useState<IPubicUser>({
-    fullname: "",
+    id: 0,
+    full_name: "",
     birthday: null,
     email: "",
     sensitive_skin: null,
     image: "",
+    follower: 0,
+    following: 0,
   });
+  
 
   const getToken = (): string | null => {
     let token: string | null = null;
@@ -77,6 +90,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       });
     return token;
   };
+  
 
   const handleLogin = async () => {
     await axiosInstance
@@ -89,7 +103,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
         }
         const token: string = res.data.data.token;
         await AsyncStorage.setItem("token", token);
-        console.log("login suc");
+        router.push("/(tabs)/home");
       })
       .catch((err) => {
         console.log(err);
@@ -102,11 +116,14 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
       .then((res) => {
         const status = res.status;
         setSignupData({
-          fullname: "",
+          id: 0,
+          full_name: "",
           birthday: null,
           email: "",
           password: "",
           sensitive_skin: false,
+          follower: 0,
+          following: 0,
         });
         if (status === 201) {
           router.push("/login");
@@ -204,6 +221,30 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     }
   }
 
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem("token");
+      
+      setUser({
+        id: 0,
+        full_name: "",
+        birthday: null,
+        email: "",
+        sensitive_skin: null,
+        image: "",
+        follower: 0,
+        following: 0,
+      });
+      
+      setTimeout(() => {
+        router.replace("/login");
+      }, 100);
+    } catch (error) {
+      console.log("Logout error:", error);
+    }
+  };
+  
+
  useEffect(() => {
     getToken();
   },[]);
@@ -216,6 +257,7 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
     setSignupData,
     handleSignup,
     googleSignIn,
+    handleLogout,
     user,
     getToken,
     isOpen,

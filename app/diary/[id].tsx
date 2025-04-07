@@ -21,17 +21,34 @@ import LoadingIndicator from "@/components/Loading";
 import { ISkincare } from "@/interface/skincare";
 import { useSkincareStore } from "@/store/skincare";
 import { ModalSkincareDetail } from "@/components/Modal";
+import { ConfirmAlert } from "@/components/Alert";
+import { AxiosError } from "axios";
 
 const ResultAnalysis = () => {
   const { id } = useLocalSearchParams();
   const [result, setResult] = useState<IResult | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [isOpened, setIsOpened] = useState(false);
-
   const { skins, acnes, facials } = useCompare();
   const { startLoading, stopLoading, isLoading } = useLoading();
   const [modalVisible, setModalVisible] = useState(false);
   const { setSkincare } = useSkincareStore();
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
+  const handleError = (error: unknown) => {
+    const axiosError = error as AxiosError;
+  
+    if (!alertVisible) {
+      if (axiosError?.response?.status === 404) {
+        setAlertMessage("Your session has expired or account not found.");
+        setAlertVisible(true);
+      } else if (axiosError?.response?.status === 401) {
+        setAlertMessage("Unauthorized. Please log in again.");
+        setAlertVisible(true);
+      }
+    }
+  };
 
   const fetchResult = useCallback(async () => {
     startLoading();
@@ -48,6 +65,7 @@ const ResultAnalysis = () => {
         stopLoading();
       }
     } catch (error) {
+      handleError(error);
       console.log(error);
       stopLoading();
     } finally {
@@ -84,7 +102,7 @@ const ResultAnalysis = () => {
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
-          <View className="h-16 bg-Snow">
+          <View className="h-16 bg-Snow -ml-2">
             <View className="h-full flex-row items-center justify-between px-3">
               <BackButtonComponents
                 title={"Result Analysis"}
@@ -109,9 +127,23 @@ const ResultAnalysis = () => {
 
             <View className="w-full">
               <View className="w-full flex justify-center">
-                <MemoizedSection title="Skin type" items={skins || []} />
-                <MemoizedSection title="Acne Type" items={acnes || []} />
-                <MemoizedSection title="Skin Problems" items={facials || []} />
+                <MemoizedSection
+                  title="Skin type"
+                  items={skins || []}
+                  highlightId={result?.skin_id}
+                />
+
+                <MemoizedSection
+                  title="Acne Type"
+                  items={acnes || []}
+                  highlightIds={result?.acne_type?.map((item) => item.id)}
+                />
+
+                <MemoizedSection
+                  title="Skin Problems"
+                  items={facials || []}
+                  highlightIds={result?.facial_type?.map((item) => item.id)}
+                />
               </View>
             </View>
 
@@ -124,7 +156,9 @@ const ResultAnalysis = () => {
                   onPress={() => setIsOpened(!isOpened)}
                   className="flex flex-row items-center gap-x-2"
                 >
-                  <Text className="text-label2 text-gray-500">See all</Text>
+                  <Text className="text-label2 text-gray-500">
+                    {isOpened ? "See less" : "See more"}
+                  </Text>
                   {isOpened ? (
                     <ChevronUp size={16} color="gray" />
                   ) : (
@@ -142,7 +176,7 @@ const ResultAnalysis = () => {
                       style={{
                         width: "32%",
                         alignItems: "center",
-                        marginBottom: 10,
+                        marginBottom: 15,
                         marginLeft: 4,
                       }}
                     >
@@ -161,6 +195,16 @@ const ResultAnalysis = () => {
             isOpen={modalVisible}
             onClose={() => setModalVisible(false)}
           />
+
+          <ConfirmAlert
+            visible={alertVisible}
+            title={alertMessage}
+            confirm="Back to login"
+            onClose={() => {
+              setAlertVisible(false);
+              router.replace("/login");
+            }}
+          />
         </ScrollView>
       )}
     </SafeAreaView>
@@ -169,35 +213,68 @@ const ResultAnalysis = () => {
 
 interface SectionProps {
   title: string;
-  items: { name: string; image: string }[];
+  items: { id: number; name: string; image: string }[];
+  highlightId?: number;
+  highlightIds?: number[];
 }
 
-const Section: React.FC<SectionProps> = ({ title, items }) => (
+const Section: React.FC<SectionProps> = ({
+  title,
+  items,
+  highlightId,
+  highlightIds,
+}) => (
   <View className="w-full">
-    <Text className="text-Heading4 mb-3 mt-4 ml-4">{title}</Text>
+    <Text className="text-Heading4 mb-3 mt-4 ml-2">{title}</Text>
     <View
-      className={`flex flex-row w-full gap-x-4 ml-4 ml-4 ${
+      className={`flex flex-row w-full gap-x-4 ml-2 ${
         items.length > 4 ? "flex-wrap" : ""
       }`}
     >
-      {items?.map((item, index) => (
-        <View key={index}>
-          <Image
-            source={{ uri: item.image }}
-            style={{ width: 65, height: 65, borderRadius: 50 }}
-          />
-          <View className="flex items-center justify-center mt-2 mb-4">
-            <Text 
-             numberOfLines={1}
-                        ellipsizeMode="tail"
-                        style={{ width: 60, textAlign: "center"}}
-            className="text-label6"
+      {items.map((item, index) => {
+        const isHighlighted =
+          item.id === highlightId || highlightIds?.includes(item.id);
+        const hasData = !!item.image && !!item.name;
+
+        return (
+          <View key={index} style={{ alignItems: "center" }}>
+            <View
+              style={{
+                width: 70,
+                height: 70,
+                borderRadius: 40,
+                borderWidth: 2.5,
+                borderColor: isHighlighted ? "black" : "gray",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
             >
-              {item.name}
+              <Image
+                source={{ uri: item.image }}
+                style={{
+                  width: 65,
+                  height: 65,
+                  borderRadius: 40,
+                  tintColor: hasData ? undefined : "gray",
+                }}
+              />
+            </View>
+            <View className="flex items-center justify-center mt-2 mb-4">
+              <Text
+                numberOfLines={3}
+                style={{
+                  width: 60,
+                  textAlign: "center",
+                  color: hasData ? "#000" : "#999",
+                }}
+                className="text-label7"
+              >
+                {item.name}
               </Text>
+            </View>
           </View>
-        </View>
-      ))}
+        );
+      })}
     </View>
   </View>
 );

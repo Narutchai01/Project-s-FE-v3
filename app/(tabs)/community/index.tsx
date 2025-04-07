@@ -11,21 +11,63 @@ import LoadingIndicator from "@/components/Loading";
 import { IReview } from "@/interface/review";
 import { IThread } from "@/interface/threads";
 import { ModalCreateReviewPost, ModalCreateThread } from "@/components/Modal";
-import { CopyPlus, Plus, MessageCircleQuestion } from "lucide-react-native";
-import axios from "axios";
-import { Search } from "@/components/Search";
+import axios, { AxiosError } from "axios";
+import { useLocalSearchParams } from "expo-router";
+import { ConfirmAlert } from "@/components/Alert";
+import { CustomHeader } from "@/components/CustomHeader";
+import { useFocusEffect } from "@react-navigation/native";
+
 
 export default function CommonScreen() {
   const [threads, setThreads] = useState<IThread[] | null>(null);
   const [reviews, setReviews] = useState<IReview[] | null>(null);
-  const [searchQuery, setSearchQuery] = useState(""); 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { startLoading, stopLoading, isLoading } = useLoading();
   const router = useRouter();
   const [isMode, setIsMode] = useState(false);
   const [isThreadModalOpen, setIsThreadModalOpen] = useState(false);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const { mode } = useLocalSearchParams();
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
-  const fetchThread = useCallback( async () => {
+  const handleSetIsMode = useCallback((mode: boolean) => {
+    setIsMode(mode);
+  }, []);
+
+  const handleSetIsThreadModalOpen = useCallback((val: boolean) => {
+    setIsThreadModalOpen(val);
+  }, []);
+
+  const handleSetIsReviewModalOpen = useCallback((val: boolean) => {
+    setIsReviewModalOpen(val);
+  }, []);
+
+  const handleSetSearchQuery = useCallback((q: string) => {
+    setSearchQuery(q);
+  }, []);
+
+  const handleSetIsSearchOpen = useCallback((open: boolean) => {
+    setIsSearchOpen(open);
+  }, []);
+
+  const handleError = (error: unknown) => {
+    const axiosError = error as AxiosError;
+  
+    if (!alertVisible) {
+      if (axiosError?.response?.status === 404) {
+        setAlertMessage("Your session has expired or account not found.");
+        setAlertVisible(true);
+      } else if (axiosError?.response?.status === 401) {
+        setAlertMessage("Unauthorized. Please log in again.");
+        setAlertVisible(true);
+      }
+    }
+  };
+  
+
+  const fetchThread = useCallback(async () => {
     startLoading();
     const token = await AsyncStorage.getItem("token");
     await axiosInstance
@@ -39,13 +81,14 @@ export default function CommonScreen() {
         }
       })
       .catch((err) => {
+        handleError(err);
         if (axios.isAxiosError(err) && err.response?.status === 401) {
           console.log("Unauthorized");
         }
       });
-  },[startLoading, stopLoading])
+  }, [startLoading, stopLoading]);
 
-  const fetchReview = useCallback( async () => {
+  const fetchReview = useCallback(async () => {
     startLoading();
     const token = await AsyncStorage.getItem("token");
     await axiosInstance
@@ -59,17 +102,36 @@ export default function CommonScreen() {
         }
       })
       .catch((err) => {
+        handleError(err);
         if (axios.isAxiosError(err) && err.response?.status === 401) {
           console.log("Unauthorized");
         }
       });
-  },[startLoading, stopLoading])
+  }, [startLoading, stopLoading]);
 
   useEffect(() => {
     fetchThread();
     fetchReview();
   }, []);
 
+  const handleFavorite = async (id: number) => {
+    const token = await AsyncStorage.getItem("token");
+    const endpoint = isMode
+      ? `/favorite/thread/${id}`
+      : `/favorite/review/skincare/${id}`;
+    try {
+      await axiosInstance.post(endpoint, null, { headers: { token } });
+
+      if (isMode) {
+        fetchThread();
+      } else {
+        fetchReview();
+      }
+    } catch (err) {
+      handleError(err);
+      console.error("Toggle favorite error:", err);
+    }
+  };
 
   const filteredThreads = threads?.filter((thread) =>
     thread.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -79,52 +141,23 @@ export default function CommonScreen() {
     review.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-
   const handleRouter = (id: number) => {
     router.push(isMode ? `/thread/${id}` : `/review/${id}`);
   };
 
-  const CustomHeader = () => (
-    <View className="bg-Snow p-4 border-b-2 border-gray-300 relative">
-      <View className="flex flex-row items-center justify-between ml-2">
-        <Text className="text-Heading3 text-Black">
-          {isMode ? "Threads" : "Reviews"}
-        </Text>
+  useEffect(() => {
+    if (mode === "thread") {
+      setIsMode(true);
+    } else if (mode === "review") {
+      setIsMode(false);
+    }
+  }, [mode]);
 
-        <View className="flex flex-row items-center justify-between">
-          <Search searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-
-          <TouchableOpacity className="bg-Bittersweet w-8 h-8 rounded-lg flex items-center justify-center mr-2">
-            <Plus
-              size={18}
-              color="white"
-              onPress={() =>
-                isMode ? setIsThreadModalOpen(true) : setIsReviewModalOpen(true)
-              }
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-      <View className="flex flex-row items-center justify-around mt-4">
-        <TouchableOpacity onPress={() => setIsMode(false)}>
-          <View className="flex items-center relative -mb-2">
-            <CopyPlus size={30} />
-            {!isMode && (
-              <View className="absolute bottom-[-8px] w-full border-b-2 border-black" />
-            )}
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity onPress={() => setIsMode(true)}>
-          <View className="flex items-center relative -mb-2">
-            <MessageCircleQuestion size={30} />
-            {isMode && (
-              <View className="absolute bottom-[-8px] w-full border-b-2 border-black" />
-            )}
-          </View>
-        </TouchableOpacity>
-      </View>
-    </View>
+  useFocusEffect(
+    useCallback(() => {
+      setIsSearchOpen(false);
+      setSearchQuery("");
+    }, [])
   );
 
   return (
@@ -132,11 +165,22 @@ export default function CommonScreen() {
       <Stack.Screen
         options={{
           headerShown: true,
-          header: () => <CustomHeader />,
+          header: () => (
+            <CustomHeader
+              isMode={isMode}
+              searchQuery={searchQuery}
+              isSearchOpen={isSearchOpen}
+              setSearchQuery={handleSetSearchQuery}
+              setIsSearchOpen={handleSetIsSearchOpen}
+              setIsThreadModalOpen={handleSetIsThreadModalOpen}
+              setIsReviewModalOpen={handleSetIsReviewModalOpen}
+              setIsMode={handleSetIsMode}
+            />
+          ),
         }}
       />
-       <SafeAreaView className="flex-1 bg-Snow p-4">
-        <View className="flex justify-center items-center mt-2">
+      <SafeAreaView className="flex-1 bg-Snow p-4">
+        <View className="flex justify-center mt-2">
           {isMode ? (
             isLoading && !threads ? (
               <LoadingIndicator />
@@ -147,12 +191,13 @@ export default function CommonScreen() {
             ) : (
               <FlatList
                 data={filteredThreads}
+                keyboardShouldPersistTaps="handled"
                 keyExtractor={(item) => item.id.toString()}
                 numColumns={2}
                 columnWrapperStyle={{
-                  justifyContent: 'space-between',
+                  justifyContent: "space-between",
                   columnGap: 6,
-                  paddingHorizontal: 0,
+                  paddingHorizontal: 4,
                 }}
                 onRefresh={fetchThread}
                 refreshing={isLoading}
@@ -163,6 +208,8 @@ export default function CommonScreen() {
                       title={item.title}
                       user={item.user?.full_name}
                       userAvatar={item.user?.image}
+                      isFavorited={item.favorite}
+                      onFavorite={() => handleFavorite(item.id)}
                     />
                   </TouchableOpacity>
                 )}
@@ -176,15 +223,14 @@ export default function CommonScreen() {
             </Text>
           ) : (
             <FlatList
-              data={filteredReviews} 
+              data={filteredReviews}
               keyExtractor={(item) => item.id.toString()}
               numColumns={2}
               columnWrapperStyle={{
-                justifyContent: 'space-between',
+                justifyContent: "space-between",
                 columnGap: 6,
-                paddingHorizontal: 0,
+                paddingHorizontal: 4,
               }}
-              
               onRefresh={fetchReview}
               refreshing={isLoading}
               renderItem={({ item }) => (
@@ -194,6 +240,8 @@ export default function CommonScreen() {
                     title={item.title}
                     user={item.user?.full_name}
                     userAvatar={item.user?.image}
+                    isFavorited={item.favorite}
+                    onFavorite={() => handleFavorite(item.id)}
                   />
                 </TouchableOpacity>
               )}
@@ -201,8 +249,25 @@ export default function CommonScreen() {
           )}
         </View>
       </SafeAreaView>
-      <ModalCreateThread isOpen={isThreadModalOpen} onClose={() => setIsThreadModalOpen(false)} isMode={isMode} />
-      <ModalCreateReviewPost isOpen={isReviewModalOpen} onClose={() => setIsReviewModalOpen(false)} isMode={isMode}/>
+      <ModalCreateThread
+        isOpen={isThreadModalOpen}
+        onClose={() => setIsThreadModalOpen(false)}
+        isMode={isMode}
+      />
+      <ModalCreateReviewPost
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
+        isMode={isMode}
+      />
+      <ConfirmAlert
+        visible={alertVisible}
+        title={alertMessage}
+        confirm="Back to login"
+        onClose={() => {
+          setAlertVisible(false);
+          router.replace("/login");
+        }}
+      />
     </SafeAreaProvider>
   );
 }

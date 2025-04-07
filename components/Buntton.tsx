@@ -3,7 +3,6 @@ import React, { FC } from "react";
 import { ButtonProps } from "@/interface/Button";
 import { Image } from "react-native";
 import { SquareArrowLeft } from "lucide-react-native";
-import { useRouter } from "expo-router";
 import { BackButtonProps } from "@/interface/Button";
 
 export const ButtonComponents: FC<ButtonProps> = (props) => {
@@ -40,7 +39,7 @@ export const BackButtonComponents: FC<BackButtonProps> = (props) => {
   const { title, textSize, onPress } = props;
 
   return (
-    <TouchableOpacity onPress={onPress} className="mb-4 flex-row items-center gap-x-4">
+    <TouchableOpacity onPress={onPress} className="mb-4 flex-row items-center gap-x-2">
       <SquareArrowLeft size={28} color="#4A4A4A" />
       <Text className={textSize}>{title}</Text>
     </TouchableOpacity>

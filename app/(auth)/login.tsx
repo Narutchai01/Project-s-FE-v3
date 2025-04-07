@@ -27,6 +27,7 @@ export default function Login() {
   useEffect(() => {
     const checkLogin = async () => {
       const token = await AsyncStorage.getItem("token");
+    
       if (token && user.sensitive_skin !== null) {
         router.push("/home");
       }

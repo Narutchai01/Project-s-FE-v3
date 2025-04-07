@@ -13,10 +13,17 @@ import { Link } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
 import { DatePicker } from "@/components/DatePicker";
 import dayjs from "dayjs";
+import { Eye, EyeOff } from "lucide-react-native";
+import { ConfirmAlert } from "@/components/Alert";
 
 export default function SignUP() {
   const { signupData, setSignupData, handleSignup } = useAuth();
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState("");
 
   const handleChange = (name: string, value: string) => {
     setSignupData({
@@ -24,6 +31,23 @@ export default function SignUP() {
       [name]: value,
     });
   };
+
+  const onRegister = () => {
+    if (!signupData.password || !confirmPassword) {
+      setAlertTitle("Please fill in all password fields");
+      setAlertVisible(true);
+      return;
+    }
+
+    if (signupData.password !== confirmPassword) {
+      setAlertTitle("Password not match");
+      setAlertVisible(true);
+      return;
+    }
+
+    handleSignup();
+  };
+
 
   return (
     <SafeAreaView className="flex-1 bg-Snow p-4">
@@ -62,17 +86,38 @@ export default function SignUP() {
             className="border-2 w-full rounded-full p-4 border-BrightGray"
             onChangeText={(email) => handleChange("email", email)}
           />
-          <TextInput
-            placeholder="Password"
-            secureTextEntry={true}
-            className="border-2 w-full rounded-full p-4 border-BrightGray"
-            onChangeText={(password) => handleChange("password", password)}
-          />
-          <TextInput
-            placeholder="Confirm Password"
-            secureTextEntry={true}
-            className="border-2 w-full rounded-full p-4 border-BrightGray"
-          />
+          
+          <View className="relative">
+              <TextInput
+                placeholder="Password"
+                secureTextEntry={!showPassword}
+                className="border-2 w-full rounded-full p-4 pr-14 border-BrightGray"
+                onChangeText={(password) => handleChange("password", password)}
+              />
+              <TouchableOpacity
+                onPress={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-5"
+              >
+                {showPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+              </TouchableOpacity>
+            </View>
+
+            <View className="relative">
+              <TextInput
+                placeholder="Confirm Password"
+                secureTextEntry={!showConfirmPassword}
+                className="border-2 w-full rounded-full p-4 pr-14 border-BrightGray"
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+              />
+              <TouchableOpacity
+                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-4 top-5"
+              >
+                {showConfirmPassword ? <Eye size={18} /> : <EyeOff size={18} />}
+              </TouchableOpacity>
+            </View>
+            
           <View className="flex flex-col gap-y-4">
             <Text>Do you have sensitive facial skin?</Text>
             <RadioComponents
@@ -82,7 +127,7 @@ export default function SignUP() {
               })} value={null}            />
           </View>
           <ButtonComponents
-            onPress={handleSignup}
+             onPress={onRegister}
             title="Register"
              className="flex flex-row items-center justify-center rounded-full border-2 border-BrightGray p-4 bg-Bittersweet"
                 textSize="text-white text-xl font-bold"
@@ -94,6 +139,13 @@ export default function SignUP() {
         Already Have an account ? <Text className="text-label4 font-bold text-black"> Login</Text>
       </Link>
       </ScrollView>
+
+      <ConfirmAlert
+        visible={alertVisible}
+        title={alertTitle}
+        confirm="OK"
+        onClose={() => setAlertVisible(false)}
+      />
     </SafeAreaView>
   );
 }

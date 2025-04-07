@@ -1,5 +1,5 @@
-import React from "react";
-import { View, Text, Image, ScrollView, SafeAreaView } from "react-native";
+import React, { useEffect } from "react";
+import { View, Text, Image, ScrollView, SafeAreaView, BackHandler } from "react-native";
 import { SkinAnalysisCard } from "@/components/SkinAnalysisCard";
 import { PopularReviews } from "@/components/PopularReviews";
 import { PopularSkincare } from "@/components/PopularSkincare";
@@ -13,6 +13,20 @@ export default function SkincareScreen() {
   const month = today.format("MMM");
   const year = today.year();
   const { skincares } = useCompare();
+
+  useEffect(() => {
+    const onBackPress = () => {
+        BackHandler.exitApp();
+        return true;
+    };
+    const subscription = BackHandler.addEventListener(
+        'hardwareBackPress',
+        onBackPress
+    );
+    return () => {
+        subscription.remove();
+    };
+}, []);
 
   return (
     <SafeAreaView className="flex-1 bg-Snow p-6">

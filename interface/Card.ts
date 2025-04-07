@@ -42,3 +42,15 @@ export interface ICommentCardProps {
   favorite: boolean;
   handleFavoriteComment: () => void;
 }
+
+export interface CommunityCardProps {
+  image?: string;
+  title?: string;
+  user?: string;
+  userAvatar?: string;
+  isFavorited?: boolean;
+  onFavorite?: () => void;
+  onPress?: () => void;
+}
+
+

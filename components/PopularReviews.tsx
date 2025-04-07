@@ -8,13 +8,30 @@ import { IReview } from "@/interface/review";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
 import LoadingIndicator from "@/components/Loading";
+import { AxiosError } from "axios";
+import { ConfirmAlert } from "./Alert";
 
 export const PopularReviews: FC = () => {
   const router = useRouter();
   const { startLoading, stopLoading, isLoading } = useLoading();
   const [reviews, setReviews] = useState<IReview[] | null>(null);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
 
-  const fetchReviews = useCallback( async () => {
+  const handleError = (error: unknown) => {
+    const axiosError = error as AxiosError;
+  
+    if (!alertVisible) {
+      if (axiosError?.response?.status === 404) {
+        setAlertMessage("Your session has expired or account not found.");
+        setAlertVisible(true);
+      } else if (axiosError?.response?.status === 401) {
+        setAlertMessage("Unauthorized. Please log in again.");
+        setAlertVisible(true);
+      }
+    }
+  };
+  const fetchReviews = useCallback(async () => {
     startLoading();
     try {
       const token = await AsyncStorage.getItem("token");
@@ -28,12 +45,27 @@ export const PopularReviews: FC = () => {
         stopLoading();
       }
     } catch (error) {
+      handleError(error);
       console.log(error);
       stopLoading();
     } finally {
       stopLoading();
     }
-  },[startLoading, stopLoading])
+  }, [startLoading, stopLoading]);
+
+  const handleFavorite = async (id: number) => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      await axiosInstance.post(`/favorite/review/skincare/${id}`, null, {
+        headers: { token },
+      });
+
+      fetchReviews();
+    } catch (error) {
+      handleError(error);
+      console.error("Favorite error:", error);
+    }
+  };
 
   useEffect(() => {
     fetchReviews();
@@ -48,9 +80,9 @@ export const PopularReviews: FC = () => {
       <View className="flex-row items-center justify-between mb-6">
         <Text className="text-Heading3">Popular Reviews</Text>
         <TouchableOpacity
-         className="flex-row items-center"
-         onPress={() => router.push("/(tabs)/community")}
-         >
+          className="flex-row items-center"
+          onPress={() => router.push("/(tabs)/community?mode=review")}
+        >
           <Text className="text-label2 text-gray-500">see more</Text>
           <ChevronRight size={16} color="gray" />
         </TouchableOpacity>
@@ -59,7 +91,9 @@ export const PopularReviews: FC = () => {
       {isLoading ? (
         <LoadingIndicator />
       ) : !reviews ? (
-        <Text className="text-gray-500 text-center mt-4">No reviews found.</Text>
+        <Text className="text-gray-500 text-center mt-4">
+          No reviews found.
+        </Text>
       ) : (
         <FlatList
           horizontal
@@ -73,11 +107,22 @@ export const PopularReviews: FC = () => {
                 title={item.title}
                 user={item.user?.full_name}
                 userAvatar={item.user?.image}
+                isFavorited={item.favorite}
+                onFavorite={() => handleFavorite(item.id)}
               />
             </TouchableOpacity>
           )}
         />
       )}
+      <ConfirmAlert
+        visible={alertVisible}
+        title={alertMessage}
+        confirm="Back to login"
+        onClose={() => {
+          setAlertVisible(false);
+          router.replace("/login");
+        }}
+      />
     </View>
   );
 };

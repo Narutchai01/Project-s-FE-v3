@@ -20,6 +20,7 @@ import useLoading from "@/hook/useLoading";
 import LoadingIndicator from "@/components/Loading";
 import { ButtonComponents } from "@/components/Buntton";
 import { ConfirmAlert } from "@/components/Alert";
+import { AxiosError } from "axios";
 
 interface CustomHeaderProps {
   openCalendar: () => void;
@@ -47,7 +48,10 @@ const CustomHeader: React.FC<CustomHeaderProps> = (props) => {
         )}
 
         <View className="flex flex-row items-center gap-x-2">
-          <TouchableOpacity onPress={openCalendar} className="bg-Bittersweet w-8 h-8 rounded-lg flex items-center justify-center mr-2">
+          <TouchableOpacity
+            onPress={openCalendar}
+            className="bg-Bittersweet w-8 h-8 rounded-lg flex items-center justify-center mr-2"
+          >
             <View className="bg-Bittersweet px-4 py-2 rounded-full">
               <CalendarDays size={18} color="white" />
             </View>
@@ -88,6 +92,23 @@ export default function DiaryScreen() {
   const { isLoading, startLoading, stopLoading } = useLoading();
   const [showAlert, setShowAlert] = useState(false);
   const [showSelectMaxAlert, setShowSelectMaxAlert] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
+  const handleError = (error: unknown) => {
+    const axiosError = error as AxiosError;
+  
+    if (!alertVisible) {
+      if (axiosError?.response?.status === 404) {
+        setAlertMessage("Your session has expired or account not found.");
+        setAlertVisible(true);
+      } else if (axiosError?.response?.status === 401) {
+        setAlertMessage("Unauthorized. Please log in again.");
+        setAlertVisible(true);
+      }
+    }
+  };
+  
 
   const fetchResults = useCallback(async () => {
     startLoading();
@@ -99,6 +120,7 @@ export default function DiaryScreen() {
         setFilteredResults(res.data.data);
       }
     } catch (error) {
+      handleError(error);
       console.log("Error fetching results:", error);
     } finally {
       stopLoading();
@@ -164,7 +186,6 @@ export default function DiaryScreen() {
                   router.push("/compare");
                 }
               }}
-              
             />
           ),
         }}
@@ -217,6 +238,15 @@ export default function DiaryScreen() {
             onClose={() => setShowSelectMaxAlert(false)}
             title="You can compare up to 3 diaries only."
             confirm="OK"
+          />
+          <ConfirmAlert
+            visible={alertVisible}
+            title={alertMessage}
+            confirm="Back to login"
+            onClose={() => {
+              setAlertVisible(false);
+              router.replace("/login");
+            }}
           />
         </SafeAreaView>
       )}

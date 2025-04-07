@@ -6,10 +6,13 @@ import {
   SafeAreaView,
   TextInput,
   TouchableOpacity,
+  Keyboard,
 } from "react-native";
 import { ButtonComponents } from "@/components/Buntton";
 import { Eye, EyeOff } from "lucide-react-native";
-import { ModalChangePassworkSuccess } from "@/components/Modal";
+import { ModalChangePasswordSuccess } from "@/components/Modal";
+import { axiosInstance } from "@/lib/axios_instance";
+import { useRecoveryStore } from "@/store/recovery";
 
 export default function RecoverPasswordScreen() {
   const [newPassword, setNewPassword] = useState("");
@@ -18,8 +21,11 @@ export default function RecoverPasswordScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const { user_id } = useRecoveryStore();
 
-  const handleChangePassword = () => {
+  const handleChangePassword = async () => {
+    Keyboard.dismiss(); 
+    
     if (!newPassword || !confirmPassword) {
       setErrorMessage("Please fill in all fields.");
       return;
@@ -30,8 +36,30 @@ export default function RecoverPasswordScreen() {
       return;
     }
 
-    setErrorMessage(""); 
-    setModalVisible(true); 
+    try {
+      const payload = {
+        new_password: newPassword,
+        user_id: user_id,
+      };
+
+      const res = await axiosInstance.post("/recovery/reset-password", payload, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      setErrorMessage("");
+      Keyboard.dismiss();
+      setModalVisible(true);
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error: any) {
+      console.error(
+        "Error resetting password:",
+        error.response?.data || error.message
+      );
+      setErrorMessage("Something went wrong. Please try again.");
+    }
   };
 
   return (
@@ -102,7 +130,7 @@ export default function RecoverPasswordScreen() {
               onPress={handleChangePassword}
               title="Submit"
               className="flex flex-row items-center justify-center rounded-full border-2 border-BrightGray p-4 bg-Bittersweet"
-                textSize="text-white text-xl font-bold"
+              textSize="text-white text-xl font-bold"
             />
 
             <View className="flex flex-col">
@@ -118,7 +146,7 @@ export default function RecoverPasswordScreen() {
         </View>
       </View>
 
-      <ModalChangePassworkSuccess
+      <ModalChangePasswordSuccess
         isOpen={modalVisible}
         onClose={() => setModalVisible(false)}
       />

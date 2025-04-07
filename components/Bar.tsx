@@ -7,14 +7,16 @@ import { ThreeDotMenu } from "@/components/ThreeDotMenu";
 import { ButtonComponents } from "./Buntton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
-import LoadingIndicator from "@/components/Loading";
 import useLoading from "@/hook/useLoading";
+import { router } from "expo-router";
+import { AxiosError } from "axios";
+import { ConfirmAlert } from "./Alert";
 
 interface IActivityBar {
   favorite: boolean | undefined;
   favoriteCount: number | undefined;
   commnetCount: number;
-  dataPaginate: any;
+  dataPaginate?: any[];
   currImage: number;
   bookmark: boolean | undefined;
   hadleFavorite: () => void;
@@ -27,7 +29,7 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
     favorite,
     favoriteCount,
     commnetCount,
-    dataPaginate,
+    dataPaginate = [],
     currImage,
     bookmark,
     hadleFavorite,
@@ -36,26 +38,22 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
   } = props;
 
   return (
-    <View
-      style={{
-        alignItems: "center",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        padding: 10,
-        marginLeft: 10,
-        marginTop: -15,
-        marginBottom: -10,
-      }}
-    >
-      <View>
-        <View style={{ flexDirection: "row", gap: 16 }}>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
+    <View style={{ paddingHorizontal: 18, marginTop: 1 }}>
+      {dataPaginate.length > 1 && (
+        <View style={{ alignItems: "center", marginBottom: 1 }}>
+          <ImagePagination data={dataPaginate} currImage={currImage} />
+        </View>
+      )}
+
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <View style={{ flexDirection: "row", gap: 16, marginLeft: -8 }}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
             <TouchableOpacity onPress={hadleFavorite}>
               <Heart
                 size={24}
@@ -63,27 +61,18 @@ export const ActivityBar: FC<IActivityBar> = (props) => {
                 fill={favorite ? "#FF6F61" : "none"}
               />
             </TouchableOpacity>
-            <Text style={{ fontSize: 20 }}>{favoriteCount}</Text>
+            <Text style={{ fontSize: 16 }}>{favoriteCount ?? 0}</Text>
           </View>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 8,
-            }}
-          >
+
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
             <TouchableOpacity onPress={isOpenComment}>
               <MessageCircle size={24} color="#4A4A4A" />
             </TouchableOpacity>
-            <Text style={{ fontSize: 20 }}>{commnetCount}</Text>
+            <Text style={{ fontSize: 16 }}>{commnetCount}</Text>
           </View>
         </View>
-      </View>
-      <View>
-        <ImagePagination data={dataPaginate} currImage={currImage} />
-      </View>
-      <View className="px-10">
-        <TouchableOpacity onPress={handleBookmark}>
+
+        <TouchableOpacity onPress={handleBookmark} style={{ marginRight: -10 }}>
           <Bookmark
             size={24}
             color={bookmark ? "#FFD700" : "#4A4A4A"}
@@ -102,17 +91,43 @@ interface UserBarProps {
   currentUserId: number | null;
   isFollowed?: boolean;
   onFollowStatusChange?: (isFollowing: boolean) => void;
+  threadId?: number;
+  reviewId?: number;
 }
 
 export const UserBar: FC<UserBarProps> = (props) => {
   const { isLoading, startLoading, stopLoading } = useLoading();
-  const { userImage, username, currentUserId, userId, onFollowStatusChange } =
-    props;
+  const {
+    userImage,
+    username,
+    currentUserId,
+    userId,
+    onFollowStatusChange,
+    threadId,
+    reviewId,
+  } = props;
   const [isFollowing, setIsFollowing] = useState<boolean>(
     props.isFollowed || false
   );
   const isOwner =
     currentUserId != null && userId != null && currentUserId === userId;
+    
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
+  const handleError = (error: unknown) => {
+    const axiosError = error as AxiosError;
+  
+    if (!alertVisible) {
+      if (axiosError?.response?.status === 404) {
+        setAlertMessage("Your session has expired or account not found.");
+        setAlertVisible(true);
+      } else if (axiosError?.response?.status === 401) {
+        setAlertMessage("Unauthorized. Please log in again.");
+        setAlertVisible(true);
+      }
+    }
+  };
 
   useEffect(() => {
     setIsFollowing(props.isFollowed || false);
@@ -139,6 +154,7 @@ export const UserBar: FC<UserBarProps> = (props) => {
         onFollowStatusChange(newFollowStatus);
       }
     } catch (error: any) {
+      handleError(error);
       console.log(
         "Follow toggle error:",
         error.response?.data || error.message
@@ -149,38 +165,59 @@ export const UserBar: FC<UserBarProps> = (props) => {
   };
 
   return (
-    <View className="flex flex-row justify-between items-center px-3 py-2 ml-2">
-      <View className="flex flex-row items-center gap-x-2 ">
-        <Image
-          source={{ uri: userImage }}
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 20,
+    <>
+      <View className="flex flex-row justify-between items-center px-3 py-2 mt-2">
+        <TouchableOpacity
+          className="flex flex-row items-center gap-x-2"
+          onPress={() => {
+            if (!isOwner && typeof userId === "number") {
+              router.push(`/profile/${userId}`);
+            }
           }}
-        />
-        <Text>{username}</Text>
+        >
+          <Image
+            source={{ uri: userImage }}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+            }}
+          />
+          <Text numberOfLines={1} ellipsizeMode="tail" style={{ width: 195 }}>
+            {username}
+          </Text>
+        </TouchableOpacity>
+
+        <View>
+          {isOwner ? (
+            <ThreeDotMenu threadId={threadId} reviewId={reviewId} />
+          ) : (
+            <TouchableOpacity
+              onPress={handleFollow}
+              disabled={isFollowing || isLoading}
+            >
+              <ButtonComponents
+                onPress={handleFollow}
+                title={isFollowing ? "following" : "follow"}
+                className={`px-3 py-1 rounded-full ${
+                  isFollowing ? "bg-Bittersweet" : "bg-Bittersweet"
+                }`}
+                textSize="text-l font-semibold text-white"
+              />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
-      <View>
-        {isOwner ? (
-          <ThreeDotMenu />
-        ) : (
-          <TouchableOpacity
-            onPress={handleFollow}
-            disabled={isFollowing || isLoading}
-          >
-            <ButtonComponents
-              onPress={handleFollow}
-              title={isFollowing ? "following" : "follow"}
-              className={`px-3 py-1 rounded-full ${
-                isFollowing ? "bg-Bittersweet" : "bg-Bittersweet"
-              }`}
-              textSize="text-l font-semibold text-white"
-            />
-          </TouchableOpacity>
-        )}
-      </View>
-    </View>
+      <ConfirmAlert
+        visible={alertVisible}
+        title={alertMessage}
+        confirm="Back to login"
+        onClose={() => {
+          setAlertVisible(false);
+          router.replace("/login");
+        }}
+      />
+    </>
   );
 };

@@ -4,9 +4,9 @@ import {
   CardSkincareProps,
   DiaryCardProps,
   CardReviewProps,
-  ThreadCardProps,
   AddPhotoProps,
   ICommentCardProps,
+  CommunityCardProps
 } from "@/interface/Card";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
@@ -14,13 +14,14 @@ import { Heart } from "lucide-react-native";
 import { LucideImage } from "lucide-react-native";
 import { MediaType, launchImageLibrary } from "react-native-image-picker";
 const defaultImage = require("@/assets/images/defaultImage.png");
+const userDefaultImage = require("@/assets/images/userDefault.jpg");
 
 export const CardSkincare: FC<CardSkincareProps> = (props) => {
   const { image, name } = props;
 
   return (
-    <View className="bg-white rounded-2xl shadow w-[115px] h-[130px] mx-2 mb-2 relative overflow-hidden">
-      <View className="w-[115px] h-[115px] relative overflow-hidden">
+    <View className="bg-white rounded-2xl shadow w-[110px] h-[140px] mx-2 mb-2 relative overflow-hidden">
+      <View className="w-[110px] h-[125px] relative overflow-hidden">
         <Image
           source={image ? { uri: image } : defaultImage}
           className="w-full h-full rounded-t-2xl object-cover"
@@ -115,8 +116,9 @@ export const CardDiary: FC<DiaryCardProps> = (props) => {
   );
 };
 
-export const PopularThreadCard: FC<ThreadCardProps> = (props) => {
-  const { image, title, user, userAvatar } = props;
+export const PopularThreadCard: FC<CommunityCardProps> = (props) => {
+  const { image, title, user, userAvatar, isFavorited, onFavorite } = props;
+
   return (
     <View className="bg-white rounded-2xl shadow w-[120px] h-[155px] mx-2 mb-2 relative overflow-hidden">
       <View className="w-[120px] h-[120px] relative overflow-hidden">
@@ -147,9 +149,9 @@ export const PopularThreadCard: FC<ThreadCardProps> = (props) => {
             borderBottomColor: "white",
           }}
         />
-        <View className="p-2">
+        <View className="p-2 -mb-1">
           <Text
-            className="text-label12 font-medium mb-1 " 
+            className="text-label12 font-medium mb-1" 
             numberOfLines={1}
             ellipsizeMode="tail"
             style={{ width: 100 }}
@@ -159,7 +161,7 @@ export const PopularThreadCard: FC<ThreadCardProps> = (props) => {
           <View className="flex-row items-center justify-between">
             <View className="flex-row items-center">
               <Image
-                source={userAvatar ? { uri: userAvatar } : defaultImage}
+                source={userAvatar ? { uri: userAvatar } : userDefaultImage}
                 className="w-5 h-5 rounded-full mr-2"
               />
               <Text 
@@ -170,8 +172,14 @@ export const PopularThreadCard: FC<ThreadCardProps> = (props) => {
               >{user}</Text>
             </View>
 
-            <TouchableOpacity className="w-7 h-7 bg-White rounded-full flex items-center justify-center">
-              <Heart size={12} color="gray" />
+            <TouchableOpacity className="w-7 h-7 bg-White rounded-full flex items-center justify-center"
+            onPress={onFavorite}
+            >
+              <Heart
+                 size={12}
+              color={isFavorited ? "#FF6F61" : "gray"}
+              fill={isFavorited ? "#FF6F61" : "none"}
+            />
             </TouchableOpacity>
           </View>
         </View>
@@ -180,8 +188,8 @@ export const PopularThreadCard: FC<ThreadCardProps> = (props) => {
   );
 };
 
-export const CommunityCard: FC<ThreadCardProps> = (props) => {
-  const { image, title, user, userAvatar } = props;
+export const CommunityCard: React.FC<CommunityCardProps> = (props) => {
+  const { image, title, user, userAvatar, isFavorited, onFavorite } = props;
 
   return (
     <View
@@ -233,14 +241,21 @@ export const CommunityCard: FC<ThreadCardProps> = (props) => {
               numberOfLines={1}
               ellipsizeMode="tail"
               className="text-label6 text-gray-600"
-              style={{ width: 75 }}
+              style={{ width: 70 }}
             >
               {user}
             </Text>
           </View>
 
-          <TouchableOpacity className="w-7 h-7 bg-White rounded-full flex items-center justify-center">
-            <Heart size={12} color="gray" />
+          <TouchableOpacity
+            className="w-7 h-7 bg-white rounded-full flex items-center justify-center ml-2"
+            onPress={onFavorite}
+          >
+            <Heart
+              size={14}
+              color={isFavorited ? "#FF6F61" : "gray"}
+              fill={isFavorited ? "#FF6F61" : "none"}
+            />
           </TouchableOpacity>
         </View>
       </View>
@@ -250,7 +265,8 @@ export const CommunityCard: FC<ThreadCardProps> = (props) => {
 
 export const ReviewCard: FC<CardReviewProps> = (props) => {
   const { data, selectArray = [], setItem } = props;
-  const check = selectArray.includes(data);
+  const check = selectArray?.some((item) => item.id === data.id);
+  
   return (
     <Pressable onPress={() => setItem(data)}>
       <View
@@ -385,7 +401,7 @@ export const CommentCard: FC<ICommentCardProps> = (props) => {
     <View className="flex flex-row justify-between ml-3 mr-3">
       <View className="flex flex-row gap-x-4">
         <Image
-          source={image ? { uri: image } : defaultImage}
+          source={image ? { uri: image } : userDefaultImage}
           style={{ width: 40, height: 40, borderRadius: 50 }}
         />
         <View className="flex justify-center gap-y-3">
@@ -434,16 +450,16 @@ export const CardSkincareReccommemded: FC<CardSkincareProps> = (props) => {
   const { image, name } = props;
 
   return (
-    <View className="bg-white rounded-2xl shadow w-[90%] h-[105px] relative overflow-hidden">
+    <View className="bg-white rounded-2xl shadow w-[90%] h-[120px] relative overflow-hidden">
       <View
         style={{
           position: "absolute",
-          top: 65,
+          top: 78,
           right: 0,
           width: 0,
           height: 0,
           borderStyle: "solid",
-          borderLeftWidth: 12,
+          borderLeftWidth: 1,
           borderRightWidth: 0,
           borderBottomWidth: 20,
           borderLeftColor: "transparent",
@@ -452,7 +468,7 @@ export const CardSkincareReccommemded: FC<CardSkincareProps> = (props) => {
           zIndex: 10,
         }}
       />
-      <View className="w-[100px] h-[100px] relative overflow-hidden rounded-2xl">
+      <View className="w-[100px] h-[100px] relative overflow-hidden ">
         <Image
           source={image ? { uri: image } : defaultImage}
           className="w-full h-full object-cover"
@@ -475,5 +491,85 @@ export const CardSkincareReccommemded: FC<CardSkincareProps> = (props) => {
         </View>
       </View>
     </View>
+  );
+};
+
+
+export const PostByUser: FC<CommunityCardProps> = (props) => {
+  const { image, title, user, userAvatar, isFavorited, onFavorite, onPress, } = props;
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      activeOpacity={0.9}
+      className="bg-white rounded-2xl shadow w-[95px] h-[140px] mx-2 mb-2 relative overflow-hidden"
+    >
+
+      <View className="w-[95px] h-[100px] relative overflow-hidden">
+        <Image
+          source={image ? { uri: image } : defaultImage}
+          className="w-full h-full rounded-t-2xl object-cover"
+        />
+      </View>
+
+      <View
+        className="absolute bottom-0 left-0 w-[100px] bg-white"
+        style={{ borderTopLeftRadius: 13 }}
+      >
+        <View
+          style={{
+            position: "absolute",
+            top: -12,
+            right: 0,
+            width: 0,
+            height: 0,
+            backgroundColor: "transparent",
+            borderStyle: "solid",
+            borderLeftWidth: 12,
+            borderRightWidth: 0,
+            borderBottomWidth: 20,
+            borderLeftColor: "transparent",
+            borderRightColor: "transparent",
+            borderBottomColor: "white",
+          }}
+        />
+        <View className="p-1 ml-1 mt-1">
+          <Text
+            className="text-label12 font-medium mb-1 " 
+            numberOfLines={1}
+            ellipsizeMode="tail"
+            style={{ width: 100 }}
+          >
+            {title?.trim() ? title : "No title"}
+          </Text>
+          <View className="flex-row items-center justify-between">
+            <View className="flex-row items-center">
+              <Image
+                source={userAvatar ? { uri: userAvatar } : userDefaultImage}
+                className="w-5 h-5 rounded-full mr-2"
+              />
+              <Text 
+              className="text-label13 text-gray-600"
+              numberOfLines={1}
+              ellipsizeMode="tail"
+              style={{ width: 40 }}
+              >{user}</Text>
+            </View>
+
+            <TouchableOpacity className="w-7 h-7 bg-White rounded-full flex items-center justify-center"
+                onPress={(e) => {
+                  e.stopPropagation(); 
+                  onFavorite?.();
+                }}
+                >
+            <Heart
+              size={12}
+              color={isFavorited ? "#FF6F61" : "gray"}
+              fill={isFavorited ? "#FF6F61" : "none"}
+            />
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    </TouchableOpacity>
   );
 };

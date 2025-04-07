@@ -1,32 +1,34 @@
-import React, { useEffect, useState } from "react";
 import {
-  SafeAreaView,
-  TouchableOpacity,
   View,
-  Image,
   Text,
+  SafeAreaView,
   FlatList,
+  TouchableOpacity,
 } from "react-native";
-import { router, Stack } from "expo-router";
-import {
-  AlignJustify,
-  Bookmark,
-  CopyPlus,
-  MessageCircleQuestion,
-} from "lucide-react-native";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import { IReview } from "@/interface/review";
-import { IThread } from "@/interface/threads";
-import useLoading from "@/hook/useLoading";
-import LoadingIndicator from "@/components/Loading";
+import { useLocalSearchParams, router, Stack } from "expo-router";
+import { useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
+import useLoading from "@/hook/useLoading";
 import { IUser } from "@/interface/user";
+import { IReview } from "@/interface/review";
+import { IThread } from "@/interface/threads";
 import { PostByUser } from "@/components/Card";
-import { AxiosError } from "axios";
+import {
+  CopyPlus,
+  MessageCircleQuestion,
+  Bookmark,
+} from "lucide-react-native";
+import LoadingIndicator from "@/components/Loading";
+import { Image } from "react-native";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { BackButtonComponents, ButtonComponents } from "@/components/Buntton";
 import { ConfirmAlert } from "@/components/Alert";
+import { AxiosError } from "axios";
 
-export default function ProfileScreen() {
+export default function OtherProfileScreen() {
+  const { id } = useLocalSearchParams();
+  const userId = Number(id);
   const [mode, setMode] = useState<"reviews" | "threads" | "bookmark">(
     "reviews"
   );
@@ -39,9 +41,41 @@ export default function ProfileScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+  const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const activeColor = "#FF6F61";
   const inactiveColor = "#848484";
 
+  const checkFollowStatus = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const res = await axiosInstance.get(`/user/${userId}`, {
+        headers: { token },
+      });
+
+      if (res.data.status) {
+        setIsFollowing(res.data.data.follow);
+      }
+    } catch (error) {
+      handleError(error);
+      console.log("Follow status check error:", error);
+    }
+  };
+
+  const handleFollow = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const res = await axiosInstance.post(`/user/follower/${userId}`, null, {
+        headers: { token },
+      });
+
+      const newFollowStatus = res.data?.followed ?? !isFollowing;
+      setIsFollowing(newFollowStatus);
+    } catch (error) {
+      handleError(error);
+      console.log("Follow toggle error:", error);
+    }
+  };
 
   const handleError = (error: unknown) => {
     const axiosError = error as AxiosError;
@@ -61,10 +95,8 @@ export default function ProfileScreen() {
     startLoading();
     try {
       const token = await AsyncStorage.getItem("token");
-      const res = await axiosInstance.get("/user/me", {
-        headers: {
-          token: token,
-        },
+      const res = await axiosInstance.get(`/user/${userId}`, {
+        headers: { token },
       });
       setProfileUser(res.data.data);
     } catch (error) {
@@ -91,14 +123,10 @@ export default function ProfileScreen() {
     try {
       if (profileUser?.id === undefined) return;
       const token = await AsyncStorage.getItem("token");
-      const res = await axiosInstance.get(`/thread/user/${profileUser?.id}`, {
-        headers: {
-          token: token,
-        },
+      const res = await axiosInstance.get(`/thread/user/${profileUser.id}`, {
+        headers: { token },
       });
-
-      const data = res.data;
-      if (data.status) {
+      if (res.data.status) {
         setThreads(res.data.data);
       }
     } catch (error) {
@@ -114,15 +142,11 @@ export default function ProfileScreen() {
     try {
       if (profileUser?.id === undefined) return;
       const token = await AsyncStorage.getItem("token");
-      const res = await axiosInstance.get(`/reviews/user/${profileUser?.id}`, {
-        headers: {
-          token: token,
-        },
+      const res = await axiosInstance.get(`/reviews/user/${profileUser.id}`, {
+        headers: { token },
       });
-
-      const data = res.data;
-      if (data.status) {
-        setReviews(data.data);
+      if (res.data.status) {
+        setReviews(res.data.data);
       }
     } catch (error) {
       handleError(error);
@@ -137,15 +161,11 @@ export default function ProfileScreen() {
     try {
       if (profileUser?.id === undefined) return;
       const token = await AsyncStorage.getItem("token");
-      const res = await axiosInstance.get(`/bookmark/get/${profileUser?.id}`, {
-        headers: {
-          token: token,
-        },
+      const res = await axiosInstance.get(`/bookmark/get/${profileUser.id}`, {
+        headers: { token },
       });
-
-      const data = res.data;
-      if (data.status) {
-        setBookmarks(data.data);
+      if (res.data.status) {
+        setBookmarks(res.data.data);
       }
     } catch (error) {
       handleError(error);
@@ -177,6 +197,32 @@ export default function ProfileScreen() {
   };
 
   useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const token = await AsyncStorage.getItem("token");
+        const res = await axiosInstance.get("/user/me", {
+          headers: { token },
+        });
+
+        if (res.data.status) {
+          setCurrentUserId(res.data.data.id);
+        }
+      } catch (error) {
+        handleError(error);
+        console.log("Error fetching current user:", error);
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
+
+  useEffect(() => {
+    if (profileUser?.id && currentUserId !== null) {
+      checkFollowStatus();
+    }
+  }, [profileUser, currentUserId]);
+
+  useEffect(() => {
     fetchUser();
   }, []);
 
@@ -189,13 +235,12 @@ export default function ProfileScreen() {
 
   const CustomHeader = () => (
     <View className="bg-Snow p-4 border-b-2 border-gray-300 relative">
-      <View className="flex flex-row justify-end items-center">
-        <TouchableOpacity
-          onPress={() => router.push("/setting")}
-          className="mr-4 mt-2"
-        >
-          <AlignJustify size={24} />
-        </TouchableOpacity>
+      <View className="h-16 flex-row items-center justify-between px-3">
+        <BackButtonComponents
+          title={profileUser?.full_name || "User"}
+          textSize="text-Heading3 text-Quartz"
+          onPress={() => router.back()}
+        />
       </View>
 
       <View className="items-center mt-6 mb-4">
@@ -206,11 +251,23 @@ export default function ProfileScreen() {
           }
         />
 
-        <Text className="text-Heading3 mt-2">
+        <Text className="text-Heading3 mt-2 mb-2">
           {profileUser?.full_name || "User"}
         </Text>
+        <View>
+          <TouchableOpacity>
+            <ButtonComponents
+              onPress={handleFollow}
+              title={isFollowing ? "following" : "follow"}
+              className={`px-3 py-1 rounded-full ${
+                isFollowing ? "bg-Bittersweet" : "bg-Bittersweet"
+              }`}
+              textSize="text-l font-semibold text-white"
+            />
+          </TouchableOpacity>
+        </View>
 
-        <View className="flex flex-row justify-between w-1/2 mt-4">
+        <View className="flex flex-row justify-between w-1/2 mt-2">
           <View className="items-center">
             <Text className="text-label8 text-OldSilver">followers</Text>
             <Text className="text-label8 text-OldSilver">
@@ -232,25 +289,25 @@ export default function ProfileScreen() {
           <View className="flex items-center relative">
             <CopyPlus size={30}  color={mode === "reviews" ? activeColor : inactiveColor} />
             {mode === "reviews" && (
-              <View className="absolute bottom-[-16px] w-full border-b-2 border-Bittersweet" />
+              <View className="absolute bottom-[-15px] w-full border-b-2 border-Bittersweet" />
             )}
           </View>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => setMode("threads")}>
           <View className="flex items-center relative">
-            <MessageCircleQuestion size={30}   color={mode === "threads" ? activeColor : inactiveColor} />
+            <MessageCircleQuestion size={30}  color={mode === "threads" ? activeColor : inactiveColor} />
             {mode === "threads" && (
-              <View className="absolute bottom-[-16px] w-full border-b-2 border-Bittersweet" />
+              <View className="absolute bottom-[-15px] w-full border-b-2 border-Bittersweet" />
             )}
           </View>
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => setMode("bookmark")}>
           <View className="flex items-center relative">
-            <Bookmark size={30}   color={mode === "bookmark" ? activeColor : inactiveColor} />
+            <Bookmark size={30}  color={mode === "bookmark" ? activeColor : inactiveColor} />
             {mode === "bookmark" && (
-              <View className="absolute bottom-[-16px] w-full border-b-2 border-Bittersweet" />
+              <View className="absolute bottom-[-15px] w-full border-b-2 border-Bittersweet" />
             )}
           </View>
         </TouchableOpacity>
@@ -266,7 +323,7 @@ export default function ProfileScreen() {
           header: () => <CustomHeader />,
         }}
       />
-      <SafeAreaView className="flex-1 bg-Snow p-4 ">
+      <SafeAreaView className="flex-1 bg-Snow p-4">
         <View className="ml-1 mt-2">
           {isLoading ? (
             <LoadingIndicator />

@@ -1,25 +1,98 @@
 import React, { useState } from "react";
 import { View, TouchableOpacity, Modal, Text } from "react-native";
 import { Ellipsis, PencilLine, Trash2 } from "lucide-react-native";
-import { LogoutConfirmAlert } from "./Alert";
+import { ConfirmAlert, LogoutConfirmAlert } from "./Alert";
 import { router } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { axiosInstance } from "@/lib/axios_instance";
+import { AxiosError } from "axios";
 
-export const ThreeDotMenu = () => {
+interface ThreeDotMenuProps {
+  threadId?: number;
+  reviewId?: number;
+}
+
+export const ThreeDotMenu: React.FC<ThreeDotMenuProps> = (props) => {
+  const { threadId, reviewId } = props;
   const [modalVisible, setModalVisible] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
+  const handleError = (error: unknown) => {
+    const axiosError = error as AxiosError;
   
+    if (!alertVisible) {
+      if (axiosError?.response?.status === 404) {
+        setAlertMessage("Your session has expired or account not found.");
+        setAlertVisible(true);
+      } else if (axiosError?.response?.status === 401) {
+        setAlertMessage("Unauthorized. Please log in again.");
+        setAlertVisible(true);
+      }
+    }
+  };
+
   const handleEdit = () => {
     setModalVisible(false);
+
+    if (reviewId) {
+      router.push(`/editReview/${reviewId}`);
+    } else if (threadId) {
+      router.push(`/editThread/${threadId}`);
+    }
   };
 
   const handleDelete = () => {
     setModalVisible(false);
-    setShowAlert(true);  
+    setShowAlert(true);
   };
-  
-  const handleDeleteConfirm = () => {
-    setShowAlert(false);
-    router.back();       
+
+  const handleDeleteThread = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      await axiosInstance.delete(`/thread/${threadId}`, {
+        headers: {
+          token: token,
+        },
+      });
+
+      setShowAlert(false);
+      router.back();
+    } catch (error: any) {
+      handleError(error);
+      const message = error?.response?.data?.message || "Something went wrong.";
+      console.error(message);
+    } finally {
+      setModalVisible(false);
+      setShowAlert(false);
+    }
+  };
+
+  const handleDeleteReview = async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+
+      console.log("Try delete review id:", reviewId);
+      console.log("Token:", token);
+
+      await axiosInstance.delete(`/reviews/${reviewId}`, {
+        headers: {
+          token: token,
+        },
+      });
+
+      setShowAlert(false);
+      router.back();
+    } catch (error: any) {
+      handleError(error);
+      const message = error?.response?.data?.message || "Something went wrong.";
+      console.error(message);
+    } finally {
+      setModalVisible(false);
+      setShowAlert(false);
+    }
   };
 
   return (
@@ -52,7 +125,7 @@ export const ThreeDotMenu = () => {
                 borderBottomColor: "white",
                 marginRight: 4,
                 marginBottom: -4,
-                transform: [{ rotate: '20deg' }],
+                transform: [{ rotate: "20deg" }],
               }}
             />
             <View className="bg-white rounded-2xl py-2 w-40 ">
@@ -77,13 +150,22 @@ export const ThreeDotMenu = () => {
         </TouchableOpacity>
       </Modal>
 
-      <LogoutConfirmAlert 
-      visible={showAlert}
-      onClose={() => setShowAlert(false)}
-      onConfirm={handleDeleteConfirm}
-      title="Confirm Delete ?"
-      confirm="Delete"
-      cancel="Cancel"
+      <LogoutConfirmAlert
+        visible={showAlert}
+        onClose={() => setShowAlert(false)}
+        onConfirm={threadId ? handleDeleteThread : handleDeleteReview}
+        title="Confirm Delete ?"
+        confirm="Delete"
+        cancel="Cancel"
+      />
+      <ConfirmAlert
+        visible={alertVisible}
+        title={alertMessage}
+        confirm="Back to login"
+        onClose={() => {
+          setAlertVisible(false);
+          router.replace("/login");
+        }}
       />
     </View>
   );

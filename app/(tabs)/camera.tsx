@@ -6,6 +6,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { axiosInstance } from "@/lib/axios_instance";
 import useLoading from "@/hook/useLoading";
 import LoadingIndicator from "@/components/Loading";
+import { AxiosError } from "axios";
+import { ConfirmAlert } from "@/components/Alert";
 
 export default function FaceScan() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -13,12 +15,29 @@ export default function FaceScan() {
   const cameraRef = useRef<CameraView | null>(null);
   const router = useRouter();
   const { startLoading, stopLoading, isLoading } = useLoading();
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+
+  const handleError = (error: unknown) => {
+    const axiosError = error as AxiosError;
+  
+    if (!alertVisible) {
+      if (axiosError?.response?.status === 404) {
+        setAlertMessage("Your session has expired or account not found.");
+        setAlertVisible(true);
+      } else if (axiosError?.response?.status === 401) {
+        setAlertMessage("Unauthorized. Please log in again.");
+        setAlertVisible(true);
+      }
+    }
+  };
+  
 
   useEffect(() => {
     const requestPermission = async () => {
       startLoading();
       const { status } = await Camera.requestCameraPermissionsAsync();
-      console.log("Camera permission status:", status);
+      // console.log("Camera permission status:", status);
       setHasPermission(status === "granted");
       stopLoading();
     };
@@ -39,7 +58,7 @@ export default function FaceScan() {
         return;
       }
 
-      console.log("Captured Photo:", photo.uri);
+      // console.log("Captured Photo:", photo.uri);
 
       const formData = new FormData();
       const photoFile = {
@@ -58,9 +77,10 @@ export default function FaceScan() {
         },
       });
 
-      console.log("Upload response:", response.data);
+      // console.log("Upload response:", response.data);
       router.push(`/diary/${response.data.data.id}`);
     } catch (error) {
+      handleError(error);
       console.error("Failed to upload photo:", error);
     } finally {
       stopLoading();
@@ -104,7 +124,11 @@ export default function FaceScan() {
           onPress={takePicture}
           disabled={isLoading}
         >
-          <View className={`w-20 h-20 rounded-full border-4 ${isLoading ? "bg-gray-300" : "bg-white border-gray-400"}`} />
+          <View
+            className={`w-20 h-20 rounded-full border-4 ${
+              isLoading ? "bg-gray-300" : "bg-white border-gray-400"
+            }`}
+          />
         </TouchableOpacity>
 
         <View className="absolute bottom-32 w-4/5 left-1/2 transform -translate-x-1/2">
@@ -125,6 +149,16 @@ export default function FaceScan() {
           </Text>
         </View>
       </CameraView>
+
+      <ConfirmAlert
+        visible={alertVisible}
+        title={alertMessage}
+        confirm="Back to login"
+        onClose={() => {
+          setAlertVisible(false);
+          router.replace("/login");
+        }}
+      />
     </View>
   );
 }
