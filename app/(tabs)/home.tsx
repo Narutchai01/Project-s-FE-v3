@@ -31,10 +31,6 @@ export default function HomeScreen() {
     };
 }, []);
 
-// useEffect(() => {
-//   fetchReviews(); 
-// }, []);
-
 const onRefresh = useCallback(async () => {
   setRefreshing(true);
   await Promise.all([fetchReviews()]);
