@@ -37,19 +37,8 @@ export default function _layout() {
       <Tabs.Screen
         name="camera"
         options={{
-          headerTitle: "",
-          headerShown: true,
-          headerTransparent: true,
           tabBarIcon: ({ color, size }) => (
             <CameraIcon size={size} color={color} />
-          ),
-          headerLeft: () => (
-            <BackButtonComponents
-              title="Camera"
-              textSize="text-Heading3 text-Quartz"
-              onPress={() => router.back()}
-            />
-
           ),
           // hide the tab bar
           tabBarStyle: { display: "none" },

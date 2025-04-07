@@ -8,6 +8,7 @@ import useLoading from "@/hook/useLoading";
 import LoadingIndicator from "@/components/Loading";
 import { AxiosError } from "axios";
 import { ConfirmAlert } from "@/components/Alert";
+import { BackButtonComponents } from "@/components/Buntton";
 
 export default function FaceScan() {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
@@ -17,18 +18,17 @@ export default function FaceScan() {
   const { startLoading, stopLoading, isLoading } = useLoading();
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
-  
-    const handleError = (error: unknown) => {
-      const axiosError = error as AxiosError;
-    
-      if (!alertVisible) {
-        if (axiosError?.response?.status === 401) {
-          setAlertMessage("Unauthorized. Please log in again.");
-          setAlertVisible(true);
-        }
+
+  const handleError = (error: unknown) => {
+    const axiosError = error as AxiosError;
+
+    if (!alertVisible) {
+      if (axiosError?.response?.status === 401) {
+        setAlertMessage("Unauthorized. Please log in again.");
+        setAlertVisible(true);
       }
-    };
-  
+    }
+  };
 
   useEffect(() => {
     const requestPermission = async () => {
@@ -108,6 +108,15 @@ export default function FaceScan() {
 
   return (
     <View className="flex-1 bg-black">
+      <View className="absolute top-0 left-0 right-0 h-16 z-10 bg-transparent px-6 pt-6">
+        <View className="flex-row items-center justify-between">
+          <BackButtonComponents
+            title={"Camera"}
+            textSize="text-Heading3 text-Quartz"
+            onPress={() => router.back()}
+          />
+        </View>
+      </View>
       <CameraView
         ref={cameraRef}
         style={{ flex: 1 }}
