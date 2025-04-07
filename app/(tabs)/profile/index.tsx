@@ -42,20 +42,16 @@ export default function ProfileScreen() {
   const activeColor = "#FF6F61";
   const inactiveColor = "#848484";
 
-
-  const handleError = (error: unknown) => {
-    const axiosError = error as AxiosError;
-  
-    if (!alertVisible) {
-      if (axiosError?.response?.status === 404) {
-        setAlertMessage("Your session has expired or account not found.");
-        setAlertVisible(true);
-      } else if (axiosError?.response?.status === 401) {
-        setAlertMessage("Unauthorized. Please log in again.");
-        setAlertVisible(true);
+    const handleError = (error: unknown) => {
+      const axiosError = error as AxiosError;
+    
+      if (!alertVisible) {
+        if (axiosError?.response?.status === 401) {
+          setAlertMessage("Unauthorized. Please log in again.");
+          setAlertVisible(true);
+        }
       }
-    }
-  };
+    };
 
   const fetchUser = async () => {
     startLoading();
@@ -295,7 +291,7 @@ export default function ProfileScreen() {
                   />
                 ) : (
                   <View className="items-center mt-10">
-                    <Text className="text-label7 text-OldSilver">
+                    <Text className="text-label8 text-OldSilver">
                       No reviews available.
                     </Text>
                   </View>
@@ -323,7 +319,7 @@ export default function ProfileScreen() {
                   />
                 ) : (
                   <View className="items-center mt-10">
-                    <Text className="text-label7 text-OldSilver">
+                    <Text className="text-label8 text-OldSilver">
                       No threads available.
                     </Text>
                   </View>
@@ -357,7 +353,7 @@ export default function ProfileScreen() {
                   />
                 ) : (
                   <View className="items-center mt-10">
-                    <Text className="text-label7 text-OldSilver">
+                    <Text className="text-label8 text-OldSilver">
                       No bookmarks available.
                     </Text>
                   </View>

@@ -40,10 +40,7 @@ const ResultAnalysis = () => {
     const axiosError = error as AxiosError;
   
     if (!alertVisible) {
-      if (axiosError?.response?.status === 404) {
-        setAlertMessage("Your session has expired or account not found.");
-        setAlertVisible(true);
-      } else if (axiosError?.response?.status === 401) {
+      if (axiosError?.response?.status === 401) {
         setAlertMessage("Unauthorized. Please log in again.");
         setAlertVisible(true);
       }
@@ -55,23 +52,28 @@ const ResultAnalysis = () => {
     try {
       const token = await AsyncStorage.getItem("token");
       const res = await axiosInstance.get(`/results/${id}`, {
-        headers: {
-          token,
-        },
+        headers: { token },
       });
+  
       const data = res.data;
-      if (data.status) {
+      if (data.status && data.data) {
         setResult(data.data);
-        stopLoading();
+      } else {
+        setResult(null);
       }
     } catch (error) {
-      handleError(error);
-      console.log(error);
-      stopLoading();
+      const axiosError = error as AxiosError;
+      if (axiosError?.response?.status === 404) {
+        setResult(null);
+      } else {
+        handleError(error);
+      }
+      console.log("Error in fetchResult:", error);
     } finally {
       stopLoading();
     }
   }, [id, startLoading, stopLoading]);
+  
 
   useEffect(() => {
     fetchResult();

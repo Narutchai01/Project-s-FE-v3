@@ -33,12 +33,9 @@ export const SkinAnalysisCard: FC = () => {
 
   const handleError = (error: unknown) => {
     const axiosError = error as AxiosError;
-  
+
     if (!alertVisible) {
-      if (axiosError?.response?.status === 404) {
-        setAlertMessage("Your session has expired or account not found.");
-        setAlertVisible(true);
-      } else if (axiosError?.response?.status === 401) {
+      if (axiosError?.response?.status === 401) {
         setAlertMessage("Unauthorized. Please log in again.");
         setAlertVisible(true);
       }
@@ -55,14 +52,19 @@ export const SkinAnalysisCard: FC = () => {
         },
       });
       const data = res.data;
-      if (data.status) {
+      if (data.status && data.data) {
         setResultLatest(data.data);
-        stopLoading();
+      } else {
+        setResultLatest(null);
       }
     } catch (error) {
-      handleError(error);
-      console.log(error);
-      stopLoading();
+      const axiosError = error as AxiosError;
+      if (axiosError?.response?.status === 404) {
+        setResultLatest(null);
+      } else {
+        handleError(error);
+      }
+
     } finally {
       stopLoading();
     }
@@ -87,9 +89,11 @@ export const SkinAnalysisCard: FC = () => {
       {isLoading ? (
         <LoadingIndicator />
       ) : !resultLatest ? (
-        <Text className="text-gray-500 text-center mt-4">
-          No result analysis found.
-        </Text>
+        <View className="bg-white rounded-3xl shadow-md flex items-center justify-center w-[90%] h-[240px] ml-[16px]">
+          <Text className="text-gray-500 text-center mt-4">
+            No result analysis available.
+          </Text>
+        </View>
       ) : (
         <TouchableOpacity
           className="flex justify-center items-center mt-2"
@@ -105,9 +109,7 @@ export const SkinAnalysisCard: FC = () => {
               </View>
 
               <View className="flex flex-col justify-evenly ml-5 ">
-              <Text className="text-label4 mb-1">
-                  Skin Type:
-                </Text>
+                <Text className="text-label4 mb-1">Skin Type:</Text>
                 <View className="flex flex-row gap-2 ">
                   {skins.filter((item) => item.id === resultLatest?.skin_id)
                     .length > 0 ? (
@@ -162,9 +164,7 @@ export const SkinAnalysisCard: FC = () => {
                   )}
                 </View>
 
-                <Text className="text-label4 mb-1 mt-2">
-                  Skin Problems:
-                </Text>
+                <Text className="text-label4 mb-1 mt-2">Skin Problems:</Text>
                 <View className="flex flex-row gap-2">
                   {facials.filter((item) =>
                     resultLatest?.facial_type.some(
@@ -195,7 +195,6 @@ export const SkinAnalysisCard: FC = () => {
                     </Text>
                   )}
                 </View>
-
               </View>
             </View>
           </View>

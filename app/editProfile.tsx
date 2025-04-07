@@ -45,19 +45,16 @@ export default function EditProfileScreen() {
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
 
-const handleError = (error: unknown) => {
-    const axiosError = error as AxiosError;
-  
-    if (!alertVisible) {
-      if (axiosError?.response?.status === 404) {
-        setAlertMessage("Your session has expired or account not found.");
-        setAlertVisible(true);
-      } else if (axiosError?.response?.status === 401) {
-        setAlertMessage("Unauthorized. Please log in again.");
-        setAlertVisible(true);
+    const handleError = (error: unknown) => {
+      const axiosError = error as AxiosError;
+    
+      if (!alertVisible) {
+        if (axiosError?.response?.status === 401) {
+          setAlertMessage("Unauthorized. Please log in again.");
+          setAlertVisible(true);
+        }
       }
-    }
-  };
+    };
 
   const fetchUserProfile = useCallback(async () => {
     startLoading();
@@ -119,11 +116,13 @@ const handleError = (error: unknown) => {
       const formData = new FormData();
       formData.append("fullname", user.full_name);
       formData.append("sensitiveskin", String(user.sensitive_skin));
-      formData.append(
-        "birthday",
-        dayjs(user.birthday).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]")
-      );
-
+      if (user.birthday) {
+        formData.append(
+          "birthday",
+          dayjs(user.birthday).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]")
+        );
+      }
+      
       if (image && typeof image[0] === "string") {
         const file = {
           uri: image[0],
@@ -162,7 +161,7 @@ const handleError = (error: unknown) => {
         </View>
 
         <View className="px-4">
-          <View className="items-center mb-6">
+          <TouchableOpacity  onPress={pickImage} className="items-center mb-6">
             <View className="relative">
               <Image
                 source={
@@ -173,14 +172,14 @@ const handleError = (error: unknown) => {
                 className="w-28 h-28 rounded-full bg-gray-300"
               />
 
-              <TouchableOpacity
-                onPress={pickImage}
+              <View
+               
                 className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-gray-200 items-center justify-center"
               >
                 <PencilLine size={16} color="#000" />
-              </TouchableOpacity>
+              </View>
             </View>
-          </View>
+          </TouchableOpacity>
 
           <Text className="text-Heading4 text-Quartz mb-2">Username</Text>
           <TextInput

@@ -95,37 +95,45 @@ export default function DiaryScreen() {
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
 
-  const handleError = (error: unknown) => {
-    const axiosError = error as AxiosError;
-  
-    if (!alertVisible) {
-      if (axiosError?.response?.status === 404) {
-        setAlertMessage("Your session has expired or account not found.");
-        setAlertVisible(true);
-      } else if (axiosError?.response?.status === 401) {
-        setAlertMessage("Unauthorized. Please log in again.");
-        setAlertVisible(true);
+    const handleError = (error: unknown) => {
+      const axiosError = error as AxiosError;
+    
+      if (!alertVisible) {
+        if (axiosError?.response?.status === 401) {
+          setAlertMessage("Unauthorized. Please log in again.");
+          setAlertVisible(true);
+        }
       }
-    }
-  };
+    };
   
 
-  const fetchResults = useCallback(async () => {
-    startLoading();
-    try {
-      const token = await AsyncStorage.getItem("token");
-      if (token) {
+    const fetchResults = useCallback(async () => {
+      startLoading();
+      try {
+        const token = await AsyncStorage.getItem("token");
         const res = await axiosInstance.get("/results", { headers: { token } });
-        setResults(res.data.data);
-        setFilteredResults(res.data.data);
+    
+        if (res.data?.status && res.data?.data) {
+          setResults(res.data.data);
+          setFilteredResults(res.data.data);
+        } else {
+          setResults([]);
+          setFilteredResults([]);
+        }
+      } catch (error) {
+        const axiosError = error as AxiosError;
+        if (axiosError?.response?.status === 404) {
+          setResults([]);
+          setFilteredResults([]);
+        } else {
+          handleError(error);
+        }
+        console.log("Error fetching results:", error);
+      } finally {
+        stopLoading();
       }
-    } catch (error) {
-      handleError(error);
-      console.log("Error fetching results:", error);
-    } finally {
-      stopLoading();
-    }
-  }, [startLoading, stopLoading]);
+    }, [startLoading, stopLoading]);
+    
 
   useEffect(() => {
     fetchResults();
@@ -203,19 +211,13 @@ export default function DiaryScreen() {
             </View>
           )}
 
-          <FlatList
-            data={filteredResults}
-            keyExtractor={(item) => item.id.toString()}
-            renderItem={({ item }) => (
-              <CardDiary
-                key={item.id}
-                data={item}
-                compareMode={isCompare}
-                selectItem={() => handleCompareOrConfirm(item.id)}
-                selectArray={compare}
-              />
-            )}
-          />
+{!isLoading && filteredResults?.length === 0 && (
+            <View className="flex items-center justify-center mt-10">
+              <Text className="text-gray-500 text-base text-center">
+                You don't have any diary entries yet.
+              </Text>
+            </View>
+          )}
 
           <CalendarPicker
             visible={isCalendarOpen}
