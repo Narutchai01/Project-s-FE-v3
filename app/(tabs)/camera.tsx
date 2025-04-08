@@ -43,29 +43,32 @@ export default function FaceScan() {
   }, []);
 
   const takePicture = async () => {
-    if (!cameraRef.current || !isCameraReady) return;
-
-    startLoading();
     try {
+      if (!cameraRef.current) {
+        console.error("Camera reference is not available");
+        return;
+      }
+
       const photo = await cameraRef.current.takePictureAsync();
 
-      if (!photo || !photo.uri) {
+      if (!photo || !photo?.uri) {
         console.error("Failed to capture photo.");
         stopLoading();
         return;
       }
 
-      // console.log("Captured Photo:", photo.uri);
+      console.log("Captured Photo:", photo?.uri);
 
       const formData = new FormData();
       const photoFile = {
-        uri: photo.uri,
+        uri: photo?.uri,
         name: "photo.jpg",
         type: "image/jpeg",
       } as unknown as Blob;
 
       formData.append("file", photoFile);
 
+      startLoading();
       const token = await AsyncStorage.getItem("token");
       const response = await axiosInstance.post("/results", formData, {
         headers: {
