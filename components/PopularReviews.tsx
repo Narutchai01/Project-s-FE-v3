@@ -1,22 +1,21 @@
-import React, { FC, useCallback, useEffect, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, FlatList } from "react-native";
 import { ChevronRight } from "lucide-react-native";
 import { PopularThreadCard } from "@/components/Card";
-import { useRouter } from "expo-router";
 import useLoading from "@/hook/useLoading";
 import { IReview } from "@/interface/review";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { axiosInstance } from "@/lib/axios_instance";
 import LoadingIndicator from "@/components/Loading";
 import { AxiosError } from "axios";
 import { ConfirmAlert } from "./Alert";
+import { useReviewStore } from "@/store/reviewStore";
+import { useRouter } from "expo-router";
 
 export const PopularReviews: FC = () => {
   const router = useRouter();
-  const { startLoading, stopLoading, isLoading } = useLoading();
-  const [reviews, setReviews] = useState<IReview[] | null>(null);
+  const { isLoading } = useLoading();
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const { reviews, fetchReviews, favoriteReview } = useReviewStore();
 
     const handleError = (error: unknown) => {
       const axiosError = error as AxiosError;
@@ -29,49 +28,23 @@ export const PopularReviews: FC = () => {
       }
     };
     
-  const fetchReviews = useCallback(async () => {
-    startLoading();
-    try {
-      const token = await AsyncStorage.getItem("token");
-      const res = await axiosInstance.get("/reviews", {
-        headers: { token },
-      });
-
-      const data = res.data;
-      if (data.status) {
-        setReviews(data.data);
-        stopLoading();
+  
+    useEffect(() => {
+      fetchReviews().catch(handleError);
+    }, []);
+  
+    const handleFavorite = async (id: number) => {
+      try {
+        await favoriteReview(id);
+      } catch (error) {
+        handleError(error);
       }
-    } catch (error) {
-      handleError(error);
-      console.log(error);
-      stopLoading();
-    } finally {
-      stopLoading();
-    }
-  }, [startLoading, stopLoading]);
-
-  const handleFavorite = async (id: number) => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      await axiosInstance.post(`/favorite/review/skincare/${id}`, null, {
-        headers: { token },
-      });
-
-      fetchReviews();
-    } catch (error) {
-      handleError(error);
-      console.error("Favorite error:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchReviews();
-  }, []);
-
-  const handleReviews = (item: IReview) => {
-    router.push(`/review/${item.id}`);
-  };
+    };
+  
+    const handleReviews = (item: IReview) => {
+      router.push(`/review/${item.id}`);
+    };
+  
 
   return (
     <View className="mt-8">

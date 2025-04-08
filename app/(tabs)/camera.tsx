@@ -18,6 +18,7 @@ export default function FaceScan() {
   const { startLoading, stopLoading, isLoading } = useLoading();
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const [redirectToLogin, setRedirectToLogin] = useState(false);
 
   const handleError = (error: unknown) => {
     const axiosError = error as AxiosError;
@@ -25,6 +26,17 @@ export default function FaceScan() {
     if (!alertVisible) {
       if (axiosError?.response?.status === 401) {
         setAlertMessage("Unauthorized. Please log in again.");
+        setRedirectToLogin(true);
+        setAlertVisible(true);
+      } else if (axiosError?.response?.status === 500) {
+        setAlertMessage(
+          "Unable to process your face. Please retake the photo ensuring your face is clearly visible."
+        );
+        setRedirectToLogin(false);
+        setAlertVisible(true);
+      } else {
+        setAlertMessage("Something went wrong. Please try again later.");
+        setRedirectToLogin(false);
         setAlertVisible(true);
       }
     }
@@ -162,10 +174,12 @@ export default function FaceScan() {
       <ConfirmAlert
         visible={alertVisible}
         title={alertMessage}
-        confirm="Back to login"
+        confirm={redirectToLogin ? "Back to login" : "OK"}
         onClose={() => {
           setAlertVisible(false);
-          router.replace("/login");
+          if (redirectToLogin) {
+            router.replace("/login");
+          }
         }}
       />
     </View>
