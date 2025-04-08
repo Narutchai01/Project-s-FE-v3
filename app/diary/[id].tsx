@@ -246,7 +246,7 @@ const Section: React.FC<SectionProps> = ({
                 height: 70,
                 borderRadius: 40,
                 borderWidth: 2.5,
-                borderColor: isHighlighted ? "black" : "gray",
+                borderColor: isHighlighted ? "black" : "#c4c4c4",
                 alignItems: "center",
                 justifyContent: "center",
               }}

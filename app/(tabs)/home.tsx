@@ -1,18 +1,21 @@
-import React, { useEffect } from "react";
-import { View, Text, Image, ScrollView, SafeAreaView, BackHandler } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { View, Text, Image, ScrollView, SafeAreaView, BackHandler, RefreshControl } from "react-native";
 import { SkinAnalysisCard } from "@/components/SkinAnalysisCard";
 import { PopularReviews } from "@/components/PopularReviews";
 import { PopularSkincare } from "@/components/PopularSkincare";
 import dayjs from "dayjs";
 import { useCompare } from "@/context/CompareContext";
+import { useReviewStore } from "@/store/reviewStore";
 
-export default function SkincareScreen() {
+export default function HomeScreen() {
   const today = dayjs();
   const day = today.date();
   const weekday = today.format("dddd");
   const month = today.format("MMM");
   const year = today.year();
   const { skincares } = useCompare();
+  const { fetchReviews } = useReviewStore();
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const onBackPress = () => {
@@ -28,9 +31,20 @@ export default function SkincareScreen() {
     };
 }, []);
 
+const onRefresh = useCallback(async () => {
+  setRefreshing(true);
+  await Promise.all([fetchReviews()]);
+  setRefreshing(false);
+}, []);
+
+
   return (
     <SafeAreaView className="flex-1 bg-Snow p-6">
-      <ScrollView>
+       <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <View className="flex-row items-center mb-6">
           <Image
             source={require("../../assets/images/ucare-logo.png")}
