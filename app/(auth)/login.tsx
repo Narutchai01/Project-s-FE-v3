@@ -17,6 +17,7 @@ import { ModalSensitiveSkin } from "@/components/Modal";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Eye, EyeOff } from "lucide-react-native";
 import { BackHandler } from "react-native";
+import { ConfirmAlert } from "@/components/Alert";
 
 export default function Login() {
   const router = useRouter();
@@ -32,6 +33,8 @@ export default function Login() {
   } = useAuth();
 
   const [showPassword, setShowPassword] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
+
 
   useEffect(() => {
     const checkLogin = async () => {
@@ -113,7 +116,12 @@ export default function Login() {
                 </View>
 
                 <ButtonComponents
-                  onPress={handleLogin}
+                   onPress={async () => {
+                    const success = await handleLogin();
+                    if (!success) {
+                      setShowAlert(true);
+                    }
+                  }}
                   title="Login"
                   className="flex flex-row items-center justify-center rounded-full border-2 border-BrightGray p-4 bg-Bittersweet"
                   textSize="text-white text-xl font-bold"
@@ -143,6 +151,13 @@ export default function Login() {
             setSensitiveSkin={setSensitiveSkin}
             onPres={UpdateSenSitiveSkincare}
           />
+          <ConfirmAlert
+  visible={showAlert}
+  onClose={() => setShowAlert(false)}
+  title="Invalid email or password."
+  confirm="OK"
+/>
+
         </ScrollView>
       </SafeAreaView>
     </SafeAreaProvider>

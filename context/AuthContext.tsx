@@ -18,10 +18,10 @@ import {
 type AuthContextType = {
   loginData: ILogin;
   setLoginData: (data: ILogin) => void;
-  handleLogin: () => void;
+  handleLogin: () => Promise<boolean>;
   signupData: ISignUp;
   setSignupData: (data: ISignUp) => void;
-  handleSignup: () => void;
+  handleSignup: () => Promise<boolean>;
   googleSignIn: () => void;
   handleLogout: () => void; 
   user: IPubicUser;
@@ -92,47 +92,62 @@ export const AuthProvider: FC<{ children: ReactNode }> = ({ children }) => {
   };
   
 
-  const handleLogin = async () => {
-    await axiosInstance
-      .post("/user/login", loginData)
-      .then(async (res) => {
-        const status = res.status;
-
-        if (status !== 200) {
-          return;
-        }
-        const token: string = res.data.data.token;
-        await AsyncStorage.setItem("token", token);
-        router.push("/(tabs)/home");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+  const handleLogin = async (): Promise<boolean> => {
+    try {
+      const res = await axiosInstance.post("/user/login", loginData);
+      const status = res.status;
+  
+      if (status !== 200) {
+        return false;
+      }
+  
+      const token: string = res.data.data.token;
+      await AsyncStorage.setItem("token", token);
+  
+      await handleGetUser();
+  
+      router.push("/(tabs)/home");
+      return true;
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
   };
+  
 
-  const handleSignup = async () => {
-    await axiosInstance
-      .post("/user/register", signupData)
-      .then((res) => {
-        const status = res.status;
-        setSignupData({
-          id: 0,
-          full_name: "",
-          birthday: null,
-          email: "",
-          password: "",
-          sensitive_skin: false,
-          follower: 0,
-          following: 0,
-        });
-        if (status === 201) {
-          router.push("/login");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
+  const handleSignup = async (): Promise<boolean> => {
+    try {
+      const res = await axiosInstance.post("/user/register", signupData);
+      const status = res.status;
+  
+      setSignupData({
+        id: 0,
+        full_name: "",
+        birthday: null,
+        email: "",
+        password: "",
+        sensitive_skin: false,
+        follower: 0,
+        following: 0,
       });
+  
+      if (status === 201) {
+        router.push("/login");
+        return true;
+      }
+  
+      return false;
+    } catch (err: any) {
+      if (err.response?.status === 500) {
+        return false;
+      }
+  
+      console.log("Signup error:", err);
+      return false;
+    }
   };
+  
+    
 
   const handleGetUser = async () => {
    try {

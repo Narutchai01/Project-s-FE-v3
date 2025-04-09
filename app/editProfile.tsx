@@ -45,16 +45,18 @@ export default function EditProfileScreen() {
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
 
-    const handleError = (error: unknown) => {
-      const axiosError = error as AxiosError;
-    
-      if (!alertVisible) {
-        if (axiosError?.response?.status === 401) {
-          setAlertMessage("Unauthorized. Please log in again.");
-          setAlertVisible(true);
-        }
-      }
-    };
+  const handleError = (error: unknown) => {
+    const axiosError = error as AxiosError;
+  
+    if (axiosError?.response?.status === 401) {
+      setAlertMessage("Unauthorized. Please log in again.");
+      setAlertVisible(true);
+    } else if (axiosError?.response?.status === 500) {
+      setAlertMessage("This email is already in use.");
+      setAlertVisible(true);
+    }
+  };
+  
 
   const fetchUserProfile = useCallback(async () => {
     startLoading();
@@ -122,16 +124,17 @@ export default function EditProfileScreen() {
           dayjs(user.birthday).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]")
         );
       }
-      
-      if (image && typeof image[0] === "string") {
-        const file = {
+      formData.append("email", user.email);
+
+      if (image && typeof image[0] === "string" && !image[0].includes("http")) {
+        formData.append("file", {
           uri: image[0],
           name: "image.jpg",
           type: "image/jpeg",
-        };
-        formData.append("file", file as unknown as Blob);
+        } as any);
       }
 
+      console.log("FormData:", formData);
       await axiosInstance.put("/user", formData, {
         headers: {
           token,
@@ -142,7 +145,6 @@ export default function EditProfileScreen() {
       setShowAlert(true);
     } catch (error: any) {
       handleError(error);
-      console.error("Update profile error:", error);
     } finally {
       stopLoading();
     }
