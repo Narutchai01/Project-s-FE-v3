@@ -35,7 +35,6 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
 
-
   useEffect(() => {
     const checkLogin = async () => {
       const token = await AsyncStorage.getItem("token");
@@ -116,7 +115,7 @@ export default function Login() {
                 </View>
 
                 <ButtonComponents
-                   onPress={async () => {
+                  onPress={async () => {
                     const success = await handleLogin();
                     if (!success) {
                       setShowAlert(true);
@@ -152,12 +151,11 @@ export default function Login() {
             onPres={UpdateSenSitiveSkincare}
           />
           <ConfirmAlert
-  visible={showAlert}
-  onClose={() => setShowAlert(false)}
-  title="Invalid email or password."
-  confirm="OK"
-/>
-
+            visible={showAlert}
+            onClose={() => setShowAlert(false)}
+            title="Invalid email or password."
+            confirm="OK"
+          />
         </ScrollView>
       </SafeAreaView>
     </SafeAreaProvider>
