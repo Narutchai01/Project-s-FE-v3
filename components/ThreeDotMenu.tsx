@@ -19,16 +19,16 @@ export const ThreeDotMenu: React.FC<ThreeDotMenuProps> = (props) => {
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
 
-    const handleError = (error: unknown) => {
-      const axiosError = error as AxiosError;
-    
-      if (!alertVisible) {
-        if (axiosError?.response?.status === 401) {
-          setAlertMessage("Unauthorized. Please log in again.");
-          setAlertVisible(true);
-        }
+  const handleError = (error: unknown) => {
+    const axiosError = error as AxiosError;
+
+    if (!alertVisible) {
+      if (axiosError?.response?.status === 401) {
+        setAlertMessage("Unauthorized. Please log in again.");
+        setAlertVisible(true);
       }
-    };
+    }
+  };
   const handleEdit = () => {
     setModalVisible(false);
 
@@ -69,10 +69,6 @@ export const ThreeDotMenu: React.FC<ThreeDotMenuProps> = (props) => {
   const handleDeleteReview = async () => {
     try {
       const token = await AsyncStorage.getItem("token");
-
-      console.log("Try delete review id:", reviewId);
-      console.log("Token:", token);
-
       await axiosInstance.delete(`/reviews/${reviewId}`, {
         headers: {
           token: token,
@@ -83,8 +79,6 @@ export const ThreeDotMenu: React.FC<ThreeDotMenuProps> = (props) => {
       router.back();
     } catch (error: any) {
       handleError(error);
-      const message = error?.response?.data?.message || "Something went wrong.";
-      console.error(message);
     } finally {
       setModalVisible(false);
       setShowAlert(false);

@@ -111,20 +111,21 @@ export const UserBar: FC<UserBarProps> = (props) => {
   );
   const isOwner =
     currentUserId != null && userId != null && currentUserId === userId;
-    
+
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const userDefaultImage = require("@/assets/images/userDefault.jpg");
 
-    const handleError = (error: unknown) => {
-      const axiosError = error as AxiosError;
-    
-      if (!alertVisible) {
-        if (axiosError?.response?.status === 401) {
-          setAlertMessage("Unauthorized. Please log in again.");
-          setAlertVisible(true);
-        }
+  const handleError = (error: unknown) => {
+    const axiosError = error as AxiosError;
+
+    if (!alertVisible) {
+      if (axiosError?.response?.status === 401) {
+        setAlertMessage("Unauthorized. Please log in again.");
+        setAlertVisible(true);
       }
-    };
+    }
+  };
 
   useEffect(() => {
     setIsFollowing(props.isFollowed || false);
@@ -173,7 +174,7 @@ export const UserBar: FC<UserBarProps> = (props) => {
           }}
         >
           <Image
-            source={{ uri: userImage }}
+            source={userImage ? { uri: userImage } : userDefaultImage}
             style={{
               width: 40,
               height: 40,

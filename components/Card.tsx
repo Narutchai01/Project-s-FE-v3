@@ -6,7 +6,7 @@ import {
   CardReviewProps,
   AddPhotoProps,
   ICommentCardProps,
-  CommunityCardProps
+  CommunityCardProps,
 } from "@/interface/Card";
 import dayjs from "dayjs";
 import { useRouter } from "expo-router";
@@ -86,30 +86,30 @@ export const CardDiary: FC<DiaryCardProps> = (props) => {
           : router.push(`/diary/${result_id}`)
       }
     >
-       <View style={{ alignItems: 'center' }}>
-      <View
-        className={`flex-row items-center rounded-lg p-2 mb-4 mt-2 ${
-          check && compareMode ? "bg-[#CAC9C9]" : "bg-white"
-        }`}
-        style={{
-          width: '90%',
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.25,
-          shadowRadius: 4,
-          elevation: 5,
-        }}
-      >
-        <Image
-          source={data.image ? { uri: data.image } : defaultImage}
-          className="w-[70px] h-[100px] rounded-lg ml-4 mr-6 mt-2 mb-2"
-        />
-        <View className="flex-1">
-          <Text className={`text-label4 font-semibold `}>Date: {date}</Text>
-          <Text className={`text-label6`}>Skin Type: {skinType}</Text>
-          <Text className={`text-label6 `}>Acnes: {countAcne}</Text>
-          <Text className={`text-label6`}>Skin Problems: {skinProblems}</Text>
-        </View>
+      <View style={{ alignItems: "center" }}>
+        <View
+          className={`flex-row items-center rounded-lg p-2 mb-4 mt-2 ${
+            check && compareMode ? "bg-[#CAC9C9]" : "bg-white"
+          }`}
+          style={{
+            width: "90%",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.25,
+            shadowRadius: 4,
+            elevation: 5,
+          }}
+        >
+          <Image
+            source={data.image ? { uri: data.image } : defaultImage}
+            className="w-[70px] h-[100px] rounded-lg ml-4 mr-6 mt-2 mb-2"
+          />
+          <View className="flex-1">
+            <Text className={`text-label4 font-semibold `}>Date: {date}</Text>
+            <Text className={`text-label6`}>Skin Type: {skinType}</Text>
+            <Text className={`text-label6 `}>Acnes: {countAcne}</Text>
+            <Text className={`text-label6`}>Skin Problems: {skinProblems}</Text>
+          </View>
         </View>
       </View>
     </Pressable>
@@ -151,7 +151,7 @@ export const PopularThreadCard: FC<CommunityCardProps> = (props) => {
         />
         <View className="p-2 -mb-1">
           <Text
-            className="text-label12 font-medium mb-1" 
+            className="text-label12 font-medium mb-1"
             numberOfLines={1}
             ellipsizeMode="tail"
             style={{ width: 100 }}
@@ -164,22 +164,25 @@ export const PopularThreadCard: FC<CommunityCardProps> = (props) => {
                 source={userAvatar ? { uri: userAvatar } : userDefaultImage}
                 className="w-5 h-5 rounded-full mr-2"
               />
-              <Text 
-              className="text-label13 text-gray-600"
-              numberOfLines={1}
-              ellipsizeMode="tail"
-              style={{ width: 60 }}
-              >{user}</Text>
+              <Text
+                className="text-label13 text-gray-600"
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                style={{ width: 60 }}
+              >
+                {user}
+              </Text>
             </View>
 
-            <TouchableOpacity className="w-7 h-7 bg-White rounded-full flex items-center justify-center"
-            onPress={onFavorite}
+            <TouchableOpacity
+              className="w-7 h-7 bg-White rounded-full flex items-center justify-center"
+              onPress={onFavorite}
             >
               <Heart
-                 size={12}
-              color={isFavorited ? "#FF6F61" : "gray"}
-              fill={isFavorited ? "#FF6F61" : "none"}
-            />
+                size={12}
+                color={isFavorited ? "#FF6F61" : "gray"}
+                fill={isFavorited ? "#FF6F61" : "none"}
+              />
             </TouchableOpacity>
           </View>
         </View>
@@ -234,9 +237,10 @@ export const CommunityCard: React.FC<CommunityCardProps> = (props) => {
         <View className="flex-row items-center justify-between mt-2">
           <View className="flex-row items-center">
             <Image
-              source={{ uri: userAvatar }}
+              source={userAvatar ? { uri: userAvatar } : userDefaultImage}
               className="w-5 h-5 rounded-full mr-2"
             />
+
             <Text
               numberOfLines={1}
               ellipsizeMode="tail"
@@ -266,7 +270,7 @@ export const CommunityCard: React.FC<CommunityCardProps> = (props) => {
 export const ReviewCard: FC<CardReviewProps> = (props) => {
   const { data, selectArray = [], setItem } = props;
   const check = selectArray?.some((item) => item.id === data.id);
-  
+
   return (
     <Pressable onPress={() => setItem(data)}>
       <View
@@ -377,8 +381,8 @@ export const CardListPopularSkincare: FC<CardSkincareProps> = (props) => {
         <Text
           className="text-label2 font-medium w-full"
           numberOfLines={1}
-              ellipsizeMode="tail"
-              style={{ width: 120 }}
+          ellipsizeMode="tail"
+          style={{ width: 120 }}
         >
           {name?.trim() ? name : "Not found"}
         </Text>
@@ -411,11 +415,11 @@ export const CommentCard: FC<ICommentCardProps> = (props) => {
       </View>
       <View className="flex justify-center items-center">
         <TouchableOpacity onPress={handleFavoriteComment}>
-        <Heart
-                size={24}
-                color={favorite ? "#FF6F61" : "#4A4A4A"}
-                fill={favorite ? "#FF6F61" : "none"}
-              />
+          <Heart
+            size={24}
+            color={favorite ? "#FF6F61" : "#4A4A4A"}
+            fill={favorite ? "#FF6F61" : "none"}
+          />
         </TouchableOpacity>
         <Text>{count_favorite > 0 ? count_favorite : ""}</Text>
       </View>
@@ -494,16 +498,15 @@ export const CardSkincareReccommemded: FC<CardSkincareProps> = (props) => {
   );
 };
 
-
 export const PostByUser: FC<CommunityCardProps> = (props) => {
-  const { image, title, user, userAvatar, isFavorited, onFavorite, onPress, } = props;
+  const { image, title, user, userAvatar, isFavorited, onFavorite, onPress } =
+    props;
   return (
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.9}
       className="bg-white rounded-2xl shadow w-[95px] h-[140px] mx-2 mb-2 relative overflow-hidden"
     >
-
       <View className="w-[95px] h-[100px] relative overflow-hidden">
         <Image
           source={image ? { uri: image } : defaultImage}
@@ -534,7 +537,7 @@ export const PostByUser: FC<CommunityCardProps> = (props) => {
         />
         <View className="p-1 ml-1 mt-1">
           <Text
-            className="text-label12 font-medium mb-1 " 
+            className="text-label12 font-medium mb-1 "
             numberOfLines={1}
             ellipsizeMode="tail"
             style={{ width: 100 }}
@@ -547,25 +550,28 @@ export const PostByUser: FC<CommunityCardProps> = (props) => {
                 source={userAvatar ? { uri: userAvatar } : userDefaultImage}
                 className="w-5 h-5 rounded-full mr-2"
               />
-              <Text 
-              className="text-label13 text-gray-600"
-              numberOfLines={1}
-              ellipsizeMode="tail"
-              style={{ width: 40 }}
-              >{user}</Text>
+              <Text
+                className="text-label13 text-gray-600"
+                numberOfLines={1}
+                ellipsizeMode="tail"
+                style={{ width: 40 }}
+              >
+                {user}
+              </Text>
             </View>
 
-            <TouchableOpacity className="w-7 h-7 bg-White rounded-full flex items-center justify-center"
-                onPress={(e) => {
-                  e.stopPropagation(); 
-                  onFavorite?.();
-                }}
-                >
-            <Heart
-              size={12}
-              color={isFavorited ? "#FF6F61" : "gray"}
-              fill={isFavorited ? "#FF6F61" : "none"}
-            />
+            <TouchableOpacity
+              className="w-7 h-7 bg-White rounded-full flex items-center justify-center"
+              onPress={(e) => {
+                e.stopPropagation();
+                onFavorite?.();
+              }}
+            >
+              <Heart
+                size={12}
+                color={isFavorited ? "#FF6F61" : "gray"}
+                fill={isFavorited ? "#FF6F61" : "none"}
+              />
             </TouchableOpacity>
           </View>
         </View>

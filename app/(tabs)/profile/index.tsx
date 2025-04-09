@@ -13,6 +13,7 @@ import {
   Bookmark,
   CopyPlus,
   MessageCircleQuestion,
+  Heart,
 } from "lucide-react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { IReview } from "@/interface/review";
@@ -42,43 +43,26 @@ export default function ProfileScreen() {
   const activeColor = "#FF6F61";
   const inactiveColor = "#848484";
 
-    const handleError = (error: unknown) => {
-      const axiosError = error as AxiosError;
-    
-      if (!alertVisible) {
-        if (axiosError?.response?.status === 401) {
-          setAlertMessage("Unauthorized. Please log in again.");
-          setAlertVisible(true);
-        }
-      }
-    };
+  const handleError = (error: unknown) => {
+    const axiosError = error as AxiosError;
+    if (!alertVisible && axiosError?.response?.status === 401) {
+      setAlertMessage("Unauthorized. Please log in again.");
+      setAlertVisible(true);
+    }
+  };
 
   const fetchUser = async () => {
     startLoading();
     try {
       const token = await AsyncStorage.getItem("token");
       const res = await axiosInstance.get("/user/me", {
-        headers: {
-          token: token,
-        },
+        headers: { token },
       });
       setProfileUser(res.data.data);
     } catch (error) {
       handleError(error);
-      console.log("Error fetching user:", error);
     } finally {
       stopLoading();
-    }
-  };
-
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    try {
-      await fetchUser();
-    } catch (error) {
-      console.error("Refresh error:", error);
-    } finally {
-      setRefreshing(false);
     }
   };
 
@@ -99,7 +83,6 @@ export default function ProfileScreen() {
       }
     } catch (error) {
       handleError(error);
-      console.error(error);
     } finally {
       stopLoading();
     }
@@ -122,7 +105,6 @@ export default function ProfileScreen() {
       }
     } catch (error) {
       handleError(error);
-      console.error(error);
     } finally {
       stopLoading();
     }
@@ -145,9 +127,19 @@ export default function ProfileScreen() {
       }
     } catch (error) {
       handleError(error);
-      console.error(error);
     } finally {
       stopLoading();
+    }
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await fetchUser();
+    } catch (error) {
+      handleError(error);
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -168,7 +160,6 @@ export default function ProfileScreen() {
       }
     } catch (error) {
       handleError(error);
-      console.error("Toggle favorite error:", error);
     }
   };
 
@@ -184,8 +175,8 @@ export default function ProfileScreen() {
   }, [profileUser]);
 
   const CustomHeader = () => (
-    <View className="bg-Snow p-4 border-b-2 border-gray-300 relative">
-      <View className="flex flex-row justify-end items-center">
+    <View className="bg-Snow p-4 border-b-2 border-gray-300 mb-6">
+      <View className="flex-row justify-end items-center">
         <TouchableOpacity
           onPress={() => router.push("/setting")}
           className="mr-4 mt-2"
@@ -201,19 +192,17 @@ export default function ProfileScreen() {
             profileUser?.image ? { uri: profileUser.image } : defaultImage
           }
         />
-
         <Text className="text-Heading3 mt-2">
           {profileUser?.full_name || "User"}
         </Text>
 
-        <View className="flex flex-row justify-between w-1/2 mt-4">
+        <View className="flex-row justify-between w-1/2 mt-4">
           <View className="items-center">
             <Text className="text-label8 text-OldSilver">followers</Text>
             <Text className="text-label8 text-OldSilver">
               {profileUser?.follower ?? "-"}
             </Text>
           </View>
-
           <View className="items-center">
             <Text className="text-label8 text-OldSilver">following</Text>
             <Text className="text-label8 text-OldSilver">
@@ -226,7 +215,10 @@ export default function ProfileScreen() {
       <View className="flex flex-row items-center justify-around mt-4">
         <TouchableOpacity onPress={() => setMode("reviews")}>
           <View className="flex items-center relative">
-            <CopyPlus size={30}  color={mode === "reviews" ? activeColor : inactiveColor} />
+            <CopyPlus
+              size={30}
+              color={mode === "reviews" ? activeColor : inactiveColor}
+            />
             {mode === "reviews" && (
               <View className="absolute bottom-[-16px] w-full border-b-2 border-Bittersweet" />
             )}
@@ -235,7 +227,10 @@ export default function ProfileScreen() {
 
         <TouchableOpacity onPress={() => setMode("threads")}>
           <View className="flex items-center relative">
-            <MessageCircleQuestion size={30}   color={mode === "threads" ? activeColor : inactiveColor} />
+            <MessageCircleQuestion
+              size={30}
+              color={mode === "threads" ? activeColor : inactiveColor}
+            />
             {mode === "threads" && (
               <View className="absolute bottom-[-16px] w-full border-b-2 border-Bittersweet" />
             )}
@@ -244,7 +239,10 @@ export default function ProfileScreen() {
 
         <TouchableOpacity onPress={() => setMode("bookmark")}>
           <View className="flex items-center relative">
-            <Bookmark size={30}   color={mode === "bookmark" ? activeColor : inactiveColor} />
+            <Bookmark
+              size={30}
+              color={mode === "bookmark" ? activeColor : inactiveColor}
+            />
             {mode === "bookmark" && (
               <View className="absolute bottom-[-16px] w-full border-b-2 border-Bittersweet" />
             )}
@@ -254,114 +252,83 @@ export default function ProfileScreen() {
     </View>
   );
 
+  const getData = () => {
+    if (mode === "reviews") return reviews ?? [];
+    if (mode === "threads") return threads ?? [];
+    return bookmarks ?? [];
+  };
+
   return (
     <SafeAreaProvider>
       <Stack.Screen
         options={{
           headerShown: true,
-          header: () => <CustomHeader />,
+          header: () => null,
         }}
       />
-      <SafeAreaView className="flex-1 bg-Snow p-4 ">
-        <View className="ml-1 mt-2">
-          {isLoading ? (
-            <LoadingIndicator />
-          ) : (
-            <>
-              {mode === "reviews" &&
-                (reviews && reviews.length > 0 ? (
-                  <FlatList
-                    data={reviews}
-                    keyExtractor={(item) => item.id.toString()}
-                    numColumns={3}
-                    refreshing={refreshing}
-                    onRefresh={handleRefresh}
-                    columnWrapperStyle={{ marginBottom: 12 }}
-                    renderItem={({ item }) => (
-                      <PostByUser
-                        image={item.image}
-                        title={item.title}
-                        user={item.user.full_name}
-                        userAvatar={item.user.image}
-                        isFavorited={item.favorite}
-                        onFavorite={() => handleFavorite(item.id, "review")}
-                        onPress={() => router.push(`/review/${item.id}`)}
-                      />
-                    )}
+      <SafeAreaView className="flex-1 bg-Snow p-4">
+        {isLoading ? (
+          <LoadingIndicator />
+        ) : (
+          <FlatList
+            data={getData()}
+            keyExtractor={(item) => item.id.toString()}
+            numColumns={3}
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            ListHeaderComponent={<CustomHeader />}
+            columnWrapperStyle={{ marginBottom: 12 }}
+            renderItem={({ item }) => {
+              if (mode === "reviews") {
+                return (
+                  <PostByUser
+                    image={item.image}
+                    title={item.title}
+                    user={item.user.full_name}
+                    userAvatar={item.user.image}
+                    isFavorited={item.favorite}
+                    onFavorite={() => handleFavorite(item.id, "review")}
+                    onPress={() => router.push(`/review/${item.id}`)}
                   />
-                ) : (
-                  <View className="items-center mt-10">
-                    <Text className="text-label8 text-OldSilver">
-                      No reviews available.
-                    </Text>
-                  </View>
-                ))}
-
-              {mode === "threads" &&
-                (threads && threads.length > 0 ? (
-                  <FlatList
-                    data={threads}
-                    keyExtractor={(item) => item.id.toString()}
-                    numColumns={3}
-                    refreshing={refreshing}
-                    onRefresh={handleRefresh}
-                    renderItem={({ item }) => (
-                      <PostByUser
-                        image={item.images[0]?.image}
-                        title={item.title}
-                        user={item.user.full_name}
-                        userAvatar={item.user.image}
-                        isFavorited={item.favorite}
-                        onFavorite={() => handleFavorite(item.id, "thread")}
-                        onPress={() => router.push(`/thread/${item.id}`)}
-                      />
-                    )}
+                );
+              } else if (mode === "threads") {
+                return (
+                  <PostByUser
+                    image={item.images?.[0]?.image}
+                    title={item.title}
+                    user={item.user.full_name}
+                    userAvatar={item.user.image}
+                    isFavorited={item.favorite}
+                    onFavorite={() => handleFavorite(item.id, "thread")}
+                    onPress={() => router.push(`/thread/${item.id}`)}
                   />
-                ) : (
-                  <View className="items-center mt-10">
-                    <Text className="text-label8 text-OldSilver">
-                      No threads available.
-                    </Text>
-                  </View>
-                ))}
-
-              {mode === "bookmark" &&
-                (bookmarks && bookmarks.length > 0 ? (
-                  <FlatList
-                    data={bookmarks}
-                    keyExtractor={(item) => item.id.toString()}
-                    numColumns={3}
-                    refreshing={refreshing}
-                    onRefresh={handleRefresh}
-                    renderItem={({ item }) => {
-                      const isThread = item.type === 1;
-                      const contentId = item.community_id;
-                      const type = isThread ? "thread" : "review";
-
-                      return (
-                        <PostByUser
-                          image={item.image}
-                          title={item.title}
-                          user={item.user?.full_name}
-                          userAvatar={item.user?.image}
-                          isFavorited={item.favorite}
-                          onFavorite={() => handleFavorite(contentId, type)}
-                          onPress={() => router.push(`/${type}/${contentId}`)}
-                        />
-                      );
-                    }}
+                );
+              } else {
+                const isThread = item.type === 1;
+                const contentId = item.community_id;
+                const type = isThread ? "thread" : "review";
+                return (
+                  <PostByUser
+                    image={item.image}
+                    title={item.title}
+                    user={item.user?.full_name}
+                    userAvatar={item.user?.image}
+                    isFavorited={item.favorite}
+                    onFavorite={() => handleFavorite(contentId, type)}
+                    onPress={() => router.push(`/${type}/${contentId}`)}
                   />
-                ) : (
-                  <View className="items-center mt-10">
-                    <Text className="text-label8 text-OldSilver">
-                      No bookmarks available.
-                    </Text>
-                  </View>
-                ))}
-            </>
-          )}
-        </View>
-
+                );
+              }
+            }}
+            ListEmptyComponent={() => (
+              <View className="items-center mt-10">
+                <Text className="text-label8 text-OldSilver">
+                  No content available.
+                </Text>
+              </View>
+            )}
+          />
+        )}
         <ConfirmAlert
           visible={alertVisible}
           title={alertMessage}
