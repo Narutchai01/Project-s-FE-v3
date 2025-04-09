@@ -32,21 +32,26 @@ export default function SignUP() {
     });
   };
 
-  const onRegister = () => {
+  const onRegister = async () => {
     if (!signupData.password || !confirmPassword) {
       setAlertTitle("Please fill in all password fields");
       setAlertVisible(true);
       return;
     }
-
+  
     if (signupData.password !== confirmPassword) {
       setAlertTitle("Password not match");
       setAlertVisible(true);
       return;
     }
-
-    handleSignup();
+  
+    const success = await handleSignup();
+    if (!success) {
+      setAlertTitle("This email is already registered");
+      setAlertVisible(true);
+    }
   };
+  
 
 
   return (

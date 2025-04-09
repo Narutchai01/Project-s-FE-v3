@@ -56,11 +56,10 @@ export default function FaceScan() {
 
   const takePicture = async () => {
     try {
-      if (!cameraRef.current) {
-        console.error("Camera reference is not available");
+      if (cameraRef.current == null) {
+        console.error("Camera reference is null.");
         return;
       }
-
       const photo = await cameraRef.current.takePictureAsync();
 
       if (!photo || !photo?.uri) {

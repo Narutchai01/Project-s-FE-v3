@@ -17,7 +17,6 @@ import { ConfirmAlert } from "@/components/Alert";
 import { CustomHeader } from "@/components/CustomHeader";
 import { useFocusEffect } from "@react-navigation/native";
 
-
 export default function CommonScreen() {
   const [threads, setThreads] = useState<IThread[] | null>(null);
   const [reviews, setReviews] = useState<IReview[] | null>(null);
@@ -52,17 +51,16 @@ export default function CommonScreen() {
     setIsSearchOpen(open);
   }, []);
 
-    const handleError = (error: unknown) => {
-      const axiosError = error as AxiosError;
-    
-      if (!alertVisible) {
-        if (axiosError?.response?.status === 401) {
-          setAlertMessage("Unauthorized. Please log in again.");
-          setAlertVisible(true);
-        }
+  const handleError = (error: unknown) => {
+    const axiosError = error as AxiosError;
+
+    if (!alertVisible) {
+      if (axiosError?.response?.status === 401) {
+        setAlertMessage("Unauthorized. Please log in again.");
+        setAlertVisible(true);
       }
-    };
-  
+    }
+  };
 
   const fetchThread = useCallback(async () => {
     startLoading();

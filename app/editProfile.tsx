@@ -44,17 +44,18 @@ export default function EditProfileScreen() {
   const [showAlert, setShowAlert] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
+  const [emailInUseAlertVisible, setEmailInUseAlertVisible] = useState(false);
 
-    const handleError = (error: unknown) => {
-      const axiosError = error as AxiosError;
-    
-      if (!alertVisible) {
-        if (axiosError?.response?.status === 401) {
-          setAlertMessage("Unauthorized. Please log in again.");
-          setAlertVisible(true);
-        }
-      }
-    };
+  const handleError = (error: unknown) => {
+    const axiosError = error as AxiosError;
+
+    if (axiosError?.response?.status === 401) {
+      setAlertMessage("Unauthorized. Please log in again.");
+      setAlertVisible(true);
+    } else if (axiosError?.response?.status === 500) {
+      setEmailInUseAlertVisible(true);
+    }
+  };
 
   const fetchUserProfile = useCallback(async () => {
     startLoading();
@@ -101,7 +102,7 @@ export default function EditProfileScreen() {
       copyToCacheDirectory: true,
       multiple: false,
     });
-  
+
     if (!result.canceled && result.assets[0].uri) {
       setImage([result.assets[0].uri]);
     }
@@ -122,16 +123,17 @@ export default function EditProfileScreen() {
           dayjs(user.birthday).format("YYYY-MM-DDTHH:mm:ss.SSS[Z]")
         );
       }
-      
-      if (image && typeof image[0] === "string") {
-        const file = {
+      formData.append("email", user.email);
+
+      if (image && typeof image[0] === "string" && !image[0].includes("http")) {
+        formData.append("file", {
           uri: image[0],
           name: "image.jpg",
           type: "image/jpeg",
-        };
-        formData.append("file", file as unknown as Blob);
+        } as any);
       }
 
+      console.log("FormData:", formData);
       await axiosInstance.put("/user", formData, {
         headers: {
           token,
@@ -142,7 +144,6 @@ export default function EditProfileScreen() {
       setShowAlert(true);
     } catch (error: any) {
       handleError(error);
-      console.error("Update profile error:", error);
     } finally {
       stopLoading();
     }
@@ -161,7 +162,7 @@ export default function EditProfileScreen() {
         </View>
 
         <View className="px-4">
-          <TouchableOpacity  onPress={pickImage} className="items-center mb-6">
+          <TouchableOpacity onPress={pickImage} className="items-center mb-6">
             <View className="relative">
               <Image
                 source={
@@ -172,10 +173,7 @@ export default function EditProfileScreen() {
                 className="w-28 h-28 rounded-full bg-gray-300"
               />
 
-              <View
-               
-                className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-gray-200 items-center justify-center"
-              >
+              <View className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-gray-200 items-center justify-center">
                 <PencilLine size={16} color="#000" />
               </View>
             </View>
@@ -264,6 +262,13 @@ export default function EditProfileScreen() {
             setAlertVisible(false);
             router.replace("/login");
           }}
+        />
+
+        <ConfirmAlert
+          visible={emailInUseAlertVisible}
+          title="This email is already in use."
+          confirm="OK"
+          onClose={() => setEmailInUseAlertVisible(false)}
         />
       </ScrollView>
     </SafeAreaView>
