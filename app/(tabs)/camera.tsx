@@ -55,10 +55,11 @@ export default function FaceScan() {
   }, []);
 
   const takePicture = async () => {
-    if (!cameraRef.current || !isCameraReady) return;
-
-    startLoading();
     try {
+      if (cameraRef.current == null) {
+        console.error("Camera reference is null.");
+        return;
+      }
       const photo = await cameraRef.current.takePictureAsync();
 
       if (!photo || !photo.uri) {
@@ -78,6 +79,7 @@ export default function FaceScan() {
 
       formData.append("file", photoFile);
 
+      startLoading();
       const token = await AsyncStorage.getItem("token");
       const response = await axiosInstance.post("/results", formData, {
         headers: {
