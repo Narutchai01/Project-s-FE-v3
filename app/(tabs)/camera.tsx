@@ -81,11 +81,15 @@ export default function FaceScan() {
 
       startLoading();
       const token = await AsyncStorage.getItem("token");
+      // Send request with no timeout
+      const controller = new AbortController();
       const response = await axiosInstance.post("/results", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           token: token,
         },
+        signal: controller.signal,
+        // Removed timeout option to allow unlimited time
       });
 
       // console.log("Upload response:", response.data);
