@@ -1,0 +1,221 @@
+import { Heart, MessageCircle, Bookmark } from "lucide-react-native";
+import { Text, TouchableOpacity, View } from "react-native";
+import { ImagePagination } from "./paginate";
+import { FC, useEffect, useState } from "react";
+import { Image } from "expo-image";
+import { ThreeDotMenu } from "@/components/ThreeDotMenu";
+import { ButtonComponents } from "./Buntton";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { axiosInstance } from "@/lib/axios_instance";
+import useLoading from "@/hook/useLoading";
+import { router } from "expo-router";
+import { AxiosError } from "axios";
+import { ConfirmAlert } from "./Alert";
+
+interface IActivityBar {
+  favorite: boolean | undefined;
+  favoriteCount: number | undefined;
+  commnetCount: number;
+  dataPaginate?: any[];
+  currImage: number;
+  bookmark: boolean | undefined;
+  hadleFavorite: () => void;
+  handleBookmark: () => void;
+  isOpenComment: () => void;
+}
+
+export const ActivityBar: FC<IActivityBar> = (props) => {
+  const {
+    favorite,
+    favoriteCount,
+    commnetCount,
+    dataPaginate = [],
+    currImage,
+    bookmark,
+    hadleFavorite,
+    handleBookmark,
+    isOpenComment,
+  } = props;
+
+  return (
+    <View style={{ paddingHorizontal: 18, marginTop: 1 }}>
+      {dataPaginate.length > 1 && (
+        <View style={{ alignItems: "center", marginBottom: 1 }}>
+          <ImagePagination data={dataPaginate} currImage={currImage} />
+        </View>
+      )}
+
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <View style={{ flexDirection: "row", gap: 16, marginLeft: -8 }}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+            <TouchableOpacity onPress={hadleFavorite}>
+              <Heart
+                size={24}
+                color={favorite ? "#FF6F61" : "#4A4A4A"}
+                fill={favorite ? "#FF6F61" : "none"}
+              />
+            </TouchableOpacity>
+            <Text style={{ fontSize: 16 }}>{favoriteCount ?? 0}</Text>
+          </View>
+
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+            <TouchableOpacity onPress={isOpenComment}>
+              <MessageCircle size={24} color="#4A4A4A" />
+            </TouchableOpacity>
+            <Text style={{ fontSize: 16 }}>{commnetCount}</Text>
+          </View>
+        </View>
+
+        <TouchableOpacity onPress={handleBookmark} style={{ marginRight: -10 }}>
+          <Bookmark
+            size={24}
+            color={bookmark ? "#FFD700" : "#4A4A4A"}
+            fill={bookmark ? "#FFD700" : "none"}
+          />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+};
+
+interface UserBarProps {
+  userImage?: string;
+  username?: string;
+  userId?: number;
+  currentUserId: number | null;
+  isFollowed?: boolean;
+  onFollowStatusChange?: (isFollowing: boolean) => void;
+  threadId?: number;
+  reviewId?: number;
+}
+
+export const UserBar: FC<UserBarProps> = (props) => {
+  const { isLoading, startLoading, stopLoading } = useLoading();
+  const {
+    userImage,
+    username,
+    currentUserId,
+    userId,
+    onFollowStatusChange,
+    threadId,
+    reviewId,
+  } = props;
+  const [isFollowing, setIsFollowing] = useState<boolean>(
+    props.isFollowed || false
+  );
+  const isOwner =
+    currentUserId != null && userId != null && currentUserId === userId;
+
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const userDefaultImage = require("@/assets/images/userDefault.jpg");
+
+  const handleError = (error: unknown) => {
+    const axiosError = error as AxiosError;
+
+    if (!alertVisible) {
+      if (axiosError?.response?.status === 401) {
+        setAlertMessage("Unauthorized. Please log in again.");
+        setAlertVisible(true);
+      }
+    }
+  };
+
+  useEffect(() => {
+    setIsFollowing(props.isFollowed || false);
+  }, [props.isFollowed]);
+
+  const handleFollow = async () => {
+    if (!userId) {
+      console.log("userId missing");
+      return;
+    }
+
+    try {
+      startLoading();
+
+      const token = await AsyncStorage.getItem("token");
+      const res = await axiosInstance.post(`/user/follower/${userId}`, null, {
+        headers: { token },
+      });
+
+      const newFollowStatus = res.data?.followed ?? !isFollowing;
+
+      setIsFollowing(newFollowStatus);
+      if (onFollowStatusChange) {
+        onFollowStatusChange(newFollowStatus);
+      }
+    } catch (error: any) {
+      handleError(error);
+      console.log(
+        "Follow toggle error:",
+        error.response?.data || error.message
+      );
+    } finally {
+      stopLoading();
+    }
+  };
+
+  return (
+    <>
+      <View className="flex flex-row justify-between items-center px-3 py-2 mt-2">
+        <TouchableOpacity
+          className="flex flex-row items-center gap-x-2"
+          onPress={() => {
+            if (!isOwner && typeof userId === "number") {
+              router.push(`/profile/${userId}`);
+            }
+          }}
+        >
+          <Image
+            source={userImage ? { uri: userImage } : userDefaultImage}
+            style={{
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+            }}
+          />
+          <Text numberOfLines={1} ellipsizeMode="tail" style={{ width: 195 }}>
+            {username}
+          </Text>
+        </TouchableOpacity>
+
+        <View>
+          {isOwner ? (
+            <ThreeDotMenu threadId={threadId} reviewId={reviewId} />
+          ) : (
+            <TouchableOpacity
+              onPress={handleFollow}
+              disabled={isFollowing || isLoading}
+            >
+              <ButtonComponents
+                onPress={handleFollow}
+                title={isFollowing ? "following" : "follow"}
+                className={`px-3 py-1 rounded-full ${
+                  isFollowing ? "bg-Bittersweet" : "bg-Bittersweet"
+                }`}
+                textSize="text-l font-semibold text-white"
+              />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+
+      <ConfirmAlert
+        visible={alertVisible}
+        title={alertMessage}
+        confirm="Back to login"
+        onClose={() => {
+          setAlertVisible(false);
+          router.replace("/login");
+        }}
+      />
+    </>
+  );
+};

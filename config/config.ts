@@ -1,4 +1,3 @@
-import { API_URL } from "@env";
+// eslint-disable-next-line import/no-unresolved, @typescript-eslint/no-unused-vars
 
-export const api_url = String(API_URL);
-
+export const api_url = "https://ucare.narutchai.com/api";
